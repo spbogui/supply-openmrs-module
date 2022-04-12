@@ -1,0 +1,7 @@
+.idea
+.vscode
+
+*.iml
+/api/target
+/omod/target
+/omod/src/main/node_modules

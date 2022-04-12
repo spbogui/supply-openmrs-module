@@ -1,0 +1,2 @@
+concept_id, name, date_created, concept_name_type, creator, locale, locale_preferred, voided, uuid
+163000, 'Goal', '2020-11-27 00:00:00', 'FULLY_SPECIFIED', 1, 'fr', 1, 0, '163000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
