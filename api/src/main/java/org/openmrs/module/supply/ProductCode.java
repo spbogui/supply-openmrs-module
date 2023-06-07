@@ -31,11 +31,11 @@ public class ProductCode extends BaseOpenmrsData {
 	//    @JoinTable(name = "supply2_product_code_regime_members", joinColumns = @JoinColumn(name = "product_code_id"), inverseJoinColumns = @JoinColumn(name = "regime_id"))
 	//    private Set<ProductRegime> regimes = new HashSet<ProductRegime>();
 	//
-	//    @OneToMany(mappedBy = "productCode", fetch = FetchType.EAGER)
-	//    private Set<ProductPrice> prices = new HashSet<ProductPrice>();
+	//	@OneToMany(mappedBy = "productCode", fetch = FetchType.EAGER)
+	//	private Set<ProductPrice> prices = new HashSet<ProductPrice>();
 	
-	//    @Transient
-	//    private ProductPrice currentPrice;
+	@Transient
+	private ProductPrice currentPrice;
 	
 	private Integer quantityInStock;
 	
@@ -88,7 +88,7 @@ public class ProductCode extends BaseOpenmrsData {
 	//    public void setRegimes(Set<ProductRegime> regimes) {
 	//        this.regimes = regimes;
 	//    }
-	//
+	
 	//    public Set<ProductPrice> getPrices() {
 	//        return prices;
 	//    }
@@ -96,7 +96,7 @@ public class ProductCode extends BaseOpenmrsData {
 	//    public void setPrices(Set<ProductPrice> prices) {
 	//        this.prices = prices;
 	//    }
-	
+	//
 	//    public void setCurrentPrice(ProductPrice currentPrice) {
 	//        this.currentPrice = currentPrice;
 	//    }

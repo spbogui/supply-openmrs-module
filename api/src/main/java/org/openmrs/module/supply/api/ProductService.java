@@ -155,4 +155,22 @@ public interface ProductService extends OpenmrsService {
 	
 	@Transactional
 	Integer purgeUnusedAttributes();
+	
+	@Transactional(readOnly = true)
+	ProductCode getProductCode(String uuid);
+	
+	@Transactional(readOnly = true)
+	ProductCode getProductCodeByCode(String code);
+	
+	@Transactional
+	ProductCode saveProductCode(ProductCode productCode);
+	
+	@Transactional(readOnly = true)
+	List<ProductCode> getProductCodes(ProductProgram program, ProductRegime productRegime);
+	
+	@Transactional(readOnly = true)
+	List<ProductCode> getProductCodes(ProductProgram program, Boolean includeVoided);
+	
+	@Transactional(readOnly = true)
+	List<ProductCode> getProductCodes(Boolean includeVoided);
 }

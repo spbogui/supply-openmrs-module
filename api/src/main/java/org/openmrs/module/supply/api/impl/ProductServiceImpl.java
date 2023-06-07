@@ -82,7 +82,7 @@ public class ProductServiceImpl extends BaseOpenmrsService implements ProductSer
 	}
 	
 	/**
-	 ********** Unit
+	 * ********* Unit
 	 */
 	
 	@Override
@@ -238,6 +238,36 @@ public class ProductServiceImpl extends BaseOpenmrsService implements ProductSer
 	@Override
 	public Integer purgeUnusedAttributes() {
 		return dao.purgeUnusedAttributes();
+	}
+	
+	@Override
+	public ProductCode getProductCode(String uuid) {
+		return dao.getProductCode(uuid);
+	}
+	
+	@Override
+	public ProductCode getProductCodeByCode(String code) {
+		return dao.getProductCodeByCode(code);
+	}
+	
+	@Override
+	public ProductCode saveProductCode(ProductCode productCode) {
+		return dao.saveProductCode(productCode);
+	}
+	
+	@Override
+	public List<ProductCode> getProductCodes(ProductProgram program, ProductRegime productRegime) {
+		return dao.getProductCodes(program, productRegime);
+	}
+	
+	@Override
+	public List<ProductCode> getProductCodes(ProductProgram program, Boolean includeVoided) {
+		return dao.getProductCodes(program, includeVoided);
+	}
+	
+	@Override
+	public List<ProductCode> getProductCodes(Boolean includeVoided) {
+		return dao.getProductCodes(includeVoided);
 	}
 	
 	@Override

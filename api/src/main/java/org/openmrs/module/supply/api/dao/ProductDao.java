@@ -298,4 +298,28 @@ public class ProductDao {
         }
         return productList;
     }
+	
+	public ProductCode getProductCode(String uuid) {
+		return null;
+	}
+	
+	public ProductCode getProductCodeByCode(String code) {
+		return null;
+	}
+	
+	public ProductCode saveProductCode(ProductCode productCode) {
+		return null;
+	}
+	
+	public List<ProductCode> getProductCodes(ProductProgram program, ProductRegime productRegime) {
+		return null;
+	}
+	
+	public List<ProductCode> getProductCodes(ProductProgram program, Boolean includeVoided) {
+		return null;
+	}
+	
+	public List<ProductCode> getProductCodes(Boolean includeVoided) {
+		return null;
+	}
 }
