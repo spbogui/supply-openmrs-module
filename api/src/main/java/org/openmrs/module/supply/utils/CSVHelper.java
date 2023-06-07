@@ -45,14 +45,14 @@ public class CSVHelper {
                     product = productService().getProductByCode(csvRecord.get("#Code"));
                     if (product != null) {
                         List<ProductRegime> regimens = productService().getAllProductRegimes();
-                        for (ProductRegime regimen : regimens) {
-                            if (!product.getRegimes().contains(regimen)) {
-                                product.addRegime(regimen);
-                            }
-                        }
+//                        for (ProductRegime regimen : regimens) {
+//                            if (!product.getRegimes().contains(regimen)) {
+//                                product.addRegime(regimen);
+//                            }
+//                        }
                         products.add(product);
                     }
-                } else  {
+                } else {
                     ProductRegime regimen = productService().getProductRegimeByConceptName(csvRecord.get("#Regime"));
                     if (regimen == null) {
                         continue;
@@ -67,9 +67,9 @@ public class CSVHelper {
                         index = products.indexOf(product);
                     }
 
-                    if (!product.getRegimes().contains(regimen)) {
-                        product.addRegime(regimen);
-                    }
+//                    if (!product.getRegimes().contains(regimen)) {
+//                        product.addRegime(regimen);
+//                    }
                     if (index == -1) {
                         products.add(product);
                     } else {
@@ -95,31 +95,31 @@ public class CSVHelper {
             String message = "";
 
             int count = 0;
-            for (CSVRecord csvRecord : csvRecords) {
-                ProductProgram program = productService().getProductProgramByName(csvRecord.get("#Programme"));
-                Product product = containsCode(products, csvRecord.get("#Code"));
-                if (product != null) {
-                    products.remove(product);
-                    product.addProgram(program);
-                    products.add(product);
-                    message = "added program to existing in list : " + csvRecord.get("#Code");
-                } else {
-                    product = productService().getProductByCode(csvRecord.get("#Code"));
-                    if (product == null) {
-                        product = getNewProduct(csvRecord);
-                        product.addProgram(program);
-                        products.add(product);
-                        message = "added program to new in all : " + csvRecord.get("#Code");
-                    } else {
-                        if (!product.getPrograms().contains(program)) {
-                            product.addProgram(program);
-                            products.add(product);
-                            message = "added program to existing in db : " + csvRecord.get("#Code");
-                        }
-                    }
-                }
-                System.out.println("--------- Product [" + message + "]: " + ++count);
-            }
+//            for (CSVRecord csvRecord : csvRecords) {
+//                ProductProgram program = productService().getProductProgramByName(csvRecord.get("#Programme"));
+//                Product product = containsCode(products, csvRecord.get("#Code"));
+//                if (product != null) {
+//                    products.remove(product);
+//                    product.addProgram(program);
+//                    products.add(product);
+//                    message = "added program to existing in list : " + csvRecord.get("#Code");
+//                } else {
+//                    product = productService().getProductByCode(csvRecord.get("#Code"));
+//                    if (product == null) {
+//                        product = getNewProduct(csvRecord);
+//                        product.addProgram(program);
+//                        products.add(product);
+//                        message = "added program to new in all : " + csvRecord.get("#Code");
+//                    } else {
+//                        if (!product.getPrograms().contains(program)) {
+//                            product.addProgram(program);
+//                            products.add(product);
+//                            message = "added program to existing in db : " + csvRecord.get("#Code");
+//                        }
+//                    }
+//                }
+//                System.out.println("--------- Product [" + message + "]: " + ++count);
+//            }
 
             return products;
         } catch (IOException e) {
@@ -134,7 +134,7 @@ public class CSVHelper {
 		    csvRecord.get("#Code").length(), csvRecord.get("#Code"));
 		
 		Product product = new Product();
-		product.setCode(csvRecord.get("#Code"));
+		//		product.setCode(csvRecord.get("#Code"));
 		ProductName dispensationName = new ProductName(csvRecord.get("#Designation de dispensation"));
 		dispensationName.setUnit(productService().getProductUnitByName(csvRecord.get("#Unite de dispensation")));
 		dispensationName.setUuid(nameUuid + "D");
@@ -151,11 +151,11 @@ public class CSVHelper {
 	}
 	
 	private static Product containsCode(List<Product> products, String code) {
-		for (Product product : products) {
-			if (product.getCode().equals(code)) {
-				return product;
-			}
-		}
+		//		for (Product product : products) {
+		//			if (product.getCode().equals(code)) {
+		//				return product;
+		//			}
+		//		}
 		return null;
 	}
 	

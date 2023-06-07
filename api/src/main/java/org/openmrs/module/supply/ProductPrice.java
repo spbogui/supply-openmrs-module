@@ -6,7 +6,7 @@ import org.openmrs.Location;
 import javax.persistence.*;
 
 @Entity(name = "ProductPrice")
-@Table(name = "supply_product_price")
+@Table(name = "supply2_product_price")
 public class ProductPrice extends BaseOpenmrsData {
 	
 	@Id
@@ -14,13 +14,17 @@ public class ProductPrice extends BaseOpenmrsData {
 	@Column(name = "product_price_id", nullable = false)
 	private Integer productPriceId;
 	
-	@ManyToOne(cascade = CascadeType.ALL, optional = false)
-	@JoinColumn(name = "product_id", nullable = false)
-	private Product product;
+	//	@ManyToOne(cascade = CascadeType.ALL, optional = false)
+	//	@JoinColumn(name = "product_id", nullable = false)
+	//	private Product product;
+	//
+	//	@ManyToOne
+	//	@JoinColumn(name = "product_program_id", nullable = false)
+	//	private ProductProgram program;
 	
 	@ManyToOne
-	@JoinColumn(name = "product_program_id", nullable = false)
-	private ProductProgram program;
+	@JoinColumn(name = "product_code_id", nullable = false)
+	private ProductCode productCode;
 	
 	@Column(name = "sale_price", nullable = false)
 	private Double salePrice;
@@ -47,21 +51,29 @@ public class ProductPrice extends BaseOpenmrsData {
 		this.productPriceId = productPriceId;
 	}
 	
-	public Product getProduct() {
-		return product;
+	public ProductCode getProductCode() {
+		return productCode;
 	}
 	
-	public void setProduct(Product product) {
-		this.product = product;
+	public void setProductCode(ProductCode productCode) {
+		this.productCode = productCode;
 	}
 	
-	public ProductProgram getProgram() {
-		return program;
-	}
-	
-	public void setProgram(ProductProgram program) {
-		this.program = program;
-	}
+	//	public Product getProduct() {
+	//		return product;
+	//	}
+	//
+	//	public void setProduct(Product product) {
+	//		this.product = product;
+	//	}
+	//
+	//	public ProductProgram getProgram() {
+	//		return program;
+	//	}
+	//
+	//	public void setProgram(ProductProgram program) {
+	//		this.program = program;
+	//	}
 	
 	public Double getSalePrice() {
 		return salePrice;

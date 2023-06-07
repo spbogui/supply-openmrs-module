@@ -31,8 +31,8 @@ public class ProductCode extends BaseOpenmrsData {
 	//    @JoinTable(name = "supply2_product_code_regime_members", joinColumns = @JoinColumn(name = "product_code_id"), inverseJoinColumns = @JoinColumn(name = "regime_id"))
 	//    private Set<ProductRegime> regimes = new HashSet<ProductRegime>();
 	//
-	//	@OneToMany(mappedBy = "productCode", fetch = FetchType.EAGER)
-	//	private Set<ProductPrice> prices = new HashSet<ProductPrice>();
+	@OneToMany(mappedBy = "productCode", fetch = FetchType.EAGER)
+	private Set<ProductPrice> prices = new HashSet<ProductPrice>();
 	
 	@Transient
 	private ProductPrice currentPrice;
@@ -79,6 +79,22 @@ public class ProductCode extends BaseOpenmrsData {
 	
 	public void setProgram(ProductProgram program) {
 		this.program = program;
+	}
+	
+	public Set<ProductPrice> getPrices() {
+		return prices;
+	}
+	
+	public void setPrices(Set<ProductPrice> prices) {
+		this.prices = prices;
+	}
+	
+	public ProductPrice getCurrentPrice() {
+		return currentPrice;
+	}
+	
+	public void setCurrentPrice(ProductPrice currentPrice) {
+		this.currentPrice = currentPrice;
 	}
 	
 	//    public Set<ProductRegime> getRegimes() {

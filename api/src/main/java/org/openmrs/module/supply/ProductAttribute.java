@@ -10,7 +10,7 @@ import java.util.Set;
 
 @SuppressWarnings("JpaAttributeTypeInspection")
 @Entity(name = "ProductAttribute")
-@Table(name = "supply_product_attribute")
+@Table(name = "supply2_product_attribute")
 public class ProductAttribute extends BaseOpenmrsData {
 
     @Id
@@ -19,8 +19,8 @@ public class ProductAttribute extends BaseOpenmrsData {
     private Integer productAttributeId;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "product_code_id", nullable = false)
+    private ProductCode productCode;
 
     @Column(name = "batch_number", nullable = false)
     private String batchNumber;
@@ -47,12 +47,12 @@ public class ProductAttribute extends BaseOpenmrsData {
         this.productAttributeId = productAttributeFluxId;
     }
 
-    public Product getProduct() {
-        return product;
+    public ProductCode getProductCode() {
+        return productCode;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductCode(ProductCode productCode) {
+        this.productCode = productCode;
     }
 
     public String getBatchNumber() {

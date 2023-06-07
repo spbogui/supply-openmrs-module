@@ -23,27 +23,27 @@ public class Product extends BaseOpenmrsData {
     @Column(name = "product_id", nullable = false)
     private Integer productId;
 
-    @Column(name = "code", nullable = false, unique = true)
-    private String code;
+//    @Column(name = "code", nullable = false, unique = true)
+//    private String code;
 
     @Column(name = "conversion_unit", nullable = false)
     private Double conversionUnit;
 
-    @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "supply_product_program_members", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "program_id"))
-    private Set<ProductProgram> programs = new HashSet<ProductProgram>();
+//    @JsonIgnore
+//    @ManyToMany(cascade = CascadeType.ALL)
+//    @JoinTable(name = "supply_product_program_members", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "program_id"))
+//    private Set<ProductProgram> programs = new HashSet<ProductProgram>();
 
-    @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "supply_product_regime_members", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "regime_id"))
-    private Set<ProductRegime> regimes = new HashSet<ProductRegime>();
+//    @JsonIgnore
+//    @ManyToMany(cascade = CascadeType.ALL)
+//    @JoinTable(name = "supply_product_regime_members", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "regime_id"))
+//    private Set<ProductRegime> regimes = new HashSet<ProductRegime>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private Set<ProductName> names = new HashSet<ProductName>();
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
-    private Set<ProductPrice> prices = new HashSet<ProductPrice>();
+//    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+//    private Set<ProductPrice> prices = new HashSet<ProductPrice>();
 
     @Transient
     private ProductPrice currentPrice;
@@ -71,13 +71,13 @@ public class Product extends BaseOpenmrsData {
         this.productId = productId;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
+//    public String getCode() {
+//        return code;
+//    }
+//
+//    public void setCode(String code) {
+//        this.code = code;
+//    }
 
     public Double getConversionUnit() {
         return conversionUnit;
@@ -87,21 +87,21 @@ public class Product extends BaseOpenmrsData {
         this.conversionUnit = conversionUnit;
     }
 
-    public Set<ProductProgram> getPrograms() {
-        return programs;
-    }
+//    public Set<ProductProgram> getPrograms() {
+//        return programs;
+//    }
+//
+//    public void setPrograms(Set<ProductProgram> programs) {
+//        this.programs = programs;
+//    }
 
-    public void setPrograms(Set<ProductProgram> programs) {
-        this.programs = programs;
-    }
-
-    public Set<ProductRegime> getRegimes() {
-        return regimes;
-    }
-
-    public void setRegimes(Set<ProductRegime> regimes) {
-        this.regimes = regimes;
-    }
+//    public Set<ProductRegime> getRegimes() {
+//        return regimes;
+//    }
+//
+//    public void setRegimes(Set<ProductRegime> regimes) {
+//        this.regimes = regimes;
+//    }
 
     public Set<ProductName> getNames() {
         return names;
@@ -111,13 +111,13 @@ public class Product extends BaseOpenmrsData {
         this.names = names;
     }
 
-    public Set<ProductPrice> getPrices() {
-        return prices;
-    }
-
-    public void setPrices(Set<ProductPrice> prices) {
-        this.prices = prices;
-    }
+//    public Set<ProductPrice> getPrices() {
+//        return prices;
+//    }
+//
+//    public void setPrices(Set<ProductPrice> prices) {
+//        this.prices = prices;
+//    }
 
     public void addDispensationName(ProductName name) {
         if (names == null) {
@@ -137,31 +137,31 @@ public class Product extends BaseOpenmrsData {
         names.add(name);
     }
 
-    public void addProgram(ProductProgram productProgram) {
-        getPrograms().add(productProgram);
-    }
+//    public void addProgram(ProductProgram productProgram) {
+//        getPrograms().add(productProgram);
+//    }
+//
+//    public void removeProgram(ProductProgram productProgram) {
+//        getPrograms().remove(productProgram);
+//    }
 
-    public void removeProgram(ProductProgram productProgram) {
-        getPrograms().remove(productProgram);
-    }
+//    public void addRegime(ProductRegime regime) {
+//        getRegimes().add(regime);
+//    }
+//
+//    public void removeRegimen(ProductRegime regime) {
+//        getRegimes().remove(regime);
+//    }
 
-    public void addRegime(ProductRegime regime) {
-        getRegimes().add(regime);
-    }
-
-    public void removeRegimen(ProductRegime regime) {
-        getRegimes().remove(regime);
-    }
-
-    public ProductPrice getCurrentPrice() {
-        for (ProductPrice price : prices) {
-            if (price.getActive()) {
-                currentPrice = price;
-                break;
-            }
-        }
-        return currentPrice;
-    }
+//    public ProductPrice getCurrentPrice() {
+//        for (ProductPrice price : prices) {
+//            if (price.getActive()) {
+//                currentPrice = price;
+//                break;
+//            }
+//        }
+//        return currentPrice;
+//    }
 
     public String getDispensationName() {
         for (ProductName name : names) {
@@ -194,13 +194,13 @@ public class Product extends BaseOpenmrsData {
         names.add(name);
     }
 
-    public void addPrice(ProductPrice price) {
-        if (prices == null) {
-            prices = new HashSet<>();
-        }
-        price.setProduct(this);
-        prices.add(price);
-    }
+//    public void addPrice(ProductPrice price) {
+//        if (prices == null) {
+//            prices = new HashSet<>();
+//        }
+//        price.setProduct(this);
+//        prices.add(price);
+//    }
 
     public List<ProductQuantity> getStockAll() {
         List<ProductProgram> programs = SupplyUtils.getUserLocationPrograms();

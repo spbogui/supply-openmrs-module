@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @SuppressWarnings("ALL")
 @Entity(name = "ProductAttributeStock")
-@Table(name = "supply_product_attribute_stock")
+@Table(name = "supply2_product_attribute_stock")
 public class ProductAttributeStock extends BaseOpenmrsData {
 	
 	@Id
@@ -23,9 +23,9 @@ public class ProductAttributeStock extends BaseOpenmrsData {
 	@JoinColumn(name = "operation_id")
 	private ProductOperation operation;
 	
-	@ManyToOne
-	@JoinColumn(name = "program_id")
-	private ProductProgram program;
+	//    @ManyToOne
+	//    @JoinColumn(name = "program_id")
+	//    private ProductProgram program;
 	
 	@Column(name = "quantity_in_stock", nullable = false)
 	private Integer quantityInStock;
@@ -78,17 +78,17 @@ public class ProductAttributeStock extends BaseOpenmrsData {
 	}
 	
 	public String getProductInStock() {
-		return attribute.getProduct().getPackagingName() + " - " + attribute.getProduct().getCode() + " ["
-		        + attribute.getBatchNumber() + "]";
+		return attribute.getProductCode().getProduct().getPackagingName() + " - " + attribute.getProductCode().getCode()
+		        + " [" + attribute.getBatchNumber() + "]";
 	}
 	
-	public ProductProgram getProgram() {
-		return program;
-	}
-	
-	public void setProgram(ProductProgram program) {
-		this.program = program;
-	}
+	//    public ProductProgram getProgram() {
+	//        return program;
+	//    }
+	//
+	//    public void setProgram(ProductProgram program) {
+	//        this.program = program;
+	//    }
 	
 	@Override
 	public Integer getId() {

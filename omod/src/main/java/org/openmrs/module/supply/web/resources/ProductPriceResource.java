@@ -9,6 +9,7 @@ import io.swagger.models.properties.StringProperty;
 import org.openmrs.api.context.Context;
 
 import org.openmrs.module.supply.Product;
+import org.openmrs.module.supply.ProductCode;
 import org.openmrs.module.supply.ProductPrice;
 import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.module.webservices.rest.web.RequestContext;
@@ -27,9 +28,9 @@ import org.openmrs.module.webservices.rest.web.response.ResponseException;
 import java.util.ArrayList;
 import java.util.List;
 
-@SubResource(parent = ProductResource.class, path = "price", supportedClass = ProductPrice.class, supportedOpenmrsVersions = {
+@SubResource(parent = ProductCodeResource.class, path = "price", supportedClass = ProductPrice.class, supportedOpenmrsVersions = {
         "1.8.*", "1.9.*", "1.11.*", "1.12.*", "2.*" })
-public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Product, ProductResource> {
+public class ProductPriceResource extends DelegatingSubResource<ProductPrice, ProductCode, ProductCodeResource> {
 	
 	ProductService getService() {
 		return Context.getService(ProductService.class);
@@ -66,7 +67,7 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 		if (representation instanceof FullRepresentation) {
 			description = new DelegatingResourceDescription();
 			//			description.addProperty("product", Representation.DEFAULT);
-			description.addProperty("program", Representation.DEFAULT);
+			//            description.addProperty("program", Representation.DEFAULT);
 			description.addProperty("salePrice");
 			description.addProperty("purchasePrice");
 			description.addProperty("active");
@@ -75,7 +76,7 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 		} else if (representation instanceof DefaultRepresentation || representation instanceof RefRepresentation) {
 			description = new DelegatingResourceDescription();
 			//			description.addProperty("product", Representation.REF);
-			description.addProperty("program", Representation.REF);
+			//            description.addProperty("program", Representation.REF);
 			description.addProperty("salePrice");
 			description.addProperty("purchasePrice");
 			description.addProperty("active");
@@ -88,8 +89,9 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 	@Override
 	public Model getGETModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
-		model.property("program", new RefProperty("#/definitions/ProductProgramGet"))
-		        .property("salePrice", new DoubleProperty()).property("purchasePrice", new DoubleProperty())
+		model
+		//                .property("program", new RefProperty("#/definitions/ProductProgramGet"))
+		.property("salePrice", new DoubleProperty()).property("purchasePrice", new DoubleProperty())
 		        .property("active", new BooleanProperty())
 		        .property("location", new RefProperty("#/definitions/LocationGet")).property("uuid", new StringProperty());
 		
@@ -99,9 +101,9 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 	@Override
 	public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addRequiredProperty("name");
+		//        description.addRequiredProperty("name");
 		//		description.addRequiredProperty("product");
-		description.addRequiredProperty("productProgram");
+		//        description.addRequiredProperty("productProgram");
 		description.addRequiredProperty("salePrice");
 		description.addRequiredProperty("purchasePrice");
 		description.addRequiredProperty("location");
@@ -113,11 +115,12 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 	@Override
 	public Model getCREATEModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
-		model.property("program", new RefProperty("#/definitions/ProductProgramCreate"))
-		        .property("salePrice", new DoubleProperty()).property("purchasePrice", new DoubleProperty())
+		model
+		//                .property("program", new RefProperty("#/definitions/ProductProgramCreate"))
+		.property("salePrice", new DoubleProperty()).property("purchasePrice", new DoubleProperty())
 		        .property("active", new BooleanProperty())
 		        .property("location", new RefProperty("#/definitions/LocationGet")).property("uuid", new StringProperty());
-		model.required("program").required("salePrice").required("location");
+		model.required("salePrice").required("purchasePrice").required("location");
 		
 		return model;
 	}
@@ -125,9 +128,9 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 	@Override
 	public DelegatingResourceDescription getUpdatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addProperty("name");
+		//        description.addProperty("name");
 		//		description.addProperty("product");
-		description.addProperty("productProgram");
+		//        description.addProperty("productProgram");
 		description.addProperty("salePrice");
 		description.addProperty("purchasePrice");
 		description.addProperty("location");
@@ -138,25 +141,26 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 	@Override
 	public Model getUPDATEModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
-		model.property("program", new RefProperty("#/definitions/ProductProgramCreate"))
-		        .property("salePrice", new DoubleProperty()).property("purchasePrice", new DoubleProperty())
+		model
+		//                .property("program", new RefProperty("#/definitions/ProductProgramCreate"))
+		.property("salePrice", new DoubleProperty()).property("purchasePrice", new DoubleProperty())
 		        .property("active", new BooleanProperty())
 		        .property("location", new RefProperty("#/definitions/LocationGet")).property("uuid", new StringProperty());
 		return model;
 	}
 	
 	@Override
-	public Product getParent(ProductPrice productPrice) {
-		return productPrice.getProduct();
+	public ProductCode getParent(ProductPrice productPrice) {
+		return productPrice.getProductCode();
 	}
 	
 	@Override
-	public void setParent(ProductPrice productPrice, Product product) {
-		productPrice.setProduct(product);
+	public void setParent(ProductPrice productPrice, ProductCode product) {
+		productPrice.setProductCode(product);
 	}
 	
 	@Override
-	public PageableResult doGetAll(Product product, RequestContext requestContext) throws ResponseException {
+	public PageableResult doGetAll(ProductCode product, RequestContext requestContext) throws ResponseException {
 		List<ProductPrice> prices = new ArrayList<ProductPrice>(product.getPrices());
 		return new NeedsPaging<ProductPrice>(prices, requestContext);
 	}

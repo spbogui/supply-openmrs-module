@@ -72,65 +72,65 @@ public class ProductResource extends DataDelegatingCrudResource<Product> {
 		return null;
 	}
 	
-	@PropertyGetter("prices")
-	public static Set<ProductPrice> getPrices(Product product) {
-		return new LinkedHashSet<ProductPrice>(product.getPrices());
-	}
+	//	@PropertyGetter("prices")
+	//	public static Set<ProductPrice> getPrices(Product product) {
+	//		return new LinkedHashSet<ProductPrice>(product.getPrices());
+	//	}
+	//
+	//	@PropertySetter("prices")
+	//	public static void setPrices(Product product, List<ProductPrice> prices) throws ResourceDoesNotSupportOperationException {
+	//		if (product.getPrices() != null && product.getPrices().containsAll(prices)) {
+	//			return;
+	//		}
+	//		for (ProductPrice price : prices) {
+	//			ProductPrice existingPrice = product.getPrices() != null ? getMatchingPrice(price, product.getPrices()) : null;
+	//			if (existingPrice != null) {
+	//				copyPriceFields(existingPrice, price);
+	//			} else {
+	//				product.addPrice(price);
+	//			}
+	//		}
+	//	}
+	//
+	//	private static void copyPriceFields(ProductPrice existingPrice, ProductPrice price) {
+	//		existingPrice.setActive(price.getActive());
+	//		existingPrice.setPurchasePrice(price.getPurchasePrice());
+	//		existingPrice.setSalePrice(price.getSalePrice());
+	//	}
+	//
+	//	private static ProductPrice getMatchingPrice(ProductPrice price, Set<ProductPrice> prices) {
+	//		for (ProductPrice existingPrice : prices) {
+	//			String uuid = price.getUuid();
+	//			if (uuid != null && uuid.equals(existingPrice.getUuid())) {
+	//				return existingPrice;
+	//			}
+	//		}
+	//		return null;
+	//	}
 	
-	@PropertySetter("prices")
-	public static void setPrices(Product product, List<ProductPrice> prices) throws ResourceDoesNotSupportOperationException {
-		if (product.getPrices() != null && product.getPrices().containsAll(prices)) {
-			return;
-		}
-		for (ProductPrice price : prices) {
-			ProductPrice existingPrice = product.getPrices() != null ? getMatchingPrice(price, product.getPrices()) : null;
-			if (existingPrice != null) {
-				copyPriceFields(existingPrice, price);
-			} else {
-				product.addPrice(price);
-			}
-		}
-	}
+	//	@PropertyGetter("programs")
+	//	private static Set<ProductProgram> getPrograms(Product product) {
+	//		return new LinkedHashSet<ProductProgram>(product.getPrograms());
+	//	}
+	//
+	//	@PropertySetter("programs")
+	//	private static void setPrograms(Product instance, List<ProductProgram> programs) {
+	//		instance.getPrograms().clear();
+	//		for (ProductProgram program : programs)
+	//			instance.addProgram(program);
+	//	}
 	
-	private static void copyPriceFields(ProductPrice existingPrice, ProductPrice price) {
-		existingPrice.setActive(price.getActive());
-		existingPrice.setPurchasePrice(price.getPurchasePrice());
-		existingPrice.setSalePrice(price.getSalePrice());
-	}
-	
-	private static ProductPrice getMatchingPrice(ProductPrice price, Set<ProductPrice> prices) {
-		for (ProductPrice existingPrice : prices) {
-			String uuid = price.getUuid();
-			if (uuid != null && uuid.equals(existingPrice.getUuid())) {
-				return existingPrice;
-			}
-		}
-		return null;
-	}
-	
-	@PropertyGetter("programs")
-	private static Set<ProductProgram> getPrograms(Product product) {
-		return new LinkedHashSet<ProductProgram>(product.getPrograms());
-	}
-	
-	@PropertySetter("programs")
-	private static void setPrograms(Product instance, List<ProductProgram> programs) {
-		instance.getPrograms().clear();
-		for (ProductProgram program : programs)
-			instance.addProgram(program);
-	}
-	
-	@PropertyGetter("regimes")
-	private static Set<ProductRegime> getRegimes(Product product) {
-		return new LinkedHashSet<ProductRegime>(product.getRegimes());
-	}
-	
-	@PropertySetter("regimes")
-	private static void setRegimes(Product instance, List<ProductRegime> regimes) {
-		instance.getRegimes().clear();
-		for (ProductRegime regime : regimes)
-			instance.addRegime(regime);
-	}
+	//	@PropertyGetter("regimes")
+	//	private static Set<ProductRegime> getRegimes(Product product) {
+	//		return new LinkedHashSet<ProductRegime>(product.getRegimes());
+	//	}
+	//
+	//	@PropertySetter("regimes")
+	//	private static void setRegimes(Product instance, List<ProductRegime> regimes) {
+	//		instance.getRegimes().clear();
+	//		for (ProductRegime regime : regimes)
+	//			instance.addRegime(regime);
+	//	}
 	
 	ProductService getService() {
 		return Context.getService(ProductService.class);
@@ -316,14 +316,15 @@ public class ProductResource extends DataDelegatingCrudResource<Product> {
 						} else {
 							String regime = filter.split(":")[1];
 							ProductRegime productRegime = getService().getProductRegimeByConceptName(regime);
-							if (productRegime != null) {
-								products.addAll(productRegime.getProducts());
-							}
+							//							if (productRegime != null) {
+							//								products.addAll(productRegime.getProductCodes());
+							//							}
 						}
 					}
-				} else {
-					products.addAll(program.getProducts());
 				}
+				//				else {
+				//					products.addAll(program.getProducts());
+				//				}
 			}
 		}
 		return new NeedsPaging<Product>(products, context);

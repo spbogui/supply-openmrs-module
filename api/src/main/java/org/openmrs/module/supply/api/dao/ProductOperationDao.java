@@ -59,7 +59,7 @@ public class ProductOperationDao {
 					attributeStock.setAttribute(fluxAttribute.getAttribute());
 					attributeStock.setLocation(fluxAttribute.getLocation());
 					attributeStock.setQuantityInStock(getQuantity(operation, fluxAttribute));
-					attributeStock.setProgram(operation.getProductProgram());
+					//					attributeStock.setProgram(operation.getProductProgram());
 					saveProductAttributeStock(attributeStock);
 				}
 				
@@ -378,10 +378,10 @@ public class ProductOperationDao {
         List<ProductOperationFlux> fluxes = new ArrayList<>();
         for (ProductAttributeStock stock : stocks) {
             if (!fluxContainsAttribute(operation, stock.getAttribute())) {
-                ProductOperationFlux flux = createFlux(operation, 0., stock.getAttribute().getProduct());
+                ProductOperationFlux flux = createFlux(operation, 0., stock.getAttribute().getProductCode().getProduct());
                 flux.setRelatedQuantity(stock.getQuantityInStock().doubleValue());
                 flux.setRelatedQuantityLabel("Quantité Théortique");
-                flux.setProduct(stock.getAttribute().getProduct());
+                flux.setProduct(stock.getAttribute().getProductCode().getProduct());
 
                 ProductOperationFluxAttribute attribute = new ProductOperationFluxAttribute();
                 attribute.setAttribute(stock.getAttribute());
@@ -433,7 +433,7 @@ public class ProductOperationDao {
 			return productAttribute;
 		}
 		productAttribute = new ProductAttribute();
-		productAttribute.setProduct(attribute.getProduct());
+		productAttribute.setProductCode(attribute.getProductCode());
 		productAttribute.setBatchNumber(attribute.getBatchNumber());
 		productAttribute.setLocation(location);
 		productAttribute.setExpiryDate(attribute.getExpiryDate());
