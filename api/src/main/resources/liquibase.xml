@@ -166,14 +166,14 @@ s
     <!--                                 referencedTableName="supply2_product" referencedColumnNames="product_id"/>-->
     <!--    </changeSet>-->
 
-    <changeSet id="supply2-create-product-program-coded" author="BOGUI SERGE">
+    <changeSet id="supply2-create-product-code" author="BOGUI SERGE">
         <preConditions>
             <not>
-                <tableExists tableName="supply2_product_program_coded"/>
+                <tableExists tableName="supply2_product_code"/>
             </not>
         </preConditions>
-        <createTable tableName="supply2_product_program_coded">
-            <column name="product_program_coded_id" type="integer" autoIncrement="true">
+        <createTable tableName="supply2_product_code">
+            <column name="product_code_id" type="integer" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
             <column name="product_id" type="integer">
@@ -205,21 +205,21 @@ s
             </column>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="supply2_product_program_product"
-                                 baseTableName="supply2_product_program_coded" baseColumnNames="product_id"
+        <addForeignKeyConstraint constraintName="supply2_product_code_product"
+                                 baseTableName="supply2_product_code" baseColumnNames="product_id"
                                  referencedTableName="supply2_product" referencedColumnNames="product_id"/>
-        <addForeignKeyConstraint constraintName="supply2_product_program_product_program"
-                                 baseTableName="supply2_product_program_coded" baseColumnNames="program_id"
+        <addForeignKeyConstraint constraintName="supply2_product_code_product_program"
+                                 baseTableName="supply2_product_code" baseColumnNames="program_id"
                                  referencedTableName="supply2_product_program"
                                  referencedColumnNames="product_program_id"/>
-        <addForeignKeyConstraint constraintName="supply2_product_program_coded_creator"
-                                 baseTableName="supply2_product_program_coded" baseColumnNames="creator"
+        <addForeignKeyConstraint constraintName="supply2_product_code_creator"
+                                 baseTableName="supply2_product_code" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply2_product_program_coded_changed_by"
-                                 baseTableName="supply2_product_program_coded" baseColumnNames="changed_by"
+        <addForeignKeyConstraint constraintName="supply2_product_code_changed_by"
+                                 baseTableName="supply2_product_code" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply2_product_program_coded_voided_by"
-                                 baseTableName="supply2_product_program_coded" baseColumnNames="voided_by"
+        <addForeignKeyConstraint constraintName="supply2_product_code_voided_by"
+                                 baseTableName="supply2_product_code" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
     </changeSet>
 
@@ -233,15 +233,9 @@ s
             <column name="product_price_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <!--            <column name="product_id" type="int">-->
-            <!--                <constraints nullable="false"/>-->
-            <!--            </column>-->
-            <column name="product_program_coded_id" type="int">
+            <column name="product_code_id" type="int">
                 <constraints nullable="false"/>
             </column>
-            <!--            <column name="product_program_id" type="int">-->
-            <!--                <constraints nullable="false"/>-->
-            <!--            </column>-->
             <column name="purchase_price" type="double">
                 <constraints nullable="false"/>
             </column>
@@ -280,14 +274,10 @@ s
         <addForeignKeyConstraint constraintName="supply2_product_price_voided_by"
                                  baseTableName="supply2_product_price" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <!--        <addForeignKeyConstraint baseTableName="supply2_product_price" baseColumnNames="product_program_id"-->
-        <!--                                 referencedTableName="supply2_product_program"-->
-        <!--                                 referencedColumnNames="product_program_id"-->
-        <!--                                 constraintName="supply2_product_price_program"/>-->
-        <addForeignKeyConstraint baseTableName="supply2_product_price" baseColumnNames="product_program_coded_id"
-                                 referencedTableName="supply2_product_program_coded"
-                                 referencedColumnNames="product_program_coded_id"
-                                 constraintName="supply2_product_program_coded_price_product"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_price" baseColumnNames="product_code_id"
+                                 referencedTableName="supply2_product_code"
+                                 referencedColumnNames="product_code_id"
+                                 constraintName="supply2_price_product_product_code"/>
         <addForeignKeyConstraint baseTableName="supply2_product_price" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"
                                  constraintName="supply2_product_price_location"/>
@@ -314,35 +304,35 @@ s
                                  baseTableName="supply2_product_regime" baseColumnNames="concept_id"
                                  referencedTableName="concept" referencedColumnNames="concept_id"/>
     </changeSet>
-    <changeSet id="supply2-product-program-coded-regime-members" author="BOGUI SERGE">
+    <changeSet id="supply2-product-code-regime-members" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply2_product_program_coded_regime_members"/>
+                <tableExists tableName="supply2_product_code_regime_members"/>
             </not>
         </preConditions>
-        <createTable tableName="supply2_product_program_coded_regime_members">
+        <createTable tableName="supply2_product_code_regime_members">
             <column name="regime_id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <!--            <column name="product_id" type="int">-->
             <!--                <constraints nullable="false" primaryKey="true"/>-->
             <!--            </column>-->
-            <column name="product_program_coded_id" type="int">
+            <column name="product_code_id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="supply2_product_program_coded_regime_members_regime"
-                                 baseTableName="supply2_product_program_coded_regime_members"
+        <addForeignKeyConstraint constraintName="supply2_product_code_regime_members_regime"
+                                 baseTableName="supply2_product_code_regime_members"
                                  baseColumnNames="regime_id"
                                  referencedTableName="supply2_product_regime"
                                  referencedColumnNames="product_regime_id"/>
 
-        <addForeignKeyConstraint constraintName="supply2_product_program_coded_regime_program_coded"
-                                 baseTableName="supply2_product_program_coded_regime_members"
-                                 baseColumnNames="product_program_coded_id"
-                                 referencedTableName="supply2_product_program_coded"
-                                 referencedColumnNames="product_program_coded_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_code_regime_product_code"
+                                 baseTableName="supply2_product_code_regime_members"
+                                 baseColumnNames="product_code_id"
+                                 referencedTableName="supply2_product_code"
+                                 referencedColumnNames="product_code_id"/>
     </changeSet>
     <changeSet id="supply2-product-attribute-create" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
@@ -354,11 +344,7 @@ s
             <column name="product_attribute_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-
-            <!--            <column name="product_id" type="int">-->
-            <!--                <constraints nullable="false"/>-->
-            <!--            </column>-->
-            <column name="product_program_coded_id" type="int">
+            <column name="product_code_id" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="batch_number" type="varchar(200)">
@@ -398,13 +384,9 @@ s
         <addForeignKeyConstraint constraintName="supply2_product_attribute_voided_by"
                                  baseTableName="supply2_product_attribute" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <!--        <addForeignKeyConstraint baseTableName="supply2_product_attribute" baseColumnNames="product_id"-->
-        <!--                                 referencedTableName="supply2_product"-->
-        <!--                                 referencedColumnNames="product_id"-->
-        <!--                                 constraintName="supply2_product_attribute_product"/>-->
-        <addForeignKeyConstraint baseTableName="supply2_product_attribute" baseColumnNames="product_program_coded_id"
-                                 referencedTableName="supply2_product_program_coded"
-                                 referencedColumnNames="product_program_coded_id"
+        <addForeignKeyConstraint baseTableName="supply2_product_attribute" baseColumnNames="product_code_id"
+                                 referencedTableName="supply2_product_code"
+                                 referencedColumnNames="product_code_id"
                                  constraintName="supply2_product_attribute_product_program_coded"/>
         <addForeignKeyConstraint baseTableName="supply2_product_attribute" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"
@@ -685,11 +667,8 @@ s
             <column name="product_operation_flux_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <!--            <column name="product_id" type="int">-->
-            <!--                <constraints nullable="false"/>-->
-            <!--            </column>-->
 
-            <column name="product_program_coded_id" type="int">
+            <column name="product_code_id" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="operation_id" type="int">
@@ -698,6 +677,9 @@ s
             <column name="quantity" type="int">
                 <constraints nullable="false"/>
             </column>
+            <column name="related_quantity" type="double"/>
+            <column name="related_quantity_label" type="varchar(200)"/>
+
             <column name="observation" type="varchar(255)"/>
             <column name="location_id" type="int">
                 <constraints nullable="false"/>
@@ -715,9 +697,9 @@ s
                                  referencedTableName="location" referencedColumnNames="location_id"/>
         <addForeignKeyConstraint constraintName="supply2_product_attribute_other_flux_product_coded"
                                  baseTableName="supply2_product_operation_flux"
-                                 baseColumnNames="product_program_coded_id"
-                                 referencedTableName="supply2_product_program_coded"
-                                 referencedColumnNames="product_program_coded_id"/>
+                                 baseColumnNames="product_code_id"
+                                 referencedTableName="supply2_product_code"
+                                 referencedColumnNames="product_code_id"/>
     </changeSet>
 
     <changeSet id="supply2-product-operation-flux-attribute-create" author="BOGUI SERGE">
@@ -865,29 +847,29 @@ s
 
     </changeSet>
 
-    <changeSet id="supply2-product-attribute-stock-add-program" author="BOGUI SERGE">
-        <preConditions>
-            <not>
-                <columnExists tableName="supply2_product_attribute_stock" columnName="program_id"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="supply2_product_attribute_stock">
-            <column name="program_id" type="int">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
-        <addForeignKeyConstraint baseTableName="supply2_product_attribute_stock" baseColumnNames="program_id"
-                                 constraintName="supply2_product_attribute_stock_program"
-                                 referencedTableName="supply2_product_program"
-                                 referencedColumnNames="product_program_id"/>
-    </changeSet>
+    <!--    <changeSet id="supply2-product-attribute-stock-add-program" author="BOGUI SERGE">-->
+    <!--        <preConditions>-->
+    <!--            <not>-->
+    <!--                <columnExists tableName="supply2_product_attribute_stock" columnName="program_id"/>-->
+    <!--            </not>-->
+    <!--        </preConditions>-->
+    <!--        <addColumn tableName="supply2_product_attribute_stock">-->
+    <!--            <column name="program_id" type="int">-->
+    <!--                <constraints nullable="false"/>-->
+    <!--            </column>-->
+    <!--        </addColumn>-->
+    <!--        <addForeignKeyConstraint baseTableName="supply2_product_attribute_stock" baseColumnNames="program_id"-->
+    <!--                                 constraintName="supply2_product_attribute_stock_program"-->
+    <!--                                 referencedTableName="supply2_product_program"-->
+    <!--                                 referencedColumnNames="product_program_id"/>-->
+    <!--    </changeSet>-->
 
-    <changeSet id="supply2-product-operation-flux-add-related-info" author="BOGUI SERGE">
-        <addColumn tableName="supply2_product_operation_flux">
-            <column name="related_quantity" type="double"/>
-            <column name="related_quantity_label" type="varchar(100)"/>
-        </addColumn>
-    </changeSet>
+    <!--    <changeSet id="supply2-product-operation-flux-add-related-info" author="BOGUI SERGE">-->
+    <!--        <addColumn tableName="supply2_product_operation_flux">-->
+    <!--            <column name="related_quantity" type="double"/>-->
+    <!--            <column name="related_quantity_label" type="varchar(100)"/>-->
+    <!--        </addColumn>-->
+    <!--    </changeSet>-->
 
     <changeSet id="supply2-product-operation-type-insert-all" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
