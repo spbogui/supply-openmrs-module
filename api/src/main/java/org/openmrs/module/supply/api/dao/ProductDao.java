@@ -34,7 +34,7 @@ public class ProductDao {
 	}
 	
 	public Product getProduct(String uuid) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Product.class);
+		Criteria criteria = getSession().createCriteria(Product.class);
 		return (Product) criteria.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 	
@@ -48,7 +48,7 @@ public class ProductDao {
 	}
 	
 	public Product getProductByCode(String code) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Product.class);
+		Criteria criteria = getSession().createCriteria(Product.class);
 		return (Product) criteria.add(Restrictions.eq("code", code)).uniqueResult();
 	}
 	
@@ -79,7 +79,7 @@ public class ProductDao {
 	}
 	
 	public ProductPrice getProductPrice(String uuid) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductPrice.class);
+		Criteria criteria = getSession().createCriteria(ProductPrice.class);
 		return (ProductPrice) criteria.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 	
@@ -103,7 +103,7 @@ public class ProductDao {
 	}
 	
 	public ProductUnit getProductUnit(String uuid) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductUnit.class);
+		Criteria criteria = getSession().createCriteria(ProductUnit.class);
 		return (ProductUnit) criteria.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 	
@@ -113,7 +113,7 @@ public class ProductDao {
 	}
 	
 	public ProductUnit getProductUnitByName(String unitName) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductUnit.class);
+		Criteria criteria = getSession().createCriteria(ProductUnit.class);
 		return (ProductUnit) criteria.add(Restrictions.eq("name", unitName)).uniqueResult();
 	}
 	
@@ -127,7 +127,7 @@ public class ProductDao {
 	}
 	
 	public ProductName getProductName(String uuid) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductName.class);
+		Criteria criteria = getSession().createCriteria(ProductName.class);
 		return (ProductName) criteria.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 	
@@ -145,12 +145,12 @@ public class ProductDao {
 	}
 	
 	public ProductProgram getProductProgram(String uuid) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductProgram.class);
+		Criteria criteria = getSession().createCriteria(ProductProgram.class);
 		return (ProductProgram) criteria.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 	
 	public ProductProgram getProductProgramByName(String name) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductProgram.class);
+		Criteria criteria = getSession().createCriteria(ProductProgram.class);
 		return (ProductProgram) criteria.add(Restrictions.eq("name", name)).uniqueResult();
 	}
 	
@@ -174,25 +174,25 @@ public class ProductDao {
 	}
 	
 	public ProductRegime getProductRegime(String uuid) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductRegime.class);
+		Criteria criteria = getSession().createCriteria(ProductRegime.class);
 		return (ProductRegime) criteria.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 	
 	public ProductRegime getProductRegimeByConceptName(String name) {
 		Concept concept = Context.getConceptService().getConceptByName(name);
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductRegime.class);
+		Criteria criteria = getSession().createCriteria(ProductRegime.class);
 		return (ProductRegime) criteria.add(Restrictions.eq("concept", concept)).uniqueResult();
 	}
 	
 	public ProductRegime getProductRegimeByConcept(Integer conceptId) {
 		Concept concept = Context.getConceptService().getConcept(conceptId);
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductRegime.class);
+		Criteria criteria = getSession().createCriteria(ProductRegime.class);
 		return (ProductRegime) criteria.add(Restrictions.eq("concept", concept)).uniqueResult();
 	}
 	
 	public ProductRegime getProductRegimeByConcept(String conceptUuid) {
 		Concept concept = Context.getConceptService().getConcept(conceptUuid);
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ProductRegime.class);
+		Criteria criteria = getSession().createCriteria(ProductRegime.class);
 		return (ProductRegime) criteria.add(Restrictions.eq("concept", concept)).uniqueResult();
 	}
 	
@@ -286,7 +286,7 @@ public class ProductDao {
                         "GROUP BY pp.product_id " +
                         "HAVING countRegimen = (SELECT COUNT(*) FROM supply_product_regime) OR countRegimen = 0) _";
 
-        Query query = sessionFactory.getCurrentSession().createSQLQuery(sqlQuery);
+        Query query = getSession().createSQLQuery(sqlQuery);
         List<Integer> productIds = query.list();
 
         List<Product> productList = new ArrayList<>();

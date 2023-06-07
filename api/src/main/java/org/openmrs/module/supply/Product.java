@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity(name = "Product")
-@Table(name = "supply_product")
+@Table(name = "supply2_product")
 public class Product extends BaseOpenmrsData {
 
     @Id

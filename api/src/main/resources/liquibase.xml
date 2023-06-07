@@ -24,19 +24,19 @@ s
         for a list of supported elements and attributes
     -->
 
-    <changeSet id="supply-product-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-create" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product"/>
+                <tableExists tableName="supply2_product"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product">
+        <createTable tableName="supply2_product">
             <column name="product_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="code" type="varchar(10)">
-                <constraints unique="true" nullable="false"/>
-            </column>
+            <!--            <column name="code" type="varchar(10)">-->
+            <!--                <constraints unique="true" nullable="false"/>-->
+            <!--            </column>-->
             <column name="conversion_unit" type="double">
                 <constraints nullable="false"/>
             </column>
@@ -59,24 +59,24 @@ s
             </column>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="supply_product_creator"
-                                 baseTableName="supply_product" baseColumnNames="creator"
+        <addForeignKeyConstraint constraintName="supply2_product_creator"
+                                 baseTableName="supply2_product" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_changed_by"
-                                 baseTableName="supply_product" baseColumnNames="changed_by"
+        <addForeignKeyConstraint constraintName="supply2_product_changed_by"
+                                 baseTableName="supply2_product" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_voided_by"
-                                 baseTableName="supply_product" baseColumnNames="voided_by"
+        <addForeignKeyConstraint constraintName="supply2_product_voided_by"
+                                 baseTableName="supply2_product" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
     </changeSet>
 
-    <changeSet id="supply-product-unit-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-unit-create" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_unit"/>
+                <tableExists tableName="supply2_product_unit"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_unit">
+        <createTable tableName="supply2_product_unit">
             <column name="product_unit_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
@@ -90,13 +90,13 @@ s
         </createTable>
     </changeSet>
 
-    <changeSet id="supply-product-name-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-name-create" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_name"/>
+                <tableExists tableName="supply2_product_name"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_name">
+        <createTable tableName="supply2_product_name">
             <column name="product_name_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
@@ -115,20 +115,20 @@ s
             </column>
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="supply_product_name" baseColumnNames="product_id"
-                                 referencedTableName="supply_product" referencedColumnNames="product_id"
-                                 constraintName="supply_product_name_product"/>
-        <addForeignKeyConstraint baseTableName="supply_product_name" baseColumnNames="product_unit"
-                                 referencedTableName="supply_product_unit" referencedColumnNames="product_unit_id"
-                                 constraintName="supply_product_name_product_unit"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_name" baseColumnNames="product_id"
+                                 referencedTableName="supply2_product" referencedColumnNames="product_id"
+                                 constraintName="supply2_product_name_product"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_name" baseColumnNames="product_unit"
+                                 referencedTableName="supply2_product_unit" referencedColumnNames="product_unit_id"
+                                 constraintName="supply2_product_name_product_unit"/>
     </changeSet>
-    <changeSet id="supply-product-program-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-program-create" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_program"/>
+                <tableExists tableName="supply2_product_program"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_program">
+        <createTable tableName="supply2_product_program">
             <column name="product_program_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
@@ -141,47 +141,107 @@ s
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="supply-product-program-members" author="BOGUI SERGE">
-        <preConditions onError="WARN" onFail="MARK_RAN">
+    <!--    <changeSet id="supply2-product-program-members" author="BOGUI SERGE">-->
+    <!--        <preConditions onError="WARN" onFail="MARK_RAN">-->
+    <!--            <not>-->
+    <!--                <tableExists tableName="supply2_product_program_members"/>-->
+    <!--            </not>-->
+    <!--        </preConditions>-->
+    <!--        <createTable tableName="supply2_product_program_members">-->
+    <!--            <column name="program_id" type="int">-->
+    <!--                <constraints nullable="false" primaryKey="true"/>-->
+    <!--            </column>-->
+    <!--            <column name="product_id" type="int">-->
+    <!--                <constraints nullable="false" primaryKey="true"/>-->
+    <!--            </column>-->
+    <!--        </createTable>-->
+
+    <!--        <addForeignKeyConstraint constraintName="supply2_product_product_program_members_program"-->
+    <!--                                 baseTableName="supply2_product_program_members" baseColumnNames="program_id"-->
+    <!--                                 referencedTableName="supply2_product_program"-->
+    <!--                                 referencedColumnNames="product_program_id"/>-->
+
+    <!--        <addForeignKeyConstraint constraintName="supply2_product_product_program_members_product"-->
+    <!--                                 baseTableName="supply2_product_program_members" baseColumnNames="product_id"-->
+    <!--                                 referencedTableName="supply2_product" referencedColumnNames="product_id"/>-->
+    <!--    </changeSet>-->
+
+    <changeSet id="supply2-create-product-program-coded" author="BOGUI SERGE">
+        <preConditions>
             <not>
-                <tableExists tableName="supply_product_program_members"/>
+                <tableExists tableName="supply2_product_program_coded"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_program_members">
-            <column name="program_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
+        <createTable tableName="supply2_product_program_coded">
+            <column name="product_program_coded_id" type="integer" autoIncrement="true">
+                <constraints primaryKey="true"/>
             </column>
-            <column name="product_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
+            <column name="product_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="program_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="varchar(10)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="creator" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by" type="int"/>
+            <column name="date_changed" type="datetime"/>
+            <column name="voided" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int"/>
+            <column name="date_voided" type="datetime"/>
+            <column name="void_reason" type="varchar(255)" defaultValue="null"/>
+            <column name="uuid" type="varchar(38)">
+                <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="supply_product_product_program_members_program"
-                                 baseTableName="supply_product_program_members" baseColumnNames="program_id"
-                                 referencedTableName="supply_product_program"
+        <addForeignKeyConstraint constraintName="supply2_product_program_product"
+                                 baseTableName="supply2_product_program_coded" baseColumnNames="product_id"
+                                 referencedTableName="supply2_product" referencedColumnNames="product_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_program_product_program"
+                                 baseTableName="supply2_product_program_coded" baseColumnNames="program_id"
+                                 referencedTableName="supply2_product_program"
                                  referencedColumnNames="product_program_id"/>
-
-        <addForeignKeyConstraint constraintName="supply_product_product_program_members_product"
-                                 baseTableName="supply_product_program_members" baseColumnNames="product_id"
-                                 referencedTableName="supply_product" referencedColumnNames="product_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_program_coded_creator"
+                                 baseTableName="supply2_product_program_coded" baseColumnNames="creator"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_program_coded_changed_by"
+                                 baseTableName="supply2_product_program_coded" baseColumnNames="changed_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_program_coded_voided_by"
+                                 baseTableName="supply2_product_program_coded" baseColumnNames="voided_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
     </changeSet>
 
-    <changeSet id="supply-product-price-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-price-create" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_price"/>
+                <tableExists tableName="supply2_product_price"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_price">
+        <createTable tableName="supply2_product_price">
             <column name="product_price_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="product_id" type="int">
+            <!--            <column name="product_id" type="int">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+            <column name="product_program_coded_id" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="product_program_id" type="int">
-                <constraints nullable="false"/>
-            </column>
+            <!--            <column name="product_program_id" type="int">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
             <column name="purchase_price" type="double">
                 <constraints nullable="false"/>
             </column>
@@ -211,35 +271,35 @@ s
             </column>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="supply_product_price_creator"
-                                 baseTableName="supply_product_price" baseColumnNames="creator"
+        <addForeignKeyConstraint constraintName="supply2_product_price_creator"
+                                 baseTableName="supply2_product_price" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_price_changed_by"
-                                 baseTableName="supply_product_price" baseColumnNames="changed_by"
+        <addForeignKeyConstraint constraintName="supply2_product_price_changed_by"
+                                 baseTableName="supply2_product_price" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_price_voided_by"
-                                 baseTableName="supply_product_price" baseColumnNames="voided_by"
+        <addForeignKeyConstraint constraintName="supply2_product_price_voided_by"
+                                 baseTableName="supply2_product_price" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint baseTableName="supply_product_price" baseColumnNames="product_program_id"
-                                 referencedTableName="supply_product_program"
-                                 referencedColumnNames="product_program_id"
-                                 constraintName="supply_product_price_program"/>
-        <addForeignKeyConstraint baseTableName="supply_product_price" baseColumnNames="product_id"
-                                 referencedTableName="supply_product"
-                                 referencedColumnNames="product_id"
-                                 constraintName="supply_product_price_product"/>
-        <addForeignKeyConstraint baseTableName="supply_product_price" baseColumnNames="location_id"
+        <!--        <addForeignKeyConstraint baseTableName="supply2_product_price" baseColumnNames="product_program_id"-->
+        <!--                                 referencedTableName="supply2_product_program"-->
+        <!--                                 referencedColumnNames="product_program_id"-->
+        <!--                                 constraintName="supply2_product_price_program"/>-->
+        <addForeignKeyConstraint baseTableName="supply2_product_price" baseColumnNames="product_program_coded_id"
+                                 referencedTableName="supply2_product_program_coded"
+                                 referencedColumnNames="product_program_coded_id"
+                                 constraintName="supply2_product_program_coded_price_product"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_price" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"
-                                 constraintName="supply_product_price_location"/>
+                                 constraintName="supply2_product_price_location"/>
     </changeSet>
 
-    <changeSet id="supply-product-regime" author="BOGUI SERGE">
+    <changeSet id="supply2-product-regime" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_regime"/>
+                <tableExists tableName="supply2_product_regime"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_regime">
+        <createTable tableName="supply2_product_regime">
             <column name="product_regime_id" type="int" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -250,46 +310,55 @@ s
                 <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint constraintName="supply_product_product_regime_concept"
-                                 baseTableName="supply_product_regime" baseColumnNames="concept_id"
+        <addForeignKeyConstraint constraintName="supply2_product_product_regime_concept"
+                                 baseTableName="supply2_product_regime" baseColumnNames="concept_id"
                                  referencedTableName="concept" referencedColumnNames="concept_id"/>
     </changeSet>
-    <changeSet id="supply-product-regime-members" author="BOGUI SERGE">
+    <changeSet id="supply2-product-program-coded-regime-members" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_regime_members"/>
+                <tableExists tableName="supply2_product_program_coded_regime_members"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_regime_members">
+        <createTable tableName="supply2_product_program_coded_regime_members">
             <column name="regime_id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="product_id" type="int">
+            <!--            <column name="product_id" type="int">-->
+            <!--                <constraints nullable="false" primaryKey="true"/>-->
+            <!--            </column>-->
+            <column name="product_program_coded_id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="supply_product_regime_members_regime"
-                                 baseTableName="supply_product_regime_members" baseColumnNames="regime_id"
-                                 referencedTableName="supply_product_regime"
+        <addForeignKeyConstraint constraintName="supply2_product_program_coded_regime_members_regime"
+                                 baseTableName="supply2_product_program_coded_regime_members"
+                                 baseColumnNames="regime_id"
+                                 referencedTableName="supply2_product_regime"
                                  referencedColumnNames="product_regime_id"/>
 
-        <addForeignKeyConstraint constraintName="supply_product_regime_members_product"
-                                 baseTableName="supply_product_regime_members" baseColumnNames="product_id"
-                                 referencedTableName="supply_product" referencedColumnNames="product_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_program_coded_regime_program_coded"
+                                 baseTableName="supply2_product_program_coded_regime_members"
+                                 baseColumnNames="product_program_coded_id"
+                                 referencedTableName="supply2_product_program_coded"
+                                 referencedColumnNames="product_program_coded_id"/>
     </changeSet>
-    <changeSet id="supply-product-attribute-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-attribute-create" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_attribute"/>
+                <tableExists tableName="supply2_product_attribute"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_attribute">
+        <createTable tableName="supply2_product_attribute">
             <column name="product_attribute_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
 
-            <column name="product_id" type="int">
+            <!--            <column name="product_id" type="int">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+            <column name="product_program_coded_id" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="batch_number" type="varchar(200)">
@@ -320,30 +389,34 @@ s
             </column>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="supply_product_attribute_creator"
-                                 baseTableName="supply_product_attribute" baseColumnNames="creator"
+        <addForeignKeyConstraint constraintName="supply2_product_attribute_creator"
+                                 baseTableName="supply2_product_attribute" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_attribute_changed_by"
-                                 baseTableName="supply_product_attribute" baseColumnNames="changed_by"
+        <addForeignKeyConstraint constraintName="supply2_product_attribute_changed_by"
+                                 baseTableName="supply2_product_attribute" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_attribute_voided_by"
-                                 baseTableName="supply_product_attribute" baseColumnNames="voided_by"
+        <addForeignKeyConstraint constraintName="supply2_product_attribute_voided_by"
+                                 baseTableName="supply2_product_attribute" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint baseTableName="supply_product_attribute" baseColumnNames="product_id"
-                                 referencedTableName="supply_product"
-                                 referencedColumnNames="product_id"
-                                 constraintName="supply_product_attribute_product"/>
-        <addForeignKeyConstraint baseTableName="supply_product_attribute" baseColumnNames="location_id"
+        <!--        <addForeignKeyConstraint baseTableName="supply2_product_attribute" baseColumnNames="product_id"-->
+        <!--                                 referencedTableName="supply2_product"-->
+        <!--                                 referencedColumnNames="product_id"-->
+        <!--                                 constraintName="supply2_product_attribute_product"/>-->
+        <addForeignKeyConstraint baseTableName="supply2_product_attribute" baseColumnNames="product_program_coded_id"
+                                 referencedTableName="supply2_product_program_coded"
+                                 referencedColumnNames="product_program_coded_id"
+                                 constraintName="supply2_product_attribute_product_program_coded"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_attribute" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"
-                                 constraintName="supply_product_attribute_location"/>
+                                 constraintName="supply2_product_attribute_location"/>
     </changeSet>
-    <changeSet id="supply-product-operation-attribute-type-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-operation-attribute-type-create" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_operation_attribute_type"/>
+                <tableExists tableName="supply2_product_operation_attribute_type"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_operation_attribute_type">
+        <createTable tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
@@ -362,13 +435,13 @@ s
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="supply-product-operation-type" author="BOGUI SERGE">
+    <changeSet id="supply2-product-operation-type" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_operation_type"/>
+                <tableExists tableName="supply2_product_operation_type"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_operation_type">
+        <createTable tableName="supply2_product_operation_type">
             <column name="product_operation_type_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
@@ -384,13 +457,13 @@ s
             </column>
         </createTable>
     </changeSet>
-    <changeSet id="supply-product-operation-type-attribute-type-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-operation-type-attribute-type-create" author="BOGUI SERGE">
         <preConditions onError="WARN" onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_operation_type_attribute_type"/>
+                <tableExists tableName="supply2_product_operation_type_attribute_type"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_operation_type_attribute_type">
+        <createTable tableName="supply2_product_operation_type_attribute_type">
             <column name="operation_type" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -399,25 +472,25 @@ s
             </column>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="supply_product_operation_type_attribute_type_operation_type"
-                                 baseTableName="supply_product_operation_type_attribute_type"
+        <addForeignKeyConstraint constraintName="supply2_product_operation_type_attribute_type_operation_type"
+                                 baseTableName="supply2_product_operation_type_attribute_type"
                                  baseColumnNames="operation_type"
-                                 referencedTableName="supply_product_operation_type"
+                                 referencedTableName="supply2_product_operation_type"
                                  referencedColumnNames="product_operation_type_id"/>
 
-        <addForeignKeyConstraint constraintName="supply_product_operation_type_attribute_type_attribute_type"
-                                 baseTableName="supply_product_operation_type_attribute_type"
+        <addForeignKeyConstraint constraintName="supply2_product_operation_type_attribute_type_attribute_type"
+                                 baseTableName="supply2_product_operation_type_attribute_type"
                                  baseColumnNames="attribute_type"
-                                 referencedTableName="supply_product_operation_attribute_type"
+                                 referencedTableName="supply2_product_operation_attribute_type"
                                  referencedColumnNames="product_operation_attribute_type_id"/>
     </changeSet>
-    <changeSet id="supply-product-operation-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-operation-create" author="BOGUI SERGE">
         <preConditions>
             <not>
-                <tableExists tableName="supply_product_operation"/>
+                <tableExists tableName="supply2_product_operation"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_operation">
+        <createTable tableName="supply2_product_operation">
             <column name="product_operation_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
@@ -464,38 +537,49 @@ s
                 <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="supply_product_operation" baseColumnNames="operation_type"
-                                 referencedTableName="supply_product_operation_type"
+        <addForeignKeyConstraint baseTableName="supply2_product_operation" baseColumnNames="operation_type"
+                                 referencedTableName="supply2_product_operation_type"
                                  referencedColumnNames="product_operation_type_id"
-                                 constraintName="supply_product_operation_operation_type"/>
-        <addForeignKeyConstraint baseTableName="supply_product_operation" baseColumnNames="linked_operation"
-                                 referencedTableName="supply_product_operation"
+                                 constraintName="supply2_product_operation_operation_type"/>
+
+        <addForeignKeyConstraint baseTableName="supply2_product_operation" baseColumnNames="linked_operation"
+                                 referencedTableName="supply2_product_operation"
                                  referencedColumnNames="product_operation_id"
-                                 constraintName="supply_product_operation_linked_operation"/>
-        <addForeignKeyConstraint baseTableName="supply_product_operation" baseColumnNames="location_id"
+                                 constraintName="supply2_product_operation_linked_operation"/>
+
+        <addForeignKeyConstraint baseTableName="supply2_product_operation" baseColumnNames="program_id"
+                                 referencedTableName="supply2_product_program"
+                                 referencedColumnNames="product_program_id"
+                                 constraintName="supply2_product_operation_product_program"/>
+
+        <addForeignKeyConstraint baseTableName="supply2_product_operation" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"
-                                 constraintName="supply_product_operation_location"/>
-        <addForeignKeyConstraint baseTableName="supply_product_operation" baseColumnNames="exchange_location"
+                                 constraintName="supply2_product_operation_location"/>
+
+        <addForeignKeyConstraint baseTableName="supply2_product_operation" baseColumnNames="exchange_location"
                                  referencedTableName="location" referencedColumnNames="location_id"
-                                 constraintName="supply_product_operation_exchange_location"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_creator"
-                                 baseTableName="supply_product_operation" baseColumnNames="creator"
+                                 constraintName="supply2_product_operation_exchange_location"/>
+
+        <addForeignKeyConstraint constraintName="supply2_product_operation_creator"
+                                 baseTableName="supply2_product_operation" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_changed_by"
-                                 baseTableName="supply_product_operation" baseColumnNames="changed_by"
+
+        <addForeignKeyConstraint constraintName="supply2_product_operation_changed_by"
+                                 baseTableName="supply2_product_operation" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_voided_by"
-                                 baseTableName="supply_product_operation" baseColumnNames="voided_by"
+
+        <addForeignKeyConstraint constraintName="supply2_product_operation_voided_by"
+                                 baseTableName="supply2_product_operation" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
     </changeSet>
 
-    <changeSet id="supply-product-dispensation" author="BOGUI SERGE">
+    <changeSet id="supply2-product-dispensation" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="supply_product_dispensation"/>
+                <tableExists tableName="supply2_product_dispensation"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_dispensation">
+        <createTable tableName="supply2_product_dispensation">
             <column name="product_operation_id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -510,29 +594,30 @@ s
             <column name="provider_id" type="int"/>
             <column name="goal" type="varchar(100)"/>
         </createTable>
-        <addForeignKeyConstraint constraintName="supply_product_dispensation_product_operation"
-                                 baseTableName="supply_product_dispensation" baseColumnNames="product_operation_id"
-                                 referencedTableName="supply_product_operation"
+
+        <addForeignKeyConstraint constraintName="supply2_product_dispensation_product_operation"
+                                 baseTableName="supply2_product_dispensation" baseColumnNames="product_operation_id"
+                                 referencedTableName="supply2_product_operation"
                                  referencedColumnNames="product_operation_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_dispensation_product_regime"
-                                 baseTableName="supply_product_dispensation" baseColumnNames="regime_id"
-                                 referencedTableName="supply_product_regime"
+        <addForeignKeyConstraint constraintName="supply2_product_dispensation_product_regime"
+                                 baseTableName="supply2_product_dispensation" baseColumnNames="regime_id"
+                                 referencedTableName="supply2_product_regime"
                                  referencedColumnNames="product_regime_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_dispensation_provider"
-                                 baseTableName="supply_product_dispensation" baseColumnNames="provider_id"
+        <addForeignKeyConstraint constraintName="supply2_product_dispensation_provider"
+                                 baseTableName="supply2_product_dispensation" baseColumnNames="provider_id"
                                  referencedTableName="provider" referencedColumnNames="provider_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_dispensation_encounter"
-                                 baseTableName="supply_product_dispensation" baseColumnNames="encounter_id"
+        <addForeignKeyConstraint constraintName="supply2_product_dispensation_encounter"
+                                 baseTableName="supply2_product_dispensation" baseColumnNames="encounter_id"
                                  referencedTableName="encounter" referencedColumnNames="encounter_id"/>
     </changeSet>
 
-    <changeSet id="supply-product-operation-attribute-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-operation-attribute-create" author="BOGUI SERGE">
         <preConditions>
             <not>
-                <tableExists tableName="supply_product_operation_attribute"/>
+                <tableExists tableName="supply2_product_operation_attribute"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_operation_attribute">
+        <createTable tableName="supply2_product_operation_attribute">
             <column name="product_operation_attribute_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
@@ -566,41 +651,45 @@ s
                 <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="supply_product_operation_attribute"
+        <addForeignKeyConstraint baseTableName="supply2_product_operation_attribute"
                                  baseColumnNames="operation_attribute_type"
-                                 referencedTableName="supply_product_operation_attribute_type"
+                                 referencedTableName="supply2_product_operation_attribute_type"
                                  referencedColumnNames="product_operation_attribute_type_id"
-                                 constraintName="supply_product_operation_attribute_attribute_type"/>
-        <addForeignKeyConstraint baseTableName="supply_product_operation_attribute"
+                                 constraintName="supply2_product_operation_attribute_attribute_type"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_operation_attribute"
                                  baseColumnNames="product_operation"
-                                 referencedTableName="supply_product_operation"
+                                 referencedTableName="supply2_product_operation"
                                  referencedColumnNames="product_operation_id"
-                                 constraintName="supply_product_operation_attribute_operation"/>
-        <addForeignKeyConstraint baseTableName="supply_product_operation_attribute" baseColumnNames="location_id"
+                                 constraintName="supply2_product_operation_attribute_operation"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_operation_attribute" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"
-                                 constraintName="supply_product_operation_attribute_location"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_attribute_creator"
-                                 baseTableName="supply_product_operation_attribute" baseColumnNames="creator"
+                                 constraintName="supply2_product_operation_attribute_location"/>
+        <addForeignKeyConstraint constraintName="supply2_product_operation_attribute_creator"
+                                 baseTableName="supply2_product_operation_attribute" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_attribute_changed_by"
-                                 baseTableName="supply_product_operation_attribute" baseColumnNames="changed_by"
+        <addForeignKeyConstraint constraintName="supply2_product_operation_attribute_changed_by"
+                                 baseTableName="supply2_product_operation_attribute" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_attribute_voided_by"
-                                 baseTableName="supply_product_operation_attribute" baseColumnNames="voided_by"
+        <addForeignKeyConstraint constraintName="supply2_product_operation_attribute_voided_by"
+                                 baseTableName="supply2_product_operation_attribute" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
     </changeSet>
 
-    <changeSet id="supply-product-operation-flux-create-1" author="BOGUI SERGE">
+    <changeSet id="supply2-product-operation-flux-create" author="BOGUI SERGE">
         <preConditions>
             <not>
-                <tableExists tableName="supply_product_operation_flux"/>
+                <tableExists tableName="supply2_product_operation_flux"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_operation_flux">
+        <createTable tableName="supply2_product_operation_flux">
             <column name="product_operation_flux_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="product_id" type="int">
+            <!--            <column name="product_id" type="int">-->
+            <!--                <constraints nullable="false"/>-->
+            <!--            </column>-->
+
+            <column name="product_program_coded_id" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="operation_id" type="int">
@@ -617,25 +706,27 @@ s
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint constraintName="supply_product_attribute_flux_product_operation"
-                                 baseTableName="supply_product_operation_flux" baseColumnNames="operation_id"
-                                 referencedTableName="supply_product_operation"
+        <addForeignKeyConstraint constraintName="supply2_product_attribute_flux_product_operation"
+                                 baseTableName="supply2_product_operation_flux" baseColumnNames="operation_id"
+                                 referencedTableName="supply2_product_operation"
                                  referencedColumnNames="product_operation_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_attribute_flux_location"
-                                 baseTableName="supply_product_operation_flux" baseColumnNames="location_id"
+        <addForeignKeyConstraint constraintName="supply2_product_attribute_flux_location"
+                                 baseTableName="supply2_product_operation_flux" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_attribute_other_flux_product"
-                                 baseTableName="supply_product_operation_flux" baseColumnNames="product_id"
-                                 referencedTableName="supply_product" referencedColumnNames="product_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_attribute_other_flux_product_coded"
+                                 baseTableName="supply2_product_operation_flux"
+                                 baseColumnNames="product_program_coded_id"
+                                 referencedTableName="supply2_product_program_coded"
+                                 referencedColumnNames="product_program_coded_id"/>
     </changeSet>
 
-    <changeSet id="supply-product-operation-flux-attribute-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-operation-flux-attribute-create" author="BOGUI SERGE">
         <preConditions>
             <not>
-                <tableExists tableName="supply_product_operation_flux_attribute"/>
+                <tableExists tableName="supply2_product_operation_flux_attribute"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_operation_flux_attribute">
+        <createTable tableName="supply2_product_operation_flux_attribute">
             <column name="product_operation_flux_attribute_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
@@ -655,67 +746,67 @@ s
                 <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint constraintName="supply_product_operation_flux_attribute_product_attribute"
-                                 baseTableName="supply_product_operation_flux_attribute"
+        <addForeignKeyConstraint constraintName="supply2_product_operation_flux_attribute_product_attribute"
+                                 baseTableName="supply2_product_operation_flux_attribute"
                                  baseColumnNames="product_attribute_id"
-                                 referencedTableName="supply_product_attribute"
+                                 referencedTableName="supply2_product_attribute"
                                  referencedColumnNames="product_attribute_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_flux_product_attribute"
-                                 baseTableName="supply_product_operation_flux_attribute"
+        <addForeignKeyConstraint constraintName="supply2_product_operation_flux_product_attribute"
+                                 baseTableName="supply2_product_operation_flux_attribute"
                                  baseColumnNames="operation_flux_id"
-                                 referencedTableName="supply_product_operation_flux"
+                                 referencedTableName="supply2_product_operation_flux"
                                  referencedColumnNames="product_operation_flux_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_flux_attribute_location"
-                                 baseTableName="supply_product_operation_flux_attribute" baseColumnNames="location_id"
+        <addForeignKeyConstraint constraintName="supply2_product_operation_flux_attribute_location"
+                                 baseTableName="supply2_product_operation_flux_attribute" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"/>
     </changeSet>
 
-    <changeSet id="supply-product-operation-other-flux" author="BOGUI SERGE">
-        <preConditions>
-            <not>
-                <tableExists tableName="supply_product_operation_other_flux"/>
-            </not>
-        </preConditions>
-        <createTable tableName="supply_product_operation_other_flux">
-            <column name="product_operation_other_flux_id" type="int" autoIncrement="true">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="product_id" type="int"/>
-            <column name="operation_id" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="label" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="quantity" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="location_id" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="uuid" type="varchar(38)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-        </createTable>
-        <addForeignKeyConstraint constraintName="supply_product_operation_other_flux_product_operation"
-                                 baseTableName="supply_product_operation_other_flux" baseColumnNames="operation_id"
-                                 referencedTableName="supply_product_operation"
-                                 referencedColumnNames="product_operation_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_other_flux_location"
-                                 baseTableName="supply_product_operation_other_flux" baseColumnNames="location_id"
-                                 referencedTableName="location" referencedColumnNames="location_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_operation_other_flux_product"
-                                 baseTableName="supply_product_operation_other_flux" baseColumnNames="product_id"
-                                 referencedTableName="supply_product" referencedColumnNames="product_id"/>
-    </changeSet>
+    <!--    <changeSet id="supply2-product-operation-other-flux" author="BOGUI SERGE">-->
+    <!--        <preConditions>-->
+    <!--            <not>-->
+    <!--                <tableExists tableName="supply2_product_operation_other_flux"/>-->
+    <!--            </not>-->
+    <!--        </preConditions>-->
+    <!--        <createTable tableName="supply2_product_operation_other_flux">-->
+    <!--            <column name="product_operation_other_flux_id" type="int" autoIncrement="true">-->
+    <!--                <constraints primaryKey="true"/>-->
+    <!--            </column>-->
+    <!--            <column name="product_id" type="int"/>-->
+    <!--            <column name="operation_id" type="int">-->
+    <!--                <constraints nullable="false"/>-->
+    <!--            </column>-->
+    <!--            <column name="label" type="int">-->
+    <!--                <constraints nullable="false"/>-->
+    <!--            </column>-->
+    <!--            <column name="quantity" type="int">-->
+    <!--                <constraints nullable="false"/>-->
+    <!--            </column>-->
+    <!--            <column name="location_id" type="int">-->
+    <!--                <constraints nullable="false"/>-->
+    <!--            </column>-->
+    <!--            <column name="uuid" type="varchar(38)">-->
+    <!--                <constraints nullable="false" unique="true"/>-->
+    <!--            </column>-->
+    <!--        </createTable>-->
+    <!--        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_product_operation"-->
+    <!--                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="operation_id"-->
+    <!--                                 referencedTableName="supply2_product_operation"-->
+    <!--                                 referencedColumnNames="product_operation_id"/>-->
+    <!--        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_location"-->
+    <!--                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="location_id"-->
+    <!--                                 referencedTableName="location" referencedColumnNames="location_id"/>-->
+    <!--        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_product"-->
+    <!--                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="product_id"-->
+    <!--                                 referencedTableName="supply2_product" referencedColumnNames="product_id"/>-->
+    <!--    </changeSet>-->
 
-    <changeSet id="supply-product-attribute-stock-create" author="BOGUI SERGE">
+    <changeSet id="supply2-product-attribute-stock-create" author="BOGUI SERGE">
         <preConditions>
             <not>
-                <tableExists tableName="supply_product_attribute_stock"/>
+                <tableExists tableName="supply2_product_attribute_stock"/>
             </not>
         </preConditions>
-        <createTable tableName="supply_product_attribute_stock">
+        <createTable tableName="supply2_product_attribute_stock">
             <column name="product_attribute_stock_id" type="int" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -751,96 +842,73 @@ s
             </column>
         </createTable>
 
-        <addForeignKeyConstraint constraintName="supply_product_attribute_stock_product_attribute"
-                                 baseTableName="supply_product_attribute_stock" baseColumnNames="product_attribute"
-                                 referencedTableName="supply_product_attribute"
+        <addForeignKeyConstraint constraintName="supply2_product_attribute_stock_product_attribute"
+                                 baseTableName="supply2_product_attribute_stock" baseColumnNames="product_attribute"
+                                 referencedTableName="supply2_product_attribute"
                                  referencedColumnNames="product_attribute_id"/>
-        <addForeignKeyConstraint constraintName="supply_product_attribute_stock_location"
-                                 baseTableName="supply_product_attribute_stock" baseColumnNames="location_id"
+        <addForeignKeyConstraint constraintName="supply2_product_attribute_stock_location"
+                                 baseTableName="supply2_product_attribute_stock" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"/>
-        <addForeignKeyConstraint baseTableName="supply_product_attribute_stock" baseColumnNames="operation_id"
-                                 referencedTableName="supply_product_operation"
+        <addForeignKeyConstraint baseTableName="supply2_product_attribute_stock" baseColumnNames="operation_id"
+                                 referencedTableName="supply2_product_operation"
                                  referencedColumnNames="product_operation_id"
-                                 constraintName="supply_product_attribute_stock_operation"/>
-        <addForeignKeyConstraint baseTableName="supply_product_attribute_stock" baseColumnNames="creator"
+                                 constraintName="supply2_product_attribute_stock_operation"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_attribute_stock" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"
-                                 constraintName="supply_product_attribute_stock_creator"/>
-        <addForeignKeyConstraint baseTableName="supply_product_attribute_stock" baseColumnNames="changed_by"
+                                 constraintName="supply2_product_attribute_stock_creator"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_attribute_stock" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"
-                                 constraintName="supply_product_attribute_stock_changed_by"/>
-        <addForeignKeyConstraint baseTableName="supply_product_attribute_stock" baseColumnNames="voided_by"
+                                 constraintName="supply2_product_attribute_stock_changed_by"/>
+        <addForeignKeyConstraint baseTableName="supply2_product_attribute_stock" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"
-                                 constraintName="supply_product_attribute_stock_voided_by"/>
+                                 constraintName="supply2_product_attribute_stock_voided_by"/>
 
     </changeSet>
 
-    <changeSet id="supply-product-attribute-stock-add-program" author="BOGUI SERGE">
+    <changeSet id="supply2-product-attribute-stock-add-program" author="BOGUI SERGE">
         <preConditions>
             <not>
-                <columnExists tableName="supply_product_attribute_stock" columnName="program_id"/>
+                <columnExists tableName="supply2_product_attribute_stock" columnName="program_id"/>
             </not>
         </preConditions>
-        <addColumn tableName="supply_product_attribute_stock">
+        <addColumn tableName="supply2_product_attribute_stock">
             <column name="program_id" type="int">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
-        <addForeignKeyConstraint baseTableName="supply_product_attribute_stock" baseColumnNames="program_id"
-                                 constraintName="supply_product_attribute_stock_program"
-                                 referencedTableName="supply_product_program"
+        <addForeignKeyConstraint baseTableName="supply2_product_attribute_stock" baseColumnNames="program_id"
+                                 constraintName="supply2_product_attribute_stock_program"
+                                 referencedTableName="supply2_product_program"
                                  referencedColumnNames="product_program_id"/>
     </changeSet>
 
-    <changeSet id="supply-product-operation-flux-add-related-info" author="BOGUI SERGE">
-        <addColumn tableName="supply_product_operation_flux">
+    <changeSet id="supply2-product-operation-flux-add-related-info" author="BOGUI SERGE">
+        <addColumn tableName="supply2_product_operation_flux">
             <column name="related_quantity" type="double"/>
             <column name="related_quantity_label" type="varchar(100)"/>
         </addColumn>
     </changeSet>
 
-
-    <!--  INSERT DATA-->
-
-    <!--    <changeSet id="supply-product-program-insert" author="BOGUI SERGE" runAlways="true">-->
-    <!--        <loadUpdateData tableName="supply_product_program" file="data/programs.csv"-->
-    <!--                        primaryKey="product_program_id">-->
-    <!--            <column name="product_program_id" type="NUMERIC"/>-->
-    <!--            <column name="name" type="STRING"/>-->
-    <!--            <column name="description" type="STRING"/>-->
-    <!--            <column name="uuid" type="STRING"/>-->
-    <!--        </loadUpdateData>-->
-    <!--    </changeSet>-->
-
-    <!--    <changeSet id="supply-product-unit-insert" author="BOGUI SERGE" runAlways="true">-->
-    <!--        <loadUpdateData tableName="supply_product_unit" file="data/units.csv"-->
-    <!--                        primaryKey="product_unit_id">-->
-    <!--            <column name="product_unit_id" type="NUMERIC"/>-->
-    <!--            <column name="name" type="STRING"/>-->
-    <!--            <column name="description" type="STRING"/>-->
-    <!--            <column name="uuid" type="STRING"/>-->
-    <!--        </loadUpdateData>-->
-    <!--    </changeSet>-->
-
-    <changeSet id="supply-product-operation-type-insert-all" author="BOGUI SERGE">
+    <changeSet id="supply2-product-operation-type-insert-all" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM supply_product_operation_type</sqlCheck>
+                                         FROM supply2_product_operation_type</sqlCheck>
         </preConditions>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">1</column>
             <column name="name">Inventaire de produit</column>
             <column name="default_incidence">2</column>
             <column name="description">Inventaire de produit</column>
             <column name="uuid">INVENTORYOOOOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">2</column>
             <column name="name">Réception de produit</column>
             <column name="default_incidence">1</column>
             <column name="description">Réception de produit</column>
             <column name="uuid">RECEPTIONOOOOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">3</column>
             <column name="name">Retour de Réception de produit</column>
             <column name="default_incidence">0</column>
@@ -849,105 +917,105 @@ s
             </column>
             <column name="uuid">RECEPTIONRETURNOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">4</column>
             <column name="name">Retour de produits au fournisseur</column>
             <column name="default_incidence">0</column>
             <column name="description">Retour de produits du fournisseur</column>
             <column name="uuid">PRODUCTRETURNOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">5</column>
             <column name="name">Transfert sortant de produit</column>
             <column name="default_incidence">0</column>
             <column name="description">Transfert de produits entre client directs de la NPSP Côte d'Ivoire</column>
             <column name="uuid">TRANSFEROUTOOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">6</column>
             <column name="name">Transfert entrant de produit</column>
             <column name="default_incidence">1</column>
             <column name="description">Transfert de produits entre client directs de la NPSP Côte d'Ivoire</column>
             <column name="uuid">TRANSFERINOOOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">7</column>
             <column name="name">Peremption de produits</column>
             <column name="default_incidence">0</column>
             <column name="description">Pertes et ajustements concernant les produits perimés</column>
             <column name="uuid">EXPIRYOUTOOOOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">8</column>
             <column name="name">Vols de produits</column>
             <column name="default_incidence">0</column>
             <column name="description">Pertes et ajustements concernant les vols de produits</column>
             <column name="uuid">THIEFOUTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">9</column>
             <column name="name">Produits endommagés</column>
             <column name="default_incidence">0</column>
             <column name="description">Pertes et ajustements concernant les produits endomagés</column>
             <column name="uuid">DESTROYEDOUTOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">10</column>
             <column name="name">Produits avariés</column>
             <column name="default_incidence">0</column>
             <column name="description">Pertes et ajustements concernant les produits avariés</column>
             <column name="uuid">SPOILEDOUTOOOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">11</column>
             <column name="name">Autres pertes de produits</column>
             <column name="default_incidence">0</column>
             <column name="description">Pertes et ajustements concernant les autres pertes</column>
             <column name="uuid">OTHEROUTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">12</column>
             <column name="name">Dons de produits des partenaires</column>
             <column name="default_incidence">0</column>
             <column name="description">Pertes et ajustements concernant les dons</column>
             <column name="uuid">DONATIONENTRYOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">13</column>
             <column name="name">Ajustement inventaire positif</column>
             <column name="default_incidence">2</column>
             <column name="description">Ajustement d'inventaire pour les écarts positifs d'inventaire</column>
             <column name="uuid">INVENTORYADJUSTPOSITIVEOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">14</column>
             <column name="name">Ajustement inventaire négatif</column>
             <column name="default_incidence">2</column>
             <column name="description">Ajustement d'inventaire pour les écarts négatifs d'inventaire</column>
             <column name="uuid">INVENTORYADJUSTNEGATIVEOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">15</column>
             <column name="name">Dispensation de produits</column>
             <column name="default_incidence">0</column>
             <column name="description">Dispensation de produits aux patients ou consommation</column>
             <column name="uuid">DISPENSATIONOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">16</column>
             <column name="name">Rapports d'activité</column>
             <column name="default_incidence">3</column>
             <column name="description">Rapport mensuels et de consommation des produits</column>
             <column name="uuid">REPORTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">17</column>
             <column name="name">Rapports urgent d'activité</column>
             <column name="default_incidence">3</column>
             <column name="description">Rapport mensuels et de consommation des produits</column>
             <column name="uuid">URGENTREPORTOOOOOOOOOOOOOOOOOOOOOOOOOO</column>
         </insert>
-        <insert tableName="supply_product_operation_type">
+        <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">18</column>
             <column name="name">Distribution</column>
             <column name="default_incidence">0</column>
@@ -956,14 +1024,14 @@ s
         </insert>
     </changeSet>
 
-    <changeSet id="supply-add-operation-attribute-type-insert" author="BOGUI SERGE" dbms="postgresql">
+    <changeSet id="supply2-add-operation-attribute-type-insert" author="BOGUI SERGE" dbms="postgresql">
         <preConditions onFail="MARK_RAN" onError="WARN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
-                FROM supply_product_operation_attribute_type
+                FROM supply2_product_operation_attribute_type
             </sqlCheck>
         </preConditions>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">1</column>
             <column name="name">Date de prescription</column>
             <column name="description">Date de prescription de la dispensation</column>
@@ -972,44 +1040,35 @@ s
             <column name="searchable">true</column>
             <column name="uuid">PRESCRIPTIONDATEAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">2</column>
             <column name="name">Date début inventaire</column>
             <column name="description">Date de de début de la période de l'inventaire</column>
             <column name="format">java.util.Date</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">INVENTORYSTARTDATEAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">3</column>
             <column name="name">Type inventaire</column>
             <column name="description">Type d'inventaire pour savoir s'il est Partiel ou Total</column>
             <column name="format">java.lang.String</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">INVENTORYTYPEAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">4</column>
             <column name="name">Partenaire</column>
             <column name="description">Partenaire destinataire pour les sorties et les entrées de stocks</column>
             <column name="format">java.lang.String</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">PARTNERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
 
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">5</column>
             <column name="name">Date traitement du rapport</column>
             <column name="description">Date de traitement du rapport soumis par le site ou le point de prestation de
@@ -1018,143 +1077,110 @@ s
             <column name="format">java.util.Date</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">REPORTTREATDATEAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
 
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">6</column>
             <column name="name">Encounter dispensation</column>
             <column name="description">Encounter dispensation for local patient</column>
             <column name="format">org.openmrs.Encounter</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">ENCOUNTERAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">7</column>
             <column name="name">Patient dispensation</column>
             <column name="description">Dispensation patient for external but existing patient</column>
             <column name="format">org.openmrs.Patient</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">PATIENTAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">8</column>
             <column name="name">Prescripteur</column>
             <column name="description">Prescripteur de la dispensation</column>
             <column name="format">org.openmrs.Provider</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">PROVIDERAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">9</column>
             <column name="name">Age</column>
             <column name="description">Age du patient</column>
             <column name="format">java.lang.Integer</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">PATIENTAGEAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">10</column>
             <column name="name">Sexe</column>
             <column name="description">Sexe du patient</column>
             <column name="format">java.lang.String</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">PATIENTGENDERAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">11</column>
             <column name="name">Regime de dispensation</column>
             <column name="description">Regime de la dispensation au patient</column>
             <column name="format">org.openmrs.module.supply.entities.ProductRegimen</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">REGIMENAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">12</column>
             <column name="name">Ligne de Regime</column>
             <column name="description">Ligne de Regime de la dispensation au patient</column>
             <column name="format">java.lang.Integer</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">REGIMENLINEAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">13</column>
             <column name="name">Date fin Traitement</column>
             <column name="description">Date de fin de traitement de la dispensation au patient</column>
             <column name="format">java.util.Date</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">TREATMENTENDDATEAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">14</column>
             <column name="name">But de la dispensation</column>
             <column name="description">But de la dispensation au patient</column>
             <column name="format">org.openmrs.module.supply.enumerations.Goal</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">GOALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">15</column>
             <column name="name">Prescripteur dispensation</column>
             <column name="description">Prescripteur de la dispensation au patient</column>
             <column name="format">org.openmrs.Provider</column>
             <column name="sort_weight">1</column>
             <column name="searchable">true</column>
-            <!--            <column name="creator">1</column>-->
-            <!--            <column name="date_created">2021-11-26 00:00:00</column>-->
-            <!--            <column name="retired">false</column>-->
             <column name="uuid">PROVIDERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
     </changeSet>
 
-    <changeSet id="supply-add-operation-attribute-treatment-duration" author="BOGUI SERGE" dbms="postgresql">
+    <changeSet id="supply2-add-operation-attribute-treatment-duration" author="BOGUI SERGE" dbms="postgresql">
         <preConditions>
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
-                FROM supply_product_operation_attribute_type
+                FROM supply2_product_operation_attribute_type
                 WHERE uuid = 'TREATMENTDURATIONAAAAAAAAAAAAAAAAAAAAA'
             </sqlCheck>
         </preConditions>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">16</column>
             <column name="name">Durée du traitement</column>
             <column name="description">Durée de traitement de la dispensation</column>
@@ -1166,35 +1192,14 @@ s
     </changeSet>
     <!--    -->
 
-    <changeSet id="supply-add-operation-attribute-type-insert-mysql" author="BOGUI SERGE" dbms="mariadb,mysql">
+    <changeSet id="supply2-add-operation-attribute-type-insert-mysql" author="BOGUI SERGE" dbms="mariadb,mysql">
         <preConditions onFail="MARK_RAN" onError="WARN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
-                FROM supply_product_operation_attribute_type
+                FROM supply2_product_operation_attribute_type
             </sqlCheck>
         </preConditions>
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
-        <!--            <column name="product_operation_attribute_type_id">1</column>-->
-        <!--            <column name="name">Partenaire</column>-->
-        <!--            <column name="description">Partenaire destinataire pour les sorties et les entrées de stocks</column>-->
-        <!--            <column name="format">java.lang.String</column>-->
-        <!--            <column name="sort_weight">1</column>-->
-        <!--            <column name="searchable">1</column>-->
-        <!--            &lt;!&ndash;            <column name="creator">1</column>&ndash;&gt;-->
-        <!--            &lt;!&ndash;            <column name="date_created">2021-11-26 00:00:00</column>&ndash;&gt;-->
-        <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
-        <!--            <column name="uuid">PARTNERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
-        <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
-        <!--            <column name="product_operation_attribute_type_id">1</column>-->
-        <!--            <column name="name">Date de prescription</column>-->
-        <!--            <column name="description">Date de prescription de la dispensation</column>-->
-        <!--            <column name="format">java.util.Date</column>-->
-        <!--            <column name="sort_weight">1</column>-->
-        <!--            <column name="searchable">1</column>-->
-        <!--            <column name="uuid">PRESCRIPTIONDATEAAAAAAAAAAAAAAAAAAAA</column>-->
-        <!--        </insert>-->
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">1</column>
             <column name="name">Date début inventaire</column>
             <column name="description">Date de de début de la période de l'inventaire</column>
@@ -1206,7 +1211,7 @@ s
             <!--            <column name="retired">false</column>-->
             <column name="uuid">INVENTORYSTARTDATEAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <insert tableName="supply_product_operation_attribute_type">
+        <insert tableName="supply2_product_operation_attribute_type">
             <column name="product_operation_attribute_type_id">2</column>
             <column name="name">Type inventaire</column>
             <column name="description">Type d'inventaire pour savoir s'il est Partiel ou Total</column>
@@ -1218,7 +1223,7 @@ s
             <!--            <column name="retired">false</column>-->
             <column name="uuid">INVENTORYTYPEAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">4</column>-->
         <!--            <column name="name">Partenaire</column>-->
         <!--            <column name="description">Partenaire destinataire pour les sorties et les entrées de stocks</column>-->
@@ -1231,7 +1236,7 @@ s
         <!--            <column name="uuid">PARTNERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
 
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">5</column>-->
         <!--            <column name="name">Date traitement du rapport</column>-->
         <!--            <column name="description">Date de traitement du rapport soumis par le site ou le point de prestation de-->
@@ -1246,7 +1251,7 @@ s
         <!--            <column name="uuid">REPORTTREATDATEAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
 
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">6</column>-->
         <!--            <column name="name">Encounter dispensation</column>-->
         <!--            <column name="description">Encounter dispensation for local patient</column>-->
@@ -1258,7 +1263,7 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">ENCOUNTERAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">7</column>-->
         <!--            <column name="name">Patient dispensation</column>-->
         <!--            <column name="description">Dispensation patient for external but existing patient</column>-->
@@ -1270,7 +1275,7 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">PATIENTAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">8</column>-->
         <!--            <column name="name">Prescripteur</column>-->
         <!--            <column name="description">Prescripteur de la dispensation</column>-->
@@ -1282,7 +1287,7 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">PROVIDERAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">9</column>-->
         <!--            <column name="name">Age</column>-->
         <!--            <column name="description">Age du patient</column>-->
@@ -1294,7 +1299,7 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">PATIENTAGEAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">10</column>-->
         <!--            <column name="name">Sexe</column>-->
         <!--            <column name="description">Sexe du patient</column>-->
@@ -1306,11 +1311,11 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">PATIENTGENDERAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">11</column>-->
         <!--            <column name="name">Regime de dispensation</column>-->
         <!--            <column name="description">Regime de la dispensation au patient</column>-->
-        <!--            <column name="format">org.openmrs.module.supply.entities.ProductRegimen</column>-->
+        <!--            <column name="format">org.openmrs.module.supply2.entities.ProductRegimen</column>-->
         <!--            <column name="sort_weight">1</column>-->
         <!--            <column name="searchable">1</column>-->
         <!--            &lt;!&ndash;            <column name="creator">1</column>&ndash;&gt;-->
@@ -1318,7 +1323,7 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">REGIMENAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">12</column>-->
         <!--            <column name="name">Ligne de Regime</column>-->
         <!--            <column name="description">Ligne de Regime de la dispensation au patient</column>-->
@@ -1330,7 +1335,7 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">REGIMENLINEAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">13</column>-->
         <!--            <column name="name">Date fin Traitement</column>-->
         <!--            <column name="description">Date de fin de traitement de la dispensation au patient</column>-->
@@ -1342,11 +1347,11 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">TREATMENTENDDATEAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">14</column>-->
         <!--            <column name="name">But de la dispensation</column>-->
         <!--            <column name="description">But de la dispensation au patient</column>-->
-        <!--            <column name="format">org.openmrs.module.supply.enumerations.Goal</column>-->
+        <!--            <column name="format">org.openmrs.module.supply2.enumerations.Goal</column>-->
         <!--            <column name="sort_weight">1</column>-->
         <!--            <column name="searchable">1</column>-->
         <!--            &lt;!&ndash;            <column name="creator">1</column>&ndash;&gt;-->
@@ -1354,7 +1359,7 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">GOALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">15</column>-->
         <!--            <column name="name">Prescripteur dispensation</column>-->
         <!--            <column name="description">Prescripteur de la dispensation au patient</column>-->
@@ -1366,7 +1371,7 @@ s
         <!--            &lt;!&ndash;            <column name="retired">false</column>&ndash;&gt;-->
         <!--            <column name="uuid">PROVIDERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_attribute_type">-->
         <!--            <column name="product_operation_attribute_type_id">16</column>-->
         <!--            <column name="name">Durée du traitement</column>-->
         <!--            <column name="description">Durée de traitement de la dispensation</column>-->
@@ -1378,117 +1383,117 @@ s
     </changeSet>
 
     <!--    -->
-    <changeSet id="supply-add-attribute-type-to-operation-type" author="BOGUI SERGE">
+    <changeSet id="supply2-add-attribute-type-to-operation-type" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN" onError="WARN">
             <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM supply_product_operation_type_attribute_type</sqlCheck>
+                                         FROM supply2_product_operation_type_attribute_type</sqlCheck>
         </preConditions>
         <!-- Inventory -->
-        <insert tableName="supply_product_operation_type_attribute_type">
+        <insert tableName="supply2_product_operation_type_attribute_type">
             <column name="operation_type" value="1"/>
             <column name="attribute_type" value="1"/>
         </insert>
-        <insert tableName="supply_product_operation_type_attribute_type">
+        <insert tableName="supply2_product_operation_type_attribute_type">
             <column name="operation_type" value="1"/>
             <column name="attribute_type" value="2"/>
         </insert>
         <!-- /Inventory -->
 
         <!--        &lt;!&ndash; Donation &ndash;&gt;-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="12"/>-->
         <!--            <column name="attribute_type" value="4"/>-->
         <!--        </insert>-->
         <!--        &lt;!&ndash; /Donation &ndash;&gt;-->
 
         <!--        &lt;!&ndash; Dispensation &ndash;&gt;-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="1"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="6"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="7"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="8"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="9"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="10"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="11"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="12"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="13"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="14"/>-->
         <!--        </insert>-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="15"/>-->
         <!--            <column name="attribute_type" value="15"/>-->
         <!--        </insert>-->
         <!--        &lt;!&ndash; /Dispensation &ndash;&gt;-->
 
         <!--        &lt;!&ndash; Distribution &ndash;&gt;-->
-        <!--        <insert tableName="supply_product_operation_type_attribute_type">-->
+        <!--        <insert tableName="supply2_product_operation_type_attribute_type">-->
         <!--            <column name="operation_type" value="18"/>-->
         <!--            <column name="attribute_type" value="5"/>-->
         <!--        </insert>-->
         <!--        &lt;!&ndash; /Report &ndash;&gt;-->
     </changeSet>
 
-    <changeSet id="supply-remove-duplicate-answer-concept-165041" author="BOGUI SERGE">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="2">SELECT COUNT(*)
-                                         FROM concept_answer
-                                         WHERE concept_id = 162240
-                                           AND answer_concept = 165041 </sqlCheck>
-        </preConditions>
-        <sql>
-            DELETE
-            FROM concept_answer
-            WHERE concept_answer_id =
-                  (SELECT MAX(concept_answer_id)
-                   FROM concept_answer
-                   WHERE concept_id = 162240
-                     AND answer_concept = 165041
-                   GROUP BY 165041)
-        </sql>
-    </changeSet>
+    <!--    <changeSet id="supply2-remove-duplicate-answer-concept-165041" author="BOGUI SERGE">-->
+    <!--        <preConditions onFail="MARK_RAN">-->
+    <!--            <sqlCheck expectedResult="2">SELECT COUNT(*)-->
+    <!--                                         FROM concept_answer-->
+    <!--                                         WHERE concept_id = 162240-->
+    <!--                                           AND answer_concept = 165041 </sqlCheck>-->
+    <!--        </preConditions>-->
+    <!--        <sql>-->
+    <!--            DELETE-->
+    <!--            FROM concept_answer-->
+    <!--            WHERE concept_answer_id =-->
+    <!--                  (SELECT MAX(concept_answer_id)-->
+    <!--                   FROM concept_answer-->
+    <!--                   WHERE concept_id = 162240-->
+    <!--                     AND answer_concept = 165041-->
+    <!--                   GROUP BY concept_id)-->
+    <!--        </sql>-->
+    <!--    </changeSet>-->
 
     <changeSet id="supply-regime-concept-insert" author="BOGUI SERGE" runAlways="true">
         <sql>
-            INSERT INTO supply_product_regime (concept_id, uuid)
+            INSERT INTO supply2_product_regime (concept_id, uuid)
             SELECT answer_concept, c.uuid
             FROM concept_answer ca,
                  concept c
             WHERE c.concept_id = ca.answer_concept
               AND ca.concept_id = 162240
-              AND c.concept_id NOT IN (SELECT concept_id FROM supply_product_regime);
+              AND c.concept_id NOT IN (SELECT concept_id FROM supply2_product_regime);
         </sql>
     </changeSet>
-    <!--    <changeSet id="supply-operation-flux-remove-location-unique-key" author="BOGUI SERGE">-->
-    <!--        <dropUniqueConstraint tableName="supply_product_operation_flux"-->
-    <!--                              constraintName="supply_product_operation_flux_location_id_key"/>-->
+    <!--    <changeSet id="supply2-operation-flux-remove-location-unique-key" author="BOGUI SERGE">-->
+    <!--        <dropUniqueConstraint tableName="supply2_product_operation_flux"-->
+    <!--                              constraintName="supply2_product_operation_flux_location_id_key"/>-->
     <!--    </changeSet>-->
 
     <changeSet id="supply-add-country-local-supplier" author="BOGUI SERGE">
@@ -1508,10 +1513,10 @@ s
             <column name="parent_location" type="int" valueNumeric="1"/>
         </insert>
     </changeSet>
-    <!--    <changeSet id="supply-remove-unique-key-batch-number" author="BOGUI SERGE">-->
+    <!--    <changeSet id="supply2-remove-unique-key-batch-number" author="BOGUI SERGE">-->
     <!--        <dropUniqueConstraint-->
-    <!--                tableName="supply_product_attribute"-->
-    <!--                constraintName="supply_product_attribute_batch_number_key"-->
+    <!--                tableName="supply2_product_attribute"-->
+    <!--                constraintName="supply2_product_attribute_batch_number_key"-->
     <!--                uniqueColumns="batch_number"/>-->
     <!--    </changeSet>-->
 
@@ -1695,17 +1700,17 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply-add-TDF-3TC-concept-to-regimen-list" author="BOGUI SERGE">
+    <changeSet id="supply2-add-TDF-3TC-concept-to-regimen-list" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
-                FROM supply_product_regime
+                FROM supply2_product_regime
                 WHERE concept_id = 161364;
             </sqlCheck>
         </preConditions>
         <sql>
             <![CDATA[
-            INSERT INTO supply_product_regime (concept_id, uuid)
+            INSERT INTO supply2_product_regime (concept_id, uuid)
             VALUES (161364, '161364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
             UPDATE concept_name
             SET name = 'TDF 3TC'
@@ -1802,9 +1807,9 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply-update-product-regime-uuid" author="BOGUI SERGE" runAlways="true">
+    <changeSet id="supply2-update-product-regime-uuid" author="BOGUI SERGE" runAlways="true">
         <sql>
-            UPDATE supply_product_regime
+            UPDATE supply2_product_regime
             SET uuid = CONCAT(concept_id, 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
             WHERE concept_id > 999
               AND uuid LIKE '%-%-%';
