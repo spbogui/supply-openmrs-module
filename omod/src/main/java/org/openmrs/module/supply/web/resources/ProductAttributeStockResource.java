@@ -169,6 +169,7 @@ public class ProductAttributeStockResource extends DelegatingCrudResource<Produc
 	@Override
 	protected PageableResult doSearch(RequestContext context) {
 		List<ProductAttributeStock> stocks = new ArrayList<ProductAttributeStock>();
+		
 		String attribute = context.getParameter("attribute");
 		String program = context.getParameter("program");
 		String filter = context.getParameter("filter");

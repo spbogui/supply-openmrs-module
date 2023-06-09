@@ -30,18 +30,16 @@ public class ProductOperationDao {
 		return sessionFactory.getCurrentSession();
 	}
 	
-	public Boolean validateOperation(ProductOperation operation) {
+	public void validateOperation(ProductOperation operation) {
 		if (!operation.getIncidence().equals(Incidence.NONE)) {
-			return createStocks(operation);
+			createStocks(operation);
 		}
-		return false;
 	}
 	
-	public Boolean cancelOperation(ProductOperation operation) {
+	public void cancelOperation(ProductOperation operation) {
 		if (!operation.getIncidence().equals(Incidence.NONE)) {
-			return createStocks(operation);
+			createStocks(operation);
 		}
-		return false;
 	}
 	
 	private boolean createStocks(ProductOperation operation) {
@@ -200,12 +198,6 @@ public class ProductOperationDao {
 			        .add(Restrictions.eq("productProgram", program)).add(Restrictions.lt("operationDate", limitEndDate))
 			        .addOrder(Order.desc("operationDate")).setMaxResults(1).uniqueResult();
 		}
-		//		if (includeVoided) {
-		//			return (ProductOperation) criteria.add(Restrictions.eq("operationType", operationType))
-		//			        .add(Restrictions.eq("location", location)).add(Restrictions.eq("productProgram", program))
-		//			        .add(Restrictions.lt("operationDate", limitEndDate)).addOrder(Order.desc("operationDate"))
-		//			        .setMaxResults(1).uniqueResult();
-		//		}
 		return (ProductOperation) criteria.add(Restrictions.eq("operationType", operationType))
 		        .add(Restrictions.eq("productProgram", program)).add(Restrictions.eq("location", location))
 		        .add(Restrictions.ne("operationStatus", OperationStatus.VALIDATED)).add(Restrictions.eq("voided", false))
@@ -262,16 +254,14 @@ public class ProductOperationDao {
 				}
 			}
 		} else if (operation.getOperationStatus().equals(OperationStatus.VALIDATED)) {
-			System.out.println("-----------------------------------------> Entered in dispensation validation");
 			if (operation.getOperationType().getUuid().equals("DISPENSATIONOOOOOOOOOOOOOOOOOOOOOOOOOO")) {
 				Set<ProductOperationFlux> fluxes = operation.getFluxes();
 				if (fluxes != null && fluxes.size() != 0) {
 					
 					for (ProductOperationFlux flux : fluxes) {
 						Double quantity = flux.getQuantity();
-						//                        Set<ProductOperationFluxAttribute> fluxAttributes = new HashSet<>();
 						List<ProductAttributeStock> stocks = getAllProductAttributeStocks(operation.getLocation(),
-						    operation.getProductProgram(), flux.getProduct());
+						    operation.getProductProgram(), flux.getProductCode());
 						for (ProductAttributeStock stock : stocks) {
 							
 							ProductOperationFluxAttribute fluxAttribute = new ProductOperationFluxAttribute();
@@ -366,10 +356,10 @@ public class ProductOperationDao {
 	
 	@SuppressWarnings("unchecked")
 	public List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program,
-	        Product product) {
+	        ProductCode productCode) {
 		return (List<ProductAttributeStock>) getSession().createCriteria(ProductAttributeStock.class, "stock")
 		        .createAlias("stock.attribute", "attribute").add(Restrictions.eq("stock.location", location))
-		        .add(Restrictions.eq("stock.voided", false)).add(Restrictions.eq("attribute.product", product))
+		        .add(Restrictions.eq("stock.voided", false)).add(Restrictions.eq("attribute.productCode", productCode))
 		        .add(Restrictions.eq("stock.program", program)).addOrder(Order.desc("attribute.expiryDate")).list();
 	}
 	
@@ -378,10 +368,10 @@ public class ProductOperationDao {
         List<ProductOperationFlux> fluxes = new ArrayList<>();
         for (ProductAttributeStock stock : stocks) {
             if (!fluxContainsAttribute(operation, stock.getAttribute())) {
-                ProductOperationFlux flux = createFlux(operation, 0., stock.getAttribute().getProductCode().getProduct());
+                ProductOperationFlux flux = createFlux(operation, 0., stock.getAttribute().getProductCode());
                 flux.setRelatedQuantity(stock.getQuantityInStock().doubleValue());
                 flux.setRelatedQuantityLabel("Quantité Théortique");
-                flux.setProduct(stock.getAttribute().getProductCode().getProduct());
+                flux.setProductCode(stock.getAttribute().getProductCode());
 
                 ProductOperationFluxAttribute attribute = new ProductOperationFluxAttribute();
                 attribute.setAttribute(stock.getAttribute());
@@ -399,8 +389,8 @@ public class ProductOperationDao {
         List<ProductOperationFlux> fluxes = new ArrayList<>();
         for (ProductOperationFlux flux : parentOperation.getFluxes()) {
 
-            if (!fluxContainsProduct(operation, flux.getProduct())) {
-                ProductOperationFlux operationFlux = createFlux(operation, flux.getQuantity(), flux.getProduct());
+            if (!fluxContainsProduct(operation, flux.getProductCode())) {
+                ProductOperationFlux operationFlux = createFlux(operation, flux.getQuantity(), flux.getProductCode());
                 operationFlux.setRelatedQuantity(flux.getQuantity());
                 operationFlux.setRelatedQuantityLabel("Quantité livree");
 
@@ -452,9 +442,9 @@ public class ProductOperationDao {
 		return false;
 	}
 	
-	private Boolean fluxContainsProduct(ProductOperation operation, Product product) {
+	private Boolean fluxContainsProduct(ProductOperation operation, ProductCode productCode) {
 		for (ProductOperationFlux flux : operation.getFluxes()) {
-			if (flux.getProduct().equals(product)) {
+			if (flux.getProductCode().equals(productCode)) {
 				return true;
 			}
 		}
@@ -463,16 +453,17 @@ public class ProductOperationDao {
 	
 	@SuppressWarnings("unchecked")
 	private List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program) {
-		return (List<ProductAttributeStock>) getSession().createCriteria(ProductAttributeStock.class)
-		        .add(Restrictions.eq("location", location)).add(Restrictions.eq("voided", false))
-		        .add(Restrictions.eq("program", program)).list();
+		return (List<ProductAttributeStock>) getSession().createCriteria(ProductAttributeStock.class, "a")
+		        .createAlias("a.attribute", "at").createAlias("at.attribute.productCode", "pc")
+		        .add(Restrictions.eq("a.location", location)).add(Restrictions.eq("a.voided", false))
+		        .add(Restrictions.eq("pc.program", program)).list();
 	}
 	
-	private ProductOperationFlux createFlux(ProductOperation operation, Double quantity, Product product) {
+	private ProductOperationFlux createFlux(ProductOperation operation, Double quantity, ProductCode productCode) {
 		ProductOperationFlux operationFlux = new ProductOperationFlux();
 		operationFlux.setQuantity(quantity);
 		operationFlux.setLocation(operation.getLocation());
-		operationFlux.setProduct(product);
+		operationFlux.setProductCode(productCode);
 		return operationFlux;
 	}
 	
@@ -484,10 +475,10 @@ public class ProductOperationDao {
 			if (operationFlux.getRelatedQuantity() != null) {
 				if (operationFlux.getQuantity() < operationFlux.getRelatedQuantity()) {
 					negativeAdjustment.addFlux(createFlux(operation,
-					    operationFlux.getRelatedQuantity() - operationFlux.getQuantity(), operationFlux.getProduct()));
+					    operationFlux.getRelatedQuantity() - operationFlux.getQuantity(), operationFlux.getProductCode()));
 				} else if (operationFlux.getQuantity() > operationFlux.getRelatedQuantity()) {
 					positiveAdjustment.addFlux(createFlux(operation,
-					    operationFlux.getRelatedQuantity() - operationFlux.getQuantity(), operationFlux.getProduct()));
+					    operationFlux.getRelatedQuantity() - operationFlux.getQuantity(), operationFlux.getProductCode()));
 				}
 			}
 		}
@@ -617,11 +608,6 @@ public class ProductOperationDao {
 		return (ProductOperationFlux) criteria.add(Restrictions.eq("uuid", uuid)).uniqueResult();
 	}
 	
-	public ProductOperationFlux getProductOperationFluxByProductAndOperation(Product product,
-	        ProductOperation productOperation) {
-		return null;
-	}
-	
 	public ProductOperationFlux saveProductOperationFlux(ProductOperationFlux productOperationFlux) {
 		getSession().saveOrUpdate(productOperationFlux);
 		return productOperationFlux;
@@ -631,26 +617,9 @@ public class ProductOperationDao {
 		getSession().delete(productOperationFlux);
 	}
 	
-	public List<ProductOperationOtherFlux> getAllProductOperationOtherFluxes(Location location) {
-		return null;
-	}
-	
 	public ProductOperationOtherFlux getProductOperationOtherFlux(String uuid) {
 		Criteria criteria = getSession().createCriteria(ProductOperationOtherFlux.class);
 		return (ProductOperationOtherFlux) criteria.add(Restrictions.eq("uuid", uuid)).uniqueResult();
-	}
-	
-	public ProductOperationOtherFlux getProductOperationOtherFlux(Integer id) {
-		return (ProductOperationOtherFlux) getSession().get(ProductOperationOtherFlux.class, id);
-	}
-	
-	public ProductOperationOtherFlux getProductOperationOtherFluxByAttributeAndOperation(ProductAttribute productAttribute,
-	        ProductOperation productOperation, Location location) {
-		return null;
-	}
-	
-	public List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperation(ProductOperation operation, Boolean b) {
-		return null;
 	}
 	
 	public ProductOperationOtherFlux saveProductOperationOtherFlux(ProductOperationOtherFlux productOperationOtherFlux) {
@@ -660,39 +629,6 @@ public class ProductOperationDao {
 	
 	public void purgeProductOperationOtherFlux(ProductOperationOtherFlux productOperationOtherFlux) {
 		getSession().delete(productOperationOtherFlux);
-	}
-	
-	public List<ProductOperationFlux> getAllProductOperationFluxByOperationAndProduct(ProductOperation operation,
-	        Product product) {
-		return null;
-	}
-	
-	public Integer getAllProductOperationFluxByOperationAndProductCount(ProductOperation operation, Product product) {
-		return null;
-	}
-	
-	public List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperationAndProduct(ProductOperation operation,
-	        Product product, Location location) {
-		return null;
-	}
-	
-	public Integer getAllProductOperationOtherFluxByOperationAndProductCount(ProductOperation operation, Product product) {
-		return null;
-	}
-	
-	public ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperation(Product product,
-	        ProductOperation productOperation) {
-		return null;
-	}
-	
-	public ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperationAndLabel(Product product,
-	        ProductOperation operation, String label, Location location) {
-		return null;
-	}
-	
-	public List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByProductAndOperation(Product product,
-	        ProductOperation operation, Location location) {
-		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -708,13 +644,13 @@ public class ProductOperationDao {
 	@SuppressWarnings("unchecked")
 	public List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program,
 	        Boolean includeVoided) {
-		Criteria criteria = getSession().createCriteria(ProductAttributeStock.class);
+		Criteria criteria = getSession().createCriteria(ProductAttributeStock.class, "a").createAlias("a.attribute", "attr")
+		        .createAlias("attr.productCode", "p");
 		if (!includeVoided) {
-			return criteria.add(Restrictions.eq("location", location)).add(Restrictions.eq("voided", false))
-			        .add(Restrictions.eq("program", program)).add(Restrictions.gt("quantityInStock", 0)).list();
+			criteria.add(Restrictions.eq("a.voided", false));
 		}
-		return criteria.add(Restrictions.eq("location", location)).add(Restrictions.eq("program", program))
-		        .add(Restrictions.gt("quantityInStock", 0)).list();
+		return criteria.add(Restrictions.eq("a.location", location)).add(Restrictions.eq("p.program", program))
+		        .add(Restrictions.gt("a.quantityInStock", 0)).list();
 	}
 	
 	public List<ProductAttributeStock> getAllProductAttributeStocks(Boolean includeVoided) {
@@ -746,34 +682,11 @@ public class ProductOperationDao {
 		getSession().delete(productAttributeStock);
 	}
 	
-	public List<ProductAttributeStock> getProductAttributeStocksByProduct(Product product, ProductProgram program,
-	        Location userLocation) {
-		return null;
-	}
-	
-	public Integer getProductQuantityInStock(Product product, ProductProgram productProgram) {
-		return null;
-	}
-	
-	public Integer getProductQuantityInStock(Product product, ProductProgram productProgram, Location location) {
-		return null;
-	}
-	
 	public ProductAttributeStock getProductAttributeStock(ProductAttribute productAttribute, ProductProgram productProgram,
 	        Location location) {
 		return (ProductAttributeStock) getSession().createCriteria(ProductAttributeStock.class)
 		        .add(Restrictions.eq("attribute", productAttribute)).add(Restrictions.eq("program", productProgram))
 		        .add(Restrictions.eq("location", location)).add(Restrictions.eq("voided", false)).uniqueResult();
-	}
-	
-	public List<ProductAttributeStock> getAllProductAttributeStockByProduct(Product product, ProductProgram productProgram,
-	        Location location) {
-		return null;
-	}
-	
-	public Integer getAllProductAttributeStockByProductCount(Product product, ProductProgram productProgram,
-	        Location location, Boolean includeChildren) {
-		return null;
 	}
 	
 	@SuppressWarnings("unchecked")

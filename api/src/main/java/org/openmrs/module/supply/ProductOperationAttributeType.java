@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 @Entity(name = "ProductOperationAttributeType")
-@Table(name = "supply_product_operation_attribute_type")
+@Table(name = "supply2_product_operation_attribute_type")
 public class ProductOperationAttributeType extends BaseOpenmrsObject implements Comparable<ProductOperationAttributeType> {
 	
 	@Id

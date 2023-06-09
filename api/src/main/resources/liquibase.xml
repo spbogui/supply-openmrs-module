@@ -1006,6 +1006,42 @@ s
         </insert>
     </changeSet>
 
+    <changeSet id="supply2-add-operation-type-product-back-site" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_type
+                WHERE uuid = 'PRODUCTRETURNINOOOOOOOOOOOOOOOOOOOOOOO'
+            </sqlCheck>
+        </preConditions>
+
+        <insert tableName="supply2_product_operation_type">
+            <column name="product_operation_type_id">19</column>
+            <column name="name">Retour de produits des sites / services</column>
+            <column name="default_incidence">1</column>
+            <column name="description">Retour de produits des sites / services</column>
+            <column name="uuid">PRODUCTRETURNINOOOOOOOOOOOOOOOOOOOOOOO</column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="supply2-add-operation-type-partial-inventory" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_type
+                WHERE uuid = 'INVENTORYPARTIALOOOOOOOOOOOOOOOOOOOOOO'
+            </sqlCheck>
+        </preConditions>
+
+        <insert tableName="supply2_product_operation_type">
+            <column name="product_operation_type_id">20</column>
+            <column name="name">Inventaire partiel</column>
+            <column name="default_incidence">2</column>
+            <column name="description">Inventire partiel de produts</column>
+            <column name="uuid">INVENTORYPARTIALOOOOOOOOOOOOOOOOOOOOOO</column>
+        </insert>
+    </changeSet>
+
     <changeSet id="supply2-add-operation-attribute-type-insert" author="BOGUI SERGE" dbms="postgresql">
         <preConditions onFail="MARK_RAN" onError="WARN">
             <sqlCheck expectedResult="0">
@@ -1927,6 +1963,267 @@ s
             UPDATE encounter_type
             SET uuid = 'DISPENSATIONEEEEEEEEEEEEEEEEEEEEEEEE'
             WHERE name = 'DISPENSATION';
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-insert-product-unit-to-supply2" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM supply2_product_unit;</sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO supply2_product_unit (name, description, uuid)
+            SELECT name, description, uuid
+            FROM supply_product_unit;
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-insert-product-program-to-supply2" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM supply2_product_program;</sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO supply2_product_program (name, description, uuid)
+            SELECT name, description, uuid
+            FROM supply_product_program;
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-insert-product-supply-to-supply2" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*)
+                                         FROM supply2_product;</sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO supply2_product (product_id, conversion_unit, creator, date_created, changed_by, date_changed,
+                                         voided, uuid)
+            SELECT product_id,
+                   conversion_unit,
+                   creator,
+                   date_created,
+                   changed_by,
+                   date_changed,
+                   voided,
+                   uuid
+            FROM supply_product;
+
+            INSERT INTO supply2_product_name (product_name_id, product_id, product_name_type, name, product_unit, uuid)
+            SELECT product_name_id, product_id, product_name_type, name, product_unit, uuid
+            FROM supply_product_name;
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-insert-product-code-supply-to-supply2" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_code;
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            <![CDATA[
+            INSERT INTO supply2_product_code (product_id, program_id, code, creator, date_created, changed_by,
+                                              date_changed, voided, uuid)
+            SELECT sp.product_id,
+                   program_id,
+                   CONCAT_WS('-', code, program_id)        AS code,
+                   creator,
+                   date_created,
+                   changed_by,
+                   date_changed,
+                   voided,
+                   CONCAT(code, IF(program_id < 10, CONCAT('0', program_id), program_id),
+                          'PPPPPPPPPPPPPPPPPPPPPPPPPPPPP') AS uuid
+            FROM supply_product sp
+                     LEFT JOIN supply_product_program_members sppm ON sp.product_id = sppm.product_id
+                     LEFT JOIN (SELECT name, product_id
+                                FROM supply_product_name
+                                WHERE product_name_type = 'DISPENSATION') spn on sp.product_id = spn.product_id
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-insert-product-price-to-supply2" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_price;
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            <![CDATA[
+            INSERT INTO supply2_product_price
+            (product_price_id, product_code_id, purchase_price, sale_price, is_active,
+             location_id, creator, date_created, changed_by, date_changed, voided, uuid)
+            SELECT product_price_id,
+                   product_code_id,
+                   purchase_price,
+                   sale_price,
+                   is_active,
+                   location_id,
+                   spp.creator,
+                   spp.date_created,
+                   spp.changed_by,
+                   spp.date_changed,
+                   spp.voided,
+                   spp.uuid
+            FROM supply_product_price spp,
+                 supply2_product_code spp2
+            WHERE spp2.program_id = spp.product_program_id
+              AND spp2.product_id = spp.product_id
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-insert-supply-product-operation-to-supply2" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation;
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            <![CDATA[
+            INSERT INTO supply2_product_operation
+            SELECT product_operation_id,
+                   operation_number,
+                   program_id,
+                   spot2.product_operation_type_id,
+                   operation_date,
+                   operation_status,
+                   incidence,
+                   linked_operation,
+                   quantity_type,
+                   observation,
+                   exchange_location,
+                   location_id,
+                   creator,
+                   date_created,
+                   changed_by,
+                   date_changed,
+                   voided,
+                   voided_by,
+                   date_voided,
+                   void_reason,
+                   spo.uuid
+            FROM supply_product_operation spo,
+                 supply_product_operation_type spot,
+                 supply2_product_operation_type spot2
+            WHERE spo.operation_type = spot.product_operation_type_id
+              AND spot.uuid = spot2.uuid;
+
+            INSERT INTO supply2_product_operation_attribute
+            SELECT product_operation_attribute_id,
+                   spoat2.product_operation_attribute_type_id,
+                   product_operation,
+                   value,
+                   location_id,
+                   creator,
+                   date_created,
+                   changed_by,
+                   date_changed,
+                   voided,
+                   voided_by,
+                   date_voided,
+                   void_reason,
+                   spoa.uuid
+            FROM supply_product_operation_attribute spoa,
+                 supply_product_operation_attribute_type spoat,
+                 supply2_product_operation_attribute_type spoat2
+            WHERE spoa.operation_attribute_type = spoat.product_operation_attribute_type_id
+              AND spoat.uuid = spoat2.uuid;
+            ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-insert-supply-product-operation-flux-to-supply2" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_flux;
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            <![CDATA[
+            INSERT INTO supply2_product_operation_flux
+            (product_operation_flux_id, product_code_id, operation_id, quantity, related_quantity,
+             related_quantity_label, observation, location_id, uuid)
+            SELECT product_operation_flux_id,
+                   product_code_id,
+                   operation_id,
+                   quantity,
+                   related_quantity,
+                   related_quantity_label,
+                   spof.observation,
+                   spo.location_id,
+                   spof.uuid
+            FROM supply_product_operation_flux spof,
+                 supply_product_operation spo,
+                 supply2_product_code spc
+            WHERE spof.operation_id = spo.product_operation_id
+              AND spo.program_id = spc.program_id
+              AND spof.product_id = spc.product_id;
+
+            INSERT INTO supply2_product_attribute
+            SELECT DISTINCT spa.product_attribute_id,
+                            product_code_id,
+                            batch_number,
+                            spa.location_id,
+                            expiry_date,
+                            spa.creator,
+                            spa.date_created,
+                            spa.changed_by,
+                            spa.date_changed,
+                            spa.voided,
+                            spa.voided_by,
+                            spa.date_voided,
+                            spa.void_reason,
+                            spa.uuid
+            FROM supply_product_attribute spa
+                     INNER JOIN supply_product_operation_flux_attribute spofa
+                                ON spa.product_attribute_id = spofa.product_attribute_id
+                     INNER JOIN supply_product_operation_flux spof
+                                ON spofa.operation_flux_id = spof.product_operation_flux_id
+                     INNER JOIN supply_product_operation spo ON spof.operation_id = spo.product_operation_id
+                     INNER JOIN supply2_product_code spc
+                                ON spc.program_id = spo.program_id AND spc.product_id = spof.product_id;
+
+            INSERT INTO supply2_product_operation_flux_attribute
+            SELECT *
+            FROM supply_product_operation_flux_attribute;
+
+            INSERT INTO supply2_product_attribute_stock
+            (product_attribute_stock_id,
+             product_attribute,
+             operation_id,
+             quantity_in_stock,
+             location_id,
+             creator,
+             date_created,
+             changed_by,
+             date_changed,
+             voided,
+             voided_by,
+             date_voided,
+             void_reason,
+             uuid)
+            SELECT product_attribute_stock_id,
+                   product_attribute,
+                   operation_id,
+                   quantity_in_stock,
+                   location_id,
+                   creator,
+                   date_created,
+                   changed_by,
+                   date_changed,
+                   voided,
+                   voided_by,
+                   date_voided,
+                   void_reason,
+                   uuid
+            FROM supply_product_attribute_stock;
+            ]]>
         </sql>
     </changeSet>
 

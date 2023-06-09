@@ -48,8 +48,8 @@ public class ProductDao {
 	}
 	
 	public Product getProductByCode(String code) {
-		Criteria criteria = getSession().createCriteria(Product.class);
-		return (Product) criteria.add(Restrictions.eq("code", code)).uniqueResult();
+		Criteria criteria = getSession().createCriteria(Product.class, "p").createAlias("p.productCodes", "pc");
+		return (Product) criteria.add(Restrictions.eq("pc.code", code)).setMaxResults(1).uniqueResult();
 	}
 	
 	public Product saveProduct(Product product) {
@@ -300,26 +300,42 @@ public class ProductDao {
     }
 	
 	public ProductCode getProductCode(String uuid) {
-		return null;
+		return (ProductCode) getSession().createCriteria(ProductCode.class).add(Restrictions.eq("uuid", uuid))
+		        .uniqueResult();
 	}
 	
 	public ProductCode getProductCodeByCode(String code) {
-		return null;
+		return (ProductCode) getSession().createCriteria(ProductCode.class).add(Restrictions.eq("code", code))
+		        .uniqueResult();
 	}
 	
 	public ProductCode saveProductCode(ProductCode productCode) {
-		return null;
+		getSession().saveOrUpdate(productCode);
+		return productCode;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<ProductCode> getProductCodes(ProductProgram program, ProductRegime productRegime) {
-		return null;
+		return getSession().createCriteria(ProductCode.class, "p").createAlias("p.regimes", "r")
+		        .add(Restrictions.eq("p.program", program)).add(Restrictions.eq("r.regime", productRegime)).list();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<ProductCode> getProductCodes(ProductProgram program, Boolean includeVoided) {
-		return null;
+		
+		Criteria criteria = getSession().createCriteria(ProductCode.class).add(Restrictions.eq("program", program));
+		if (!includeVoided) {
+			criteria.add(Restrictions.eq("voided", false));
+		}
+		return criteria.list();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<ProductCode> getProductCodes(Boolean includeVoided) {
-		return null;
+		Criteria criteria = getSession().createCriteria(ProductCode.class);
+		if (!includeVoided) {
+			criteria.add(Restrictions.eq("voided", false));
+		}
+		return criteria.list();
 	}
 }

@@ -21,7 +21,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 @Entity(name = "ProductOperationAttribute")
-@Table(name = "supply_product_operation_attribute")
+@Table(name = "supply2_product_operation_attribute")
 public class ProductOperationAttribute extends BaseOpenmrsData implements Serializable, Comparable<ProductOperationAttribute> {
 	
 	public static final long serialVersionUID = 11231211232111L;

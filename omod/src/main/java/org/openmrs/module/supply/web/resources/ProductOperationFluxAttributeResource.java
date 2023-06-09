@@ -47,7 +47,6 @@ public class ProductOperationFluxAttributeResource extends DelegatingCrudResourc
 	@Override
 	protected void delete(ProductOperationFluxAttribute productOperationFluxAttribute, String s,
 	        RequestContext requestContext) throws ResponseException {
-		
 	}
 	
 	@Override

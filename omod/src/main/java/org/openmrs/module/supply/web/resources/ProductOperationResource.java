@@ -90,10 +90,12 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 			description.addProperty("incidence");
 			description.addProperty("quantityType");
 			description.addProperty("observation");
+			description.addProperty("totalSalePrice");
+			description.addProperty("totalPurchasePrice");
 			description.addProperty("attributes", Representation.DEFAULT);
 			description.addProperty("fluxAttributes", Representation.DEFAULT);
 			description.addProperty("fluxes", Representation.DEFAULT);
-			description.addProperty("otherFluxes", Representation.DEFAULT);
+			//            description.addProperty("otherFluxes", Representation.DEFAULT);
 			description.addProperty("exchangeLocation", Representation.DEFAULT);
 			description.addProperty("location", Representation.DEFAULT);
 			description.addProperty("uuid");
@@ -110,8 +112,8 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 			description.addProperty("quantityType");
 			description.addProperty("observation");
 			description.addProperty("attributes", Representation.REF);
-			description.addProperty("fluxes", Representation.DEFAULT);
-			description.addProperty("otherFluxes", Representation.REF);
+			description.addProperty("fluxes", Representation.REF);
+			//            description.addProperty("otherFluxes", Representation.REF);
 			description.addProperty("exchangeLocation", Representation.REF);
 			description.addProperty("fluxAttributes", Representation.DEFAULT);
 			description.addProperty("location", Representation.REF);
@@ -135,7 +137,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 	
 	@Override
 	public List<String> getPropertiesToExposeAsSubResources() {
-		return Arrays.asList("fluxes", "otherFluxes", "attributes");
+		return Arrays.asList("fluxes", "attributes");
 	}
 	
 	@PropertyGetter("operationType")
@@ -224,53 +226,53 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		return null;
 	}
 	
-	@PropertyGetter("otherFluxes")
-	public static Set<ProductOperationOtherFlux> getOtherFluxes(ProductOperation operation) {
-		return new LinkedHashSet<ProductOperationOtherFlux>(operation.getOtherFluxes());
-	}
+	//    @PropertyGetter("otherFluxes")
+	//    public static Set<ProductOperationOtherFlux> getOtherFluxes(ProductOperation operation) {
+	//        return new LinkedHashSet<ProductOperationOtherFlux>(operation.getOtherFluxes());
+	//    }
 	
 	@PropertyGetter("fluxAttributes")
 	public static Set<ProductOperationFluxAttribute> getFluxAttributes(ProductOperation operation) {
 		return new LinkedHashSet<ProductOperationFluxAttribute>(operation.getFluxAttributes());
 	}
 	
-	@PropertySetter("otherFluxes")
-	public static void setOtherFluxes(ProductOperation operation, List<ProductOperationOtherFlux> fluxes)
-	        throws ResourceDoesNotSupportOperationException {
-		if (operation.getOtherFluxes() != null && operation.getOtherFluxes().containsAll(fluxes)) {
-			return;
-		}
-		if (operation.getOtherFluxes() != null && !operation.getOtherFluxes().isEmpty()) {
-			throw new ResourceDoesNotSupportOperationException("Other fluxes can only be set for newly created objects !");
-		}
-		for (ProductOperationOtherFlux flux : fluxes) {
-			ProductOperationOtherFlux existingFlux = operation.getOtherFluxes() != null ? getMatchingOtherFlux(flux,
-			    operation.getOtherFluxes()) : null;
-			if (existingFlux != null) {
-				copyOtherFluxFields(existingFlux, flux);
-			} else {
-				operation.addOtherFlux(flux);
-			}
-		}
-	}
-	
-	private static void copyOtherFluxFields(ProductOperationOtherFlux existingFlux, ProductOperationOtherFlux flux) {
-		existingFlux.setProduct(flux.getProduct());
-		//existingFlux.setProductAttribute(flux.getProductAttribute());
-		existingFlux.setLabel(flux.getLabel());
-		existingFlux.setQuantity(flux.getQuantity());
-		existingFlux.setLocation(flux.getLocation());
-	}
-	
-	private static ProductOperationOtherFlux getMatchingOtherFlux(ProductOperationOtherFlux flux,
-	        Set<ProductOperationOtherFlux> productAttributeFluxes) {
-		for (ProductOperationOtherFlux existingFlux : productAttributeFluxes) {
-			if (existingFlux.getUuid() != null && existingFlux.getUuid().equals(flux.getUuid())) {
-				return existingFlux;
-			}
-		}
-		return null;
-	}
+	//    @PropertySetter("otherFluxes")
+	//    public static void setOtherFluxes(ProductOperation operation, List<ProductOperationOtherFlux> fluxes)
+	//            throws ResourceDoesNotSupportOperationException {
+	//        if (operation.getOtherFluxes() != null && operation.getOtherFluxes().containsAll(fluxes)) {
+	//            return;
+	//        }
+	//        if (operation.getOtherFluxes() != null && !operation.getOtherFluxes().isEmpty()) {
+	//            throw new ResourceDoesNotSupportOperationException("Other fluxes can only be set for newly created objects !");
+	//        }
+	//        for (ProductOperationOtherFlux flux : fluxes) {
+	//            ProductOperationOtherFlux existingFlux = operation.getOtherFluxes() != null ? getMatchingOtherFlux(flux,
+	//                    operation.getOtherFluxes()) : null;
+	//            if (existingFlux != null) {
+	//                copyOtherFluxFields(existingFlux, flux);
+	//            } else {
+	//                operation.addOtherFlux(flux);
+	//            }
+	//        }
+	//    }
+	//
+	//    private static void copyOtherFluxFields(ProductOperationOtherFlux existingFlux, ProductOperationOtherFlux flux) {
+	//        existingFlux.setProduct(flux.getProduct());
+	//        //existingFlux.setProductAttribute(flux.getProductAttribute());
+	//        existingFlux.setLabel(flux.getLabel());
+	//        existingFlux.setQuantity(flux.getQuantity());
+	//        existingFlux.setLocation(flux.getLocation());
+	//    }
+	//
+	//    private static ProductOperationOtherFlux getMatchingOtherFlux(ProductOperationOtherFlux flux,
+	//                                                                  Set<ProductOperationOtherFlux> productAttributeFluxes) {
+	//        for (ProductOperationOtherFlux existingFlux : productAttributeFluxes) {
+	//            if (existingFlux.getUuid() != null && existingFlux.getUuid().equals(flux.getUuid())) {
+	//                return existingFlux;
+	//            }
+	//        }
+	//        return null;
+	//    }
 	
 	@Override
 	public Model getGETModel(Representation rep) {
@@ -320,7 +322,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 			model.property("location", new RefProperty("#/definitions/LocationCreate"))
 			        .property("exchangeLocation", new RefProperty("#/definitions/LocationCreate"))
 			        .property("fluxes", new RefProperty("#/definitions/ProductOperationFluxCreate"))
-			        .property("otherFluxes", new RefProperty("#/definitions/ProductOperationOtherFluxCreate"))
+			        //                    .property("otherFluxes", new RefProperty("#/definitions/ProductOperationOtherFluxCreate"))
 			        .property("productProgram", new RefProperty("#/definitions/ProductProgramCreate"))
 			        .property("parentOperation", new RefProperty("#/definitions/ProductOperationCreate"))
 			        .property("operationType", new RefProperty("#/definitions/ProductOperationTypeCreate"));
@@ -328,7 +330,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 			model.property("location", new StringProperty().example("uuid"))
 			        .property("exchangeLocation", new StringProperty().example("uuid"))
 			        .property("fluxes", new StringProperty().example("uuid"))
-			        .property("otherFluxes", new StringProperty().example("uuid"))
+			        //                    .property("otherFluxes", new StringProperty().example("uuid"))
 			        .property("productProgram", new StringProperty().example("uuid"))
 			        .property("parentOperation", new StringProperty().example("uuid"))
 			        .property("operationType", new StringProperty().example("uuid"));
@@ -354,11 +356,12 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		                Incidence.POSITIVE.name(), Incidence.NEGATIVE.name())))
 		        .property("quantityType",
 		            new EnumProperty(QuantityType.class)._enum(Arrays.asList("DISPENSATION", "PACKAGING")))
-		        .property("observation", new StringProperty()).property("uuid", new StringProperty())
+		        .property("observation", new StringProperty())
+		        .property("uuid", new StringProperty())
 		        .property("location", new StringProperty().example("uuid"))
 		        .property("exchangeLocation", new StringProperty().example("uuid"))
 		        .property("fluxes", new StringProperty().example("uuid"))
-		        .property("otherFluxes", new StringProperty().example("uuid"))
+		        //                .property("otherFluxes", new StringProperty().example("uuid"))
 		        .property("productProgram", new StringProperty().example("uuid"))
 		        .property("parentOperation", new StringProperty().example("uuid"))
 		        .property("operationAttributes", new StringProperty().example("uuid"));
@@ -378,7 +381,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		description.addRequiredProperty("operationType");
 		description.addRequiredProperty("quantityType");
 		description.addProperty("fluxes");
-		description.addProperty("otherFluxes");
+		//        description.addProperty("otherFluxes");
 		description.addProperty("attributes");
 		description.addProperty("parentOperation");
 		description.addProperty("exchangeLocation");
@@ -397,9 +400,9 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		description.addProperty("operationStatus");
 		description.addProperty("incidence");
 		description.addProperty("fluxes");
-		//		description.addProperty("operationType");
+		description.addProperty("operationType");
 		description.addProperty("quantityType");
-		description.addProperty("otherFluxes");
+		//        description.addProperty("otherFluxes");
 		description.addProperty("attributes");
 		description.addProperty("parentOperation");
 		description.addProperty("exchangeLocation");
@@ -421,6 +424,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		String filter = context.getParameter("filter");
 		String operationType = context.getParameter("type");
 		String locationUuid = context.getParameter("location");
+		String includeVoided = context.getParameter("includeVoided");
 		
 		List<ProductOperation> productOperations = new ArrayList<ProductOperation>();
 		
@@ -435,7 +439,8 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 							    program);
 							if (productProgram != null) {
 								ProductOperation operation = getService().getLastProductOperation(type, productProgram,
-								    SupplyUtils.getUserLocation(), filter.contains("validated"), false);
+								    SupplyUtils.getUserLocation(), filter.contains("validated"),
+								    includeVoided != null && includeVoided.equals("true"));
 								if (operation != null) {
 									productOperations.add(operation);
 								}
@@ -470,7 +475,8 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 							Date startDate = sourceFormat.parse(startDateString);
 							Date endDate = sourceFormat.parse(endDateString);
 							List<ProductOperation> operations = getService().getAllProductOperation(type, startDate,
-							    endDate, SupplyUtils.getUserLocation(), true, false);
+							    endDate, SupplyUtils.getUserLocation(), true,
+							    includeVoided != null && includeVoided.equals("true"));
 							
 							if (operations != null) {
 								productOperations.addAll(operations);
@@ -482,7 +488,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 					}
 				} else {
 					productOperations.addAll(getService().getAllProductOperation(type, SupplyUtils.getUserLocation(), false,
-					    false));
+					    includeVoided != null && includeVoided.equals("true")));
 				}
 			}
 		} else {

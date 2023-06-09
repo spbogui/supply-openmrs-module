@@ -5,7 +5,7 @@ import org.openmrs.BaseOpenmrsObject;
 import javax.persistence.*;
 
 @Entity(name = "ProductUnit")
-@Table(name = "supply_product_unit")
+@Table(name = "supply2_product_unit")
 public class ProductUnit extends BaseOpenmrsObject {
 	
 	@Id

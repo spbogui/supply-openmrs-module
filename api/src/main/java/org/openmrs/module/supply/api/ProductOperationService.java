@@ -16,11 +16,11 @@ public interface ProductOperationService extends OpenmrsService {
 	 * *********** Operation
 	 */
 	
-	Boolean validateOperation(ProductOperation operation) throws APIException;
-	
-	Boolean cancelOperation(ProductOperation operation) throws APIException;
-	
-	ProductOperation getProductOperation(Integer productOperationId) throws APIException;
+	//	Boolean validateOperation(ProductOperation operation) throws APIException;
+	//
+	//	Boolean cancelOperation(ProductOperation operation) throws APIException;
+	//
+	//	ProductOperation getProductOperation(Integer productOperationId) throws APIException;
 	
 	ProductOperation getProductOperation(String uuid) throws APIException;
 	
@@ -60,7 +60,7 @@ public interface ProductOperationService extends OpenmrsService {
 	
 	ProductOperationType saveProductOperationType(ProductOperationType operationType) throws APIException;
 	
-	ProductOperationType getProductOperationType(Integer id) throws APIException;
+	//	ProductOperationType getProductOperationType(Integer id) throws APIException;
 	
 	ProductOperationType getProductOperationType(String uuid) throws APIException;
 	
@@ -75,7 +75,7 @@ public interface ProductOperationService extends OpenmrsService {
 	ProductOperationAttributeType saveOperationAttributeType(ProductOperationAttributeType operationAttributeType)
 	        throws APIException;
 	
-	ProductOperationAttributeType getOperationAttributeType(Integer id) throws APIException;
+	//	ProductOperationAttributeType getOperationAttributeType(Integer id) throws APIException;
 	
 	ProductOperationAttributeType getOperationAttributeType(String uuid) throws APIException;
 	
@@ -85,33 +85,32 @@ public interface ProductOperationService extends OpenmrsService {
 	
 	ProductOperationAttribute saveOperationAttribute(ProductOperationAttribute attribute) throws APIException;
 	
-	ProductOperationAttribute getOperationAttribute(Integer id) throws APIException;
+	//	ProductOperationAttribute getOperationAttribute(Integer id) throws APIException;
 	
 	ProductOperationAttribute getOperationAttribute(String uuid) throws APIException;
 	
 	/**
 	 * *********** Operation Flux
 	 */
-	@Transactional(readOnly = true)
-	List<ProductOperationFlux> getAllProductOperationFluxes(Location location, Boolean includeVoided) throws APIException;
+	//	@Transactional(readOnly = true)
+	//	List<ProductOperationFlux> getAllProductOperationFluxes(Location location, Boolean includeVoided) throws APIException;
+	//
+	//	@Transactional(readOnly = true)
+	//	List<ProductOperationFlux> getAllProductOperationFluxes(Location location, Date startDate, Date endDate,
+	//	        Boolean includeVoided) throws APIException;
+	//
+	//	@Transactional(readOnly = true)
+	//	List<ProductOperationFlux> getAllProductOperationFluxByOperation(ProductOperation productOperation, Boolean includeVoided)
+	//	        throws APIException;
 	
-	@Transactional(readOnly = true)
-	List<ProductOperationFlux> getAllProductOperationFluxes(Location location, Date startDate, Date endDate,
-	        Boolean includeVoided) throws APIException;
-	
-	@Transactional(readOnly = true)
-	List<ProductOperationFlux> getAllProductOperationFluxByOperation(ProductOperation productOperation, Boolean includeVoided)
-	        throws APIException;
-	
-	@Transactional(readOnly = true)
-	ProductOperationFlux getProductOperationFlux(Integer id) throws APIException;
-	
+	//	@Transactional(readOnly = true)
+	//	ProductOperationFlux getProductOperationFlux(Integer id) throws APIException;
 	@Transactional(readOnly = true)
 	ProductOperationFlux getProductOperationFlux(String uuid) throws APIException;
 	
-	@Transactional(readOnly = true)
-	ProductOperationFlux getProductOperationFluxByProductAndOperation(Product product, ProductOperation productOperation)
-	        throws APIException;
+	//	@Transactional(readOnly = true)
+	//	ProductOperationFlux getProductOperationFluxByProductAndOperation(Product product, ProductOperation productOperation)
+	//	        throws APIException;
 	
 	@Transactional
 	ProductOperationFlux saveProductOperationFlux(ProductOperationFlux productOperationFlux) throws APIException;
@@ -119,29 +118,29 @@ public interface ProductOperationService extends OpenmrsService {
 	@Transactional
 	void purgeProductOperationFlux(ProductOperationFlux productOperationFlux) throws APIException;
 	
-	@Transactional(readOnly = true)
-	List<ProductOperationFlux> getAllProductOperationFluxByOperationAndProduct(ProductOperation operation, Product product)
-	        throws APIException;
+	//	@Transactional(readOnly = true)
+	//	List<ProductOperationFlux> getAllProductOperationFluxByOperationAndProduct(ProductOperation operation, Product product)
+	//	        throws APIException;
 	
-	@Transactional(readOnly = true)
-	Integer getAllProductOperationFluxByOperationAndProductCount(ProductOperation operation, Product product)
-	        throws APIException;
+	//	@Transactional(readOnly = true)
+	//	Integer getAllProductOperationFluxByOperationAndProductCount(ProductOperation operation, Product product)
+	//	        throws APIException;
 	
 	/**
 	 * *********** Operation other flux
 	 */
 	
-	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxes(Location location) throws APIException;
+	//	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxes(Location location) throws APIException;
 	
 	ProductOperationOtherFlux getProductOperationOtherFlux(String uuid) throws APIException;
 	
-	ProductOperationOtherFlux getProductOperationOtherFlux(Integer id) throws APIException;
+	//	ProductOperationOtherFlux getProductOperationOtherFlux(Integer id) throws APIException;
 	
-	ProductOperationOtherFlux getProductOperationOtherFluxByAttributeAndOperation(ProductAttribute productAttribute,
-	        ProductOperation productOperation, Location location) throws APIException;
+	//	ProductOperationOtherFlux getProductOperationOtherFluxByAttributeAndOperation(ProductAttribute productAttribute,
+	//	        ProductOperation productOperation, Location location) throws APIException;
 	
-	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperation(ProductOperation operation, Boolean b)
-	        throws APIException;
+	//	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperation(ProductOperation operation, Boolean b)
+	//	        throws APIException;
 	
 	ProductOperationOtherFlux saveProductOperationOtherFlux(ProductOperationOtherFlux productOperationOtherFlux)
 	        throws APIException;
@@ -152,20 +151,20 @@ public interface ProductOperationService extends OpenmrsService {
 	 * *********** Operation other flux
 	 */
 	
-	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperationAndProduct(ProductOperation operation,
-	        Product product, Location location) throws APIException;
-	
-	Integer getAllProductOperationOtherFluxByOperationAndProductCount(ProductOperation operation, Product product)
-	        throws APIException;
-	
-	ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperation(Product product,
-	        ProductOperation productOperation) throws APIException;
-	
-	ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperationAndLabel(Product product,
-	        ProductOperation productOperation, String label, Location location) throws APIException;
-	
-	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByProductAndOperation(Product product,
-	        ProductOperation productOperation, Location location) throws APIException;
+	//	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperationAndProduct(ProductOperation operation,
+	//	        Product product, Location location) throws APIException;
+	//
+	//	Integer getAllProductOperationOtherFluxByOperationAndProductCount(ProductOperation operation, Product product)
+	//	        throws APIException;
+	//
+	//	ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperation(Product product,
+	//	        ProductOperation productOperation) throws APIException;
+	//
+	//	ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperationAndLabel(Product product,
+	//	        ProductOperation productOperation, String label, Location location) throws APIException;
+	//
+	//	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByProductAndOperation(Product product,
+	//	        ProductOperation productOperation, Location location) throws APIException;
 	
 	/**
 	 * *********** Attribute Stock
@@ -176,7 +175,7 @@ public interface ProductOperationService extends OpenmrsService {
 	List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program, Boolean includeVoided)
 	        throws APIException;
 	
-	List<ProductAttributeStock> getAllProductAttributeStocks(Boolean includeVoided) throws APIException;
+	//	List<ProductAttributeStock> getAllProductAttributeStocks(Boolean includeVoided) throws APIException;
 	
 	List<ProductAttributeStock> getAllProductAttributeStockByAttribute(ProductAttribute productAttribute,
 	        Boolean includeVoided) throws APIException;
@@ -184,7 +183,7 @@ public interface ProductOperationService extends OpenmrsService {
 	ProductAttributeStock getProductAttributeStockByAttribute(ProductAttribute productAttribute, Location location,
 	        Boolean includeVoided) throws APIException;
 	
-	ProductAttributeStock getProductAttributeStock(Integer id) throws APIException;
+	//	ProductAttributeStock getProductAttributeStock(Integer id) throws APIException;
 	
 	ProductAttributeStock getProductAttributeStock(String uuid) throws APIException;
 	
@@ -192,20 +191,20 @@ public interface ProductOperationService extends OpenmrsService {
 	
 	void purgeProductAttributeStock(ProductAttributeStock productAttributeStock) throws APIException;
 	
-	List<ProductAttributeStock> getProductAttributeStocksByProduct(Product product, ProductProgram program,
-	        Location userLocation) throws APIException;
+	//	List<ProductAttributeStock> getProductAttributeStocksByProduct(Product product, ProductProgram program,
+	//	        Location userLocation) throws APIException;
+	//
+	//	Integer getProductQuantityInStock(Product product, ProductProgram productProgram) throws APIException;
+	//
+	//	Integer getProductQuantityInStock(Product product, ProductProgram productProgram, Location location) throws APIException;
 	
-	Integer getProductQuantityInStock(Product product, ProductProgram productProgram) throws APIException;
+	//	List<ProductAttributeStock> getAllProductAttributeStockByProduct(Product product, ProductProgram productProgram,
+	//	        Location location) throws APIException;
 	
-	Integer getProductQuantityInStock(Product product, ProductProgram productProgram, Location location) throws APIException;
-	
-	List<ProductAttributeStock> getAllProductAttributeStockByProduct(Product product, ProductProgram productProgram,
-	        Location location) throws APIException;
-	
-	Integer getAllProductAttributeStockByProductCount(Product product, ProductProgram productProgram, Location location,
-	        Boolean includeChildren) throws APIException;
-	
-	List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program, Product product);
+	//	Integer getAllProductAttributeStockByProductCount(Product product, ProductProgram productProgram, Location location,
+	//	        Boolean includeChildren) throws APIException;
+	//
+	//	List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program, Product product);
 	
 	/**
 	 * *********** Operation Flux Attribute
@@ -230,7 +229,7 @@ public interface ProductOperationService extends OpenmrsService {
 	 */
 	ProductDispensation getProductDispensation(String uuid);
 	
-	ProductDispensation saveProductDispensation(ProductDispensation dispensation);
+	//	ProductDispensation saveProductDispensation(ProductDispensation dispensation);
 	
 	List<ProductDispensation> getAllProductDispensation(Location location, Boolean includeVoided);
 	

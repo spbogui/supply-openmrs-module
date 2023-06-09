@@ -72,7 +72,35 @@ public class ProductOperation extends BaseOpenmrsData implements Auditable {
 	@JoinColumn(name = "location_id", nullable = false)
 	private Location location;
 	
+	@Transient
+	private Double totalPurchasePrice = 0.;
+	
+	@Transient
+	private Double totalSalePrice = 0.;
+	
 	public ProductOperation() {
+	}
+	
+	public Double getTotalSalePrice() {
+		for (ProductOperationFlux flux : fluxes) {
+			totalSalePrice += flux.getProductCode().getCurrentPrice().getSalePrice() * flux.getQuantity();
+		}
+		return totalSalePrice;
+	}
+	
+	public void setTotalSalePrice(Double totalSalePrice) {
+		this.totalSalePrice = totalSalePrice;
+	}
+	
+	public Double getTotalPurchasePrice() {
+		for (ProductOperationFlux flux : fluxes) {
+			totalPurchasePrice += flux.getProductCode().getCurrentPrice().getPurchasePrice() * flux.getQuantity();
+		}
+		return totalPurchasePrice;
+	}
+	
+	public void setTotalPurchasePrice(Double totalPurchasePrice) {
+		this.totalPurchasePrice = totalPurchasePrice;
 	}
 	
 	public Integer getProductOperationId() {

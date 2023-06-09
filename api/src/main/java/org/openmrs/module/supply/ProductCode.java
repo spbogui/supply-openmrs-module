@@ -1,5 +1,6 @@
 package org.openmrs.module.supply;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.openmrs.BaseOpenmrsData;
 
 import javax.persistence.*;
@@ -26,17 +27,18 @@ public class ProductCode extends BaseOpenmrsData {
 	@JoinColumn(name = "program_id", nullable = false)
 	private ProductProgram program;
 	
-	//    @JsonIgnore
-	//    @ManyToMany(cascade = CascadeType.ALL)
-	//    @JoinTable(name = "supply2_product_code_regime_members", joinColumns = @JoinColumn(name = "product_code_id"), inverseJoinColumns = @JoinColumn(name = "regime_id"))
-	//    private Set<ProductRegime> regimes = new HashSet<ProductRegime>();
-	//
+	@JsonIgnore
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "supply2_product_code_regime_members", joinColumns = @JoinColumn(name = "product_code_id"), inverseJoinColumns = @JoinColumn(name = "regime_id"))
+	private Set<ProductRegime> regimes = new HashSet<ProductRegime>();
+	
 	@OneToMany(mappedBy = "productCode", fetch = FetchType.EAGER)
 	private Set<ProductPrice> prices = new HashSet<ProductPrice>();
 	
 	@Transient
 	private ProductPrice currentPrice;
 	
+	@Transient
 	private Integer quantityInStock;
 	
 	public Integer getProductCodeId() {
@@ -81,6 +83,14 @@ public class ProductCode extends BaseOpenmrsData {
 		this.program = program;
 	}
 	
+	public Set<ProductRegime> getRegimes() {
+		return regimes;
+	}
+	
+	public void setRegimes(Set<ProductRegime> regimes) {
+		this.regimes = regimes;
+	}
+	
 	public Set<ProductPrice> getPrices() {
 		return prices;
 	}
@@ -89,33 +99,9 @@ public class ProductCode extends BaseOpenmrsData {
 		this.prices = prices;
 	}
 	
-	public ProductPrice getCurrentPrice() {
-		return currentPrice;
-	}
-	
 	public void setCurrentPrice(ProductPrice currentPrice) {
 		this.currentPrice = currentPrice;
 	}
-	
-	//    public Set<ProductRegime> getRegimes() {
-	//        return regimes;
-	//    }
-	//
-	//    public void setRegimes(Set<ProductRegime> regimes) {
-	//        this.regimes = regimes;
-	//    }
-	
-	//    public Set<ProductPrice> getPrices() {
-	//        return prices;
-	//    }
-	//
-	//    public void setPrices(Set<ProductPrice> prices) {
-	//        this.prices = prices;
-	//    }
-	//
-	//    public void setCurrentPrice(ProductPrice currentPrice) {
-	//        this.currentPrice = currentPrice;
-	//    }
 	
 	public Integer getQuantityInStock() {
 		return quantityInStock;
@@ -125,29 +111,29 @@ public class ProductCode extends BaseOpenmrsData {
 		this.quantityInStock = quantityInStock;
 	}
 	
-	//	public void addPrice(ProductPrice price) {
-	//        if (prices == null) {
-	//            prices = new HashSet<>();
-	//        }
-	//        price.setProductCoe(this);
-	//        prices.add(price);
-	//    }
+	public void addPrice(ProductPrice price) {
+        if (prices == null) {
+            prices = new HashSet<>();
+        }
+        price.setProductCode(this);
+        prices.add(price);
+    }
 	
-	//    public ProductPrice getCurrentPrice() {
-	//        for (ProductPrice price : prices) {
-	//            if (price.getActive()) {
-	//                currentPrice = price;
-	//                break;
-	//            }
-	//        }
-	//        return currentPrice;
-	//    }
-	//
-	//    public void addRegime(ProductRegime regime) {
-	//        getRegimes().add(regime);
-	//    }
-	//
-	//    public void removeRegime(ProductRegime regime) {
-	//        getRegimes().remove(regime);
-	//    }
+	public ProductPrice getCurrentPrice() {
+		for (ProductPrice price : prices) {
+			if (price.getActive()) {
+				currentPrice = price;
+				break;
+			}
+		}
+		return currentPrice;
+	}
+	
+	public void addRegime(ProductRegime regime) {
+		getRegimes().add(regime);
+	}
+	
+	public void removeRegime(ProductRegime regime) {
+		getRegimes().remove(regime);
+	}
 }

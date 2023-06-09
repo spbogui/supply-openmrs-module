@@ -11,6 +11,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.supply.Product;
 import org.openmrs.module.supply.ProductAttribute;
 import org.openmrs.module.supply.ProductAttributeStock;
+import org.openmrs.module.supply.ProductCode;
 import org.openmrs.module.supply.api.ProductOperationService;
 import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.module.supply.utils.SupplyUtils;
@@ -71,7 +72,7 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 		DelegatingResourceDescription description = null;
 		if (representation instanceof FullRepresentation) {
 			description = new DelegatingResourceDescription();
-			description.addProperty("product", Representation.DEFAULT);
+			description.addProperty("productCode", Representation.DEFAULT);
 			description.addProperty("batchNumber");
 			description.addProperty("expiryDate");
 			description.addProperty("location", Representation.REF);
@@ -79,7 +80,7 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 			description.addProperty("uuid");
 		} else if (representation instanceof DefaultRepresentation) {
 			description = new DelegatingResourceDescription();
-			description.addProperty("product", Representation.REF);
+			description.addProperty("productCode", Representation.REF);
 			description.addProperty("batchNumber");
 			description.addProperty("expiryDate");
 			description.addProperty("location", Representation.REF);
@@ -87,7 +88,7 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 			description.addProperty("uuid");
 		} else if (representation instanceof RefRepresentation) {
 			description = new DelegatingResourceDescription();
-			description.addProperty("product", Representation.REF);
+			description.addProperty("productCode", Representation.REF);
 			description.addProperty("batchNumber");
 			description.addProperty("expiryDate");
 			description.addProperty("quantityInStock");
@@ -100,7 +101,7 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 	@Override
 	public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addRequiredProperty("product");
+		description.addRequiredProperty("productCode");
 		description.addRequiredProperty("batchNumber");
 		description.addRequiredProperty("expiryDate");
 		description.addRequiredProperty("location");
@@ -111,7 +112,7 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 	@Override
 	public DelegatingResourceDescription getUpdatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addProperty("product");
+		description.addProperty("productCode");
 		description.addProperty("batchNumber");
 		description.addProperty("expiryDate");
 		description.addProperty("location");
@@ -128,19 +129,11 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 	@Override
 	protected PageableResult doSearch(RequestContext context) {
 		String batchNumber = context.getParameter("batchNumber");
-		String productUuid = context.getParameter("product");
+		String productUuid = context.getParameter("productCode");
 		
 		List<ProductAttribute> attributes = new ArrayList<ProductAttribute>();
 		if (batchNumber != null) {
-			if (StringUtils.isNotBlank(productUuid) && StringUtils.isNotEmpty(productUuid)) {
-				Product product = getService().getProduct(productUuid);
-				if (product != null) {
-					attributes.add(getService().getOtherProductAttributeByBatchNumber(batchNumber, product,
-					    SupplyUtils.getUserLocation()));
-				}
-			} else {
-				attributes.add(getService().getProductAttributeByBatchNumber(batchNumber, SupplyUtils.getUserLocation()));
-			}
+			attributes.add(getService().getProductAttributeByBatchNumber(batchNumber, SupplyUtils.getUserLocation()));
 		}
 		return new NeedsPaging<ProductAttribute>(attributes, context);
 	}
@@ -148,8 +141,8 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 	@Override
 	public Model getGETModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
-		model.property("product", new RefProperty("#/definitions/ProductGet")).property("batchNumber", new StringProperty())
-		        .property("expiryDate", new DateProperty())
+		model.property("productCode", new RefProperty("#/definitions/ProductCodeGet"))
+		        .property("batchNumber", new StringProperty()).property("expiryDate", new DateProperty())
 		        .property("location", new RefProperty("#/definitions/LocationGet"))
 		        .property("quantityInStock", new IntegerProperty()).property("uuid", new StringProperty());
 		return model;
@@ -162,10 +155,10 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 		        .property("uuid", new StringProperty());
 		
 		if (rep instanceof FullRepresentation) {
-			model.property("location", new RefProperty("#/definitions/LocationCreate")).property("product",
-			    new RefProperty("#/definitions/ProductCreate"));
+			model.property("location", new RefProperty("#/definitions/LocationCreate")).property("productCode",
+			    new RefProperty("#/definitions/ProductCodeCreate"));
 		} else if (rep instanceof DefaultRepresentation) {
-			model.property("product", new StringProperty().example("uuid")).property("location",
+			model.property("productCode", new StringProperty().example("uuid")).property("location",
 			    new StringProperty().example("uuid"));
 		}
 		model.required("location").required("batchNumber").required("expiryDate").required("product");
@@ -176,13 +169,13 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 	public Model getUPDATEModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
 		model.property("batchNumber", new StringProperty()).property("expiryDate", new DateProperty())
-		        .property("uuid", new StringProperty()).property("product", new StringProperty().example("uuid"))
+		        .property("uuid", new StringProperty()).property("productCode", new StringProperty().example("uuid"))
 		        .property("location", new StringProperty().example("uuid"));
 		return model;
 	}
 	
 	@PropertyGetter("quantityInStock")
-	public static Integer getNames(ProductAttribute attribute) {
+	public static Integer getQuantityInStock(ProductAttribute attribute) {
 		ProductAttributeStock attributeStock = Context.getService(ProductOperationService.class)
 		        .getProductAttributeStockByAttribute(attribute, SupplyUtils.getUserLocation(), false);
 		if (attributeStock != null) {
@@ -190,36 +183,4 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 		}
 		return null;
 	}
-	
-	//	@Override
-	//	public SimpleObject search(RequestContext context) throws ResponseException {
-	//		String batchNumber = context.getParameter("batchNumber");
-	//		String productUuid = context.getParameter("product");
-	//
-	//		if (batchNumber != null) {
-	//			if (StringUtils.isNotBlank(productUuid) && StringUtils.isNotEmpty(productUuid)) {
-	//				Product product = getService().getProduct(productUuid);
-	//				if (product != null) {
-	//					try {
-	//						return SimpleObject.parseJson(getService().getOtherProductAttributeByBatchNumber(batchNumber, product,
-	//								SupplyUtils.getUserLocation()).toString()) ;
-	//					} catch (IOException e) {
-	//						e.printStackTrace();
-	//					}
-	//				}
-	//			} else {
-	//				try {
-	//					return SimpleObject.parseJson(getService().getProductAttributeByBatchNumber(batchNumber, SupplyUtils.getUserLocation()).toString());
-	//				} catch (IOException e) {
-	//					e.printStackTrace();
-	//				}
-	//			}
-	//		}
-	//		return null;
-	//	}
-	//
-	//	@Override
-	//	public Object create(SimpleObject propertiesToCreate, RequestContext context) throws ResponseException {
-	//		return super.create(propertiesToCreate, context);
-	//	}
 }

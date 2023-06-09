@@ -10,7 +10,7 @@ import java.util.Set;
 
 @SuppressWarnings("JpaAttributeTypeInspection")
 @Entity(name = "ProductOperationFlux")
-@Table(name = "supply_product_operation_flux")
+@Table(name = "supply2_product_operation_flux")
 public class ProductOperationFlux extends BaseOpenmrsObject {
 
     @Id
@@ -19,8 +19,8 @@ public class ProductOperationFlux extends BaseOpenmrsObject {
     private Integer productAttributeFluxId;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @JoinColumn(name = "product_code_id")
+    private ProductCode productCode;
 
     @Column(name = "quantity", nullable = false)
     private Double quantity;
@@ -105,12 +105,12 @@ public class ProductOperationFlux extends BaseOpenmrsObject {
         this.location = location;
     }
 
-    public Product getProduct() {
-        return product;
+    public ProductCode getProductCode() {
+        return productCode;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductCode(ProductCode productCode) {
+        this.productCode = productCode;
     }
 
     public Set<ProductOperationFluxAttribute> getAttributes() {

@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity(name = "ProductOperationType")
-@Table(name = "supply_product_operation_type")
+@Table(name = "supply2_product_operation_type")
 public class ProductOperationType extends BaseOpenmrsObject {
 	
 	@Id

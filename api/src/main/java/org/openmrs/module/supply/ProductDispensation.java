@@ -8,7 +8,7 @@ import java.util.Date;
 
 @SuppressWarnings("JpaAttributeTypeInspection")
 @Entity(name = "ProductDispensation")
-@Table(name = "supply_product_dispensation")
+@Table(name = "supply2_product_dispensation")
 public class ProductDispensation extends ProductOperation {
 	
 	@Column(name = "treatment_duration")

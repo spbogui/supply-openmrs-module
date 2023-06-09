@@ -71,7 +71,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 			description.addProperty("quantity");
 			description.addProperty("relatedQuantity");
 			description.addProperty("relatedQuantityLabel");
-			description.addProperty("product", Representation.DEFAULT);
+			description.addProperty("productCode", Representation.DEFAULT);
 			description.addProperty("location", Representation.REF);
 			description.addProperty("observation");
 			description.addProperty("attributes", Representation.DEFAULT);
@@ -81,7 +81,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 		} else if (representation instanceof DefaultRepresentation) {
 			description = new DelegatingResourceDescription();
 			description.addProperty("attributes", Representation.REF);
-			description.addProperty("product", Representation.REF);
+			description.addProperty("productCode", Representation.REF);
 			description.addProperty("quantity");
 			description.addProperty("relatedQuantity");
 			description.addProperty("relatedQuantityLabel");
@@ -94,7 +94,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 			description.addProperty("relatedQuantity");
 			description.addProperty("relatedQuantityLabel");
 			description.addProperty("quantity");
-			description.addProperty("product");
+			description.addProperty("productCode", Representation.REF);
 			description.addProperty("uuid");
 		}
 		return description;
@@ -111,12 +111,6 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 		if (flux.getAttributes() != null && flux.getAttributes().containsAll(attributes)) {
 			return;
 		}
-		
-		//		if (flux.getAttributes() != null && !flux.getAttributes().isEmpty()) {
-		//			throw new ResourceDoesNotSupportOperationException(
-		//			        "Operation flux attributes can only be set for newly created objects !");
-		//		}
-		
 		for (ProductOperationFluxAttribute attribute : attributes) {
 			ProductOperationFluxAttribute existingAttribute = flux.getAttributes() != null ? getMatchingAttribute(attribute,
 			    flux.getAttributes()) : null;
@@ -147,7 +141,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 	@Override
 	public Model getGETModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
-		model.property("product", new RefProperty("#/definitions/ProductGet"))
+		model.property("productCode", new RefProperty("#/definitions/ProductCodeGet"))
 		        .property("attributes", new RefProperty("#/definitions/ProductAttributeGet"))
 		        .property("quantity", new IntegerProperty()).property("relatedQuantity", new DoubleProperty())
 		        .property("relatedQuantityLabel", new StringProperty()).property("display", new StringProperty())
@@ -159,7 +153,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 	@Override
 	public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addRequiredProperty("product");
+		description.addRequiredProperty("productCode");
 		description.addRequiredProperty("quantity");
 		description.addRequiredProperty("location");
 		description.addProperty("attributes");
@@ -173,7 +167,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 	@Override
 	public Model getCREATEModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
-		model.property("product", new StringProperty().example("uuid"))
+		model.property("productCode", new StringProperty().example("uuid"))
 		        .property("location", new StringProperty().example("uuid")).property("quantity", new IntegerProperty())
 		        .property("relatedQuantity", new DoubleProperty()).property("relatedQuantityLabel", new StringProperty())
 		        .property("observation", new StringProperty()).property("uuid", new StringProperty())
@@ -191,7 +185,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 	@Override
 	public DelegatingResourceDescription getUpdatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addProperty("product");
+		description.addProperty("productCode");
 		description.addProperty("attributes");
 		description.addProperty("quantity");
 		description.addProperty("relatedQuantity");

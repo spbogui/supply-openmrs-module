@@ -21,20 +21,20 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 		this.dao = dao;
 	}
 	
-	@Override
-	public Boolean validateOperation(ProductOperation operation) throws APIException {
-		return dao.validateOperation(operation);
-	}
-	
-	@Override
-	public Boolean cancelOperation(ProductOperation operation) throws APIException {
-		return dao.cancelOperation(operation);
-	}
-	
-	@Override
-	public ProductOperation getProductOperation(Integer productOperationId) throws APIException {
-		return dao.getProductOperation(productOperationId);
-	}
+	//	@Override
+	//	public Boolean validateOperation(ProductOperation operation) throws APIException {
+	//		return dao.validateOperation(operation);
+	//	}
+	//
+	//	@Override
+	//	public Boolean cancelOperation(ProductOperation operation) throws APIException {
+	//		return dao.cancelOperation(operation);
+	//	}
+	//
+	//	@Override
+	//	public ProductOperation getProductOperation(Integer productOperationId) throws APIException {
+	//		return dao.getProductOperation(productOperationId);
+	//	}
 	
 	@Override
 	public ProductOperation getProductOperation(String uuid) throws APIException {
@@ -114,11 +114,6 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 	}
 	
 	@Override
-	public ProductOperationType getProductOperationType(Integer id) throws APIException {
-		return dao.getProductOperationType(id);
-	}
-	
-	@Override
 	public ProductOperationType getProductOperationType(String uuid) throws APIException {
 		return dao.getProductOperationType(uuid);
 	}
@@ -140,11 +135,6 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 	}
 	
 	@Override
-	public ProductOperationAttributeType getOperationAttributeType(Integer id) throws APIException {
-		return dao.getOperationAttributeType(id);
-	}
-	
-	@Override
 	public ProductOperationAttributeType getOperationAttributeType(String uuid) throws APIException {
 		return dao.getOperationAttributeType(uuid);
 	}
@@ -155,47 +145,36 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 	}
 	
 	@Override
-	public ProductOperationAttribute getOperationAttribute(Integer id) throws APIException {
-		return dao.getOperationAttribute(id);
-	}
-	
-	@Override
 	public ProductOperationAttribute getOperationAttribute(String uuid) throws APIException {
 		return dao.getOperationAttribute(uuid);
 	}
 	
-	@Override
-	public List<ProductOperationFlux> getAllProductOperationFluxes(Location location, Boolean includeVoided)
-	        throws APIException {
-		return dao.getAllProductOperationFluxes(location, includeVoided);
-	}
+	//	@Override
+	//	public List<ProductOperationFlux> getAllProductOperationFluxes(Location location, Boolean includeVoided)
+	//	        throws APIException {
+	//		return dao.getAllProductOperationFluxes(location, includeVoided);
+	//	}
 	
-	@Override
-	public List<ProductOperationFlux> getAllProductOperationFluxes(Location location, Date startDate, Date endDate,
-	        Boolean includeVoided) throws APIException {
-		return dao.getAllProductOperationFluxes(location, startDate, endDate, includeVoided);
-	}
+	//	@Override
+	//	public List<ProductOperationFlux> getAllProductOperationFluxes(Location location, Date startDate, Date endDate,
+	//	        Boolean includeVoided) throws APIException {
+	//		return dao.getAllProductOperationFluxes(location, startDate, endDate, includeVoided);
+	//	}
 	
-	@Override
-	public List<ProductOperationFlux> getAllProductOperationFluxByOperation(ProductOperation productOperation,
-	        Boolean includeVoided) throws APIException {
-		return dao.getAllProductOperationFluxByOperation(productOperation, includeVoided);
-	}
+	//	@Override
+	//	public List<ProductOperationFlux> getAllProductOperationFluxByOperation(ProductOperation productOperation,
+	//	        Boolean includeVoided) throws APIException {
+	//		return dao.getAllProductOperationFluxByOperation(productOperation, includeVoided);
+	//	}
 	
-	@Override
-	public ProductOperationFlux getProductOperationFlux(Integer id) throws APIException {
-		return dao.getProductOperationFlux(id);
-	}
+	//	@Override
+	//	public ProductOperationFlux getProductOperationFlux(Integer id) throws APIException {
+	//		return dao.getProductOperationFlux(id);
+	//	}
 	
 	@Override
 	public ProductOperationFlux getProductOperationFlux(String uuid) throws APIException {
 		return dao.getProductOperationFlux(uuid);
-	}
-	
-	@Override
-	public ProductOperationFlux getProductOperationFluxByProductAndOperation(Product product,
-	        ProductOperation productOperation) throws APIException {
-		return dao.getProductOperationFluxByProductAndOperation(product, productOperation);
 	}
 	
 	@Override
@@ -209,30 +188,8 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 	}
 	
 	@Override
-	public List<ProductOperationOtherFlux> getAllProductOperationOtherFluxes(Location location) throws APIException {
-		return dao.getAllProductOperationOtherFluxes(location);
-	}
-	
-	@Override
 	public ProductOperationOtherFlux getProductOperationOtherFlux(String uuid) throws APIException {
 		return dao.getProductOperationOtherFlux(uuid);
-	}
-	
-	@Override
-	public ProductOperationOtherFlux getProductOperationOtherFluxByAttributeAndOperation(ProductAttribute productAttribute,
-	        ProductOperation productOperation, Location location) throws APIException {
-		return dao.getProductOperationOtherFluxByAttributeAndOperation(productAttribute, productOperation, location);
-	}
-	
-	@Override
-	public List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperation(ProductOperation operation, Boolean b)
-	        throws APIException {
-		return dao.getAllProductOperationOtherFluxByOperation(operation, b);
-	}
-	
-	@Override
-	public ProductOperationOtherFlux getProductOperationOtherFlux(Integer id) throws APIException {
-		return dao.getProductOperationOtherFlux(id);
 	}
 	
 	@Override
@@ -247,48 +204,6 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 	}
 	
 	@Override
-	public List<ProductOperationFlux> getAllProductOperationFluxByOperationAndProduct(ProductOperation operation,
-	        Product product) throws APIException {
-		return dao.getAllProductOperationFluxByOperationAndProduct(operation, product);
-	}
-	
-	@Override
-	public Integer getAllProductOperationFluxByOperationAndProductCount(ProductOperation operation, Product product)
-	        throws APIException {
-		return dao.getAllProductOperationFluxByOperationAndProductCount(operation, product);
-	}
-	
-	@Override
-	public List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperationAndProduct(ProductOperation operation,
-	        Product product, Location location) throws APIException {
-		return dao.getAllProductOperationOtherFluxByOperationAndProduct(operation, product, location);
-	}
-	
-	@Override
-	public Integer getAllProductOperationOtherFluxByOperationAndProductCount(ProductOperation operation, Product product)
-	        throws APIException {
-		return dao.getAllProductOperationOtherFluxByOperationAndProductCount(operation, product);
-	}
-	
-	@Override
-	public ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperation(Product product,
-	        ProductOperation productOperation) throws APIException {
-		return dao.getProductOperationOtherFluxByProductAndOperation(product, productOperation);
-	}
-	
-	@Override
-	public ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperationAndLabel(Product product,
-	        ProductOperation operation, String label, Location location) throws APIException {
-		return dao.getProductOperationOtherFluxByProductAndOperationAndLabel(product, operation, label, location);
-	}
-	
-	@Override
-	public List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByProductAndOperation(Product product,
-	        ProductOperation operation, Location location) throws APIException {
-		return dao.getAllProductOperationOtherFluxByProductAndOperation(product, operation, location);
-	}
-	
-	@Override
 	public List<ProductAttributeStock> getAllProductAttributeStocks(Location location, Boolean includeVoided)
 	        throws APIException {
 		return dao.getAllProductAttributeStocks(location, includeVoided);
@@ -300,10 +215,10 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 		return dao.getAllProductAttributeStocks(location, program, includeVoided);
 	}
 	
-	@Override
-	public List<ProductAttributeStock> getAllProductAttributeStocks(Boolean includeVoided) throws APIException {
-		return dao.getAllProductAttributeStocks(includeVoided);
-	}
+	//	@Override
+	//	public List<ProductAttributeStock> getAllProductAttributeStocks(Boolean includeVoided) throws APIException {
+	//		return dao.getAllProductAttributeStocks(includeVoided);
+	//	}
 	
 	@Override
 	public List<ProductAttributeStock> getAllProductAttributeStockByAttribute(ProductAttribute productAttribute,
@@ -317,10 +232,10 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 		return dao.getAllProductAttributeStockByAttribute(productAttribute, location, includeVoided);
 	}
 	
-	@Override
-	public ProductAttributeStock getProductAttributeStock(Integer id) throws APIException {
-		return dao.getProductAttributeStock(id);
-	}
+	//	@Override
+	//	public ProductAttributeStock getProductAttributeStock(Integer id) throws APIException {
+	//		return dao.getProductAttributeStock(id);
+	//	}
 	
 	@Override
 	public ProductAttributeStock getProductAttributeStock(String uuid) throws APIException {
@@ -337,40 +252,11 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 		dao.purgeProductAttributeStock(productAttributeStock);
 	}
 	
-	@Override
-	public List<ProductAttributeStock> getProductAttributeStocksByProduct(Product product, ProductProgram program,
-	        Location userLocation) throws APIException {
-		return dao.getProductAttributeStocksByProduct(product, program, userLocation);
-	}
-	
-	@Override
-	public Integer getProductQuantityInStock(Product product, ProductProgram productProgram) throws APIException {
-		return dao.getProductQuantityInStock(product, productProgram);
-	}
-	
-	@Override
-	public Integer getProductQuantityInStock(Product product, ProductProgram productProgram, Location location)
-	        throws APIException {
-		return dao.getProductQuantityInStock(product, productProgram, location);
-	}
-	
-	@Override
-	public List<ProductAttributeStock> getAllProductAttributeStockByProduct(Product product, ProductProgram productProgram,
-	        Location location) throws APIException {
-		return dao.getAllProductAttributeStockByProduct(product, productProgram, location);
-	}
-	
-	@Override
-	public Integer getAllProductAttributeStockByProductCount(Product product, ProductProgram productProgram,
-	        Location location, Boolean includeChildren) throws APIException {
-		return dao.getAllProductAttributeStockByProductCount(product, productProgram, location, includeChildren);
-	}
-	
-	@Override
-	public List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program,
-	        Product product) {
-		return dao.getAllProductAttributeStocks(location, program, product);
-	}
+	//	@Override
+	//	public List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program,
+	//	        Product product) {
+	//		return dao.getAllProductAttributeStocks(location, program, product);
+	//	}
 	
 	@Override
 	public List<ProductOperationFluxAttribute> getAllProductOperationFluxAttributes(Location userLocation,
@@ -404,10 +290,10 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 		return dao.getProductDispensation(uuid);
 	}
 	
-	@Override
-	public ProductDispensation saveProductDispensation(ProductDispensation dispensation) {
-		return dao.saveProductDispensation(dispensation);
-	}
+	//	@Override
+	//	public ProductDispensation saveProductDispensation(ProductDispensation dispensation) {
+	//		return dao.saveProductDispensation(dispensation);
+	//	}
 	
 	@Override
 	public List<ProductDispensation> getAllProductDispensation(Location location, Boolean includeVoided) {

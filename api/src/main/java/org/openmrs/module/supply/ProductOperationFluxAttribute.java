@@ -6,7 +6,7 @@ import org.openmrs.Location;
 import javax.persistence.*;
 
 @Entity(name = "ProductOperationFluxAttribute")
-@Table(name = "supply_product_operation_flux_attribute")
+@Table(name = "supply2_product_operation_flux_attribute")
 public class ProductOperationFluxAttribute extends BaseOpenmrsObject {
 	
 	@Id

@@ -128,9 +128,6 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 	@Override
 	public DelegatingResourceDescription getUpdatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		//        description.addProperty("name");
-		//		description.addProperty("product");
-		//        description.addProperty("productProgram");
 		description.addProperty("salePrice");
 		description.addProperty("purchasePrice");
 		description.addProperty("location");
@@ -141,9 +138,7 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 	@Override
 	public Model getUPDATEModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
-		model
-		//                .property("program", new RefProperty("#/definitions/ProductProgramCreate"))
-		.property("salePrice", new DoubleProperty()).property("purchasePrice", new DoubleProperty())
+		model.property("salePrice", new DoubleProperty()).property("purchasePrice", new DoubleProperty())
 		        .property("active", new BooleanProperty())
 		        .property("location", new RefProperty("#/definitions/LocationGet")).property("uuid", new StringProperty());
 		return model;
@@ -160,8 +155,8 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 	}
 	
 	@Override
-	public PageableResult doGetAll(ProductCode product, RequestContext requestContext) throws ResponseException {
-		List<ProductPrice> prices = new ArrayList<ProductPrice>(product.getPrices());
+	public PageableResult doGetAll(ProductCode productCode, RequestContext requestContext) throws ResponseException {
+		List<ProductPrice> prices = new ArrayList<ProductPrice>(productCode.getPrices());
 		return new NeedsPaging<ProductPrice>(prices, requestContext);
 	}
 }
