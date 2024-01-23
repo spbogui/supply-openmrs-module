@@ -6,10 +6,9 @@ import io.swagger.models.properties.IntegerProperty;
 import io.swagger.models.properties.RefProperty;
 import io.swagger.models.properties.StringProperty;
 import org.apache.commons.lang.StringUtils;
+import org.openmrs.Location;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.supply.ProductAttribute;
-import org.openmrs.module.supply.ProductAttributeStock;
-import org.openmrs.module.supply.ProductProgram;
+import org.openmrs.module.supply.*;
 import org.openmrs.module.supply.api.ProductOperationService;
 import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.module.supply.utils.SupplyUtils;
@@ -29,7 +28,11 @@ import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Resource(name = RestConstants.VERSION_1 + SupplyResourceController.SUPPLY_REST_NAMESPACE + "AttributeStock", supportedClass = ProductAttributeStock.class, supportedOpenmrsVersions = {
@@ -154,8 +157,8 @@ public class ProductAttributeStockResource extends DelegatingCrudResource<Produc
 		
 		if (rep instanceof FullRepresentation) {
 			model.property("location", new RefProperty("#/definitions/LocationCreate"))
-			        .property("attribute", new RefProperty("#/definitions/SupplyProductAttributeCreate"))
-			        .property("operation", new RefProperty("#/definitions/SupplyProductOperationCreate"));
+			        .property("attribute", new RefProperty("#/definitions/ProductAttributeCreate"))
+			        .property("operation", new RefProperty("#/definitions/ProductOperationCreate"));
 		}
 		return model;
 	}
@@ -173,18 +176,84 @@ public class ProductAttributeStockResource extends DelegatingCrudResource<Produc
 		String attribute = context.getParameter("attribute");
 		String program = context.getParameter("program");
 		String filter = context.getParameter("filter");
+		String includeVoided = context.getParameter("includeVoided");
+		String availableOnly = context.getParameter("availableOnly");
+		String period = context.getParameter("period");
+		String product = context.getParameter("product");
+		String dateString = context.getParameter("operationDate");
+		String locationString = context.getParameter("location");
+		
+		Location location = StringUtils.isNotBlank(locationString) ? Context.getLocationService().getLocationByUuid(
+		    locationString) : null;
+		if (location == null) {
+			location = SupplyUtils.getUserLocation();
+		}
 		
 		if (StringUtils.isNotBlank(attribute)) {
 			ProductAttribute productAttribute = Context.getService(ProductService.class).getProductAttribute(attribute);
-			stocks = getService().getAllProductAttributeStockByAttribute(productAttribute, false);
+			stocks = getService().getAllProductAttributeStockByAttribute(productAttribute, includeVoided.equals("true"));
 			return new NeedsPaging<ProductAttributeStock>(stocks, context);
 		} else if (StringUtils.isNotEmpty(filter)) {
 			if (StringUtils.isNotBlank(program)) {
 				ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(program);
 				if (productProgram != null) {
-					if (filter.equals("available")) {
+					if (StringUtils.isNotEmpty(period)) {
+						DateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd");
+						String startDateString = period.split(",")[0];
+						String endDateString = period.split(",")[1];
+						try {
+							Date startDate = sourceFormat.parse(startDateString);
+							Date endDate = sourceFormat.parse(endDateString);
+							List<ProductAttributeStock> productAttributeStocks = getService().getAllProductAttributeStocks(
+							    SupplyUtils.getUserLocation(), productProgram, startDate, endDate,
+							    availableOnly.equals("true"), includeVoided.equals("true"));
+							if (productAttributeStocks != null) {
+								stocks.addAll(productAttributeStocks);
+							}
+						}
+						catch (ParseException e) {
+							e.printStackTrace();
+						}
+					} else if (StringUtils.isNotBlank(dateString)) {
+						DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+						try {
+							Date operationDate = sourceFormat.parse(dateString);
+							if (StringUtils.isNotBlank(product)) {
+								if (filter.equals("expiry")) {
+									ProductCode productCode = Context.getService(ProductService.class).getProductCode(
+									    product);
+									
+									if (productCode != null && operationDate != null) {
+										List<ProductAttributeStock> productAttributeStocks = getService()
+										        .getProductAttributeStockByExpiryDate(productCode, operationDate, location);
+										if (productAttributeStocks != null) {
+											stocks.addAll(productAttributeStocks);
+										}
+									}
+								}
+							} else {
+								if (filter.equals("expired")) {
+									List<ProductAttributeStock> productAttributeStocks = getService()
+									        .getProductAttributeStockByExpired(operationDate, location, productProgram);
+									if (productAttributeStocks != null) {
+										stocks.addAll(productAttributeStocks);
+									}
+								} else if (filter.equals("expiring")) {
+									List<ProductAttributeStock> productAttributeStocks = getService()
+									        .getProductAttributeStockByExpiring(operationDate, location, productProgram);
+									if (productAttributeStocks != null) {
+										stocks.addAll(productAttributeStocks);
+									}
+								}
+							}
+						}
+						catch (ParseException e) {
+							throw new RuntimeException(e);
+						}
+					} else {
 						List<ProductAttributeStock> productAttributeStocks = getService().getAllProductAttributeStocks(
-						    SupplyUtils.getUserLocation(), productProgram, false);
+						    SupplyUtils.getUserLocation(), productProgram, availableOnly.equals("true"),
+						    includeVoided.equals("true"));
 						if (productAttributeStocks != null) {
 							stocks.addAll(productAttributeStocks);
 						}

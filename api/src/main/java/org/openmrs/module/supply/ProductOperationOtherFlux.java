@@ -1,6 +1,5 @@
 package org.openmrs.module.supply;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.openmrs.BaseOpenmrsObject;
 import org.openmrs.Location;
 
@@ -8,7 +7,7 @@ import javax.persistence.*;
 
 @SuppressWarnings("JpaAttributeTypeInspection")
 @Entity(name = "ProductOperationOtherFlux")
-@Table(name = "supply_product_operation_other_flux")
+@Table(name = "supply2_product_operation_other_flux")
 public class ProductOperationOtherFlux extends BaseOpenmrsObject {
 	
 	@Id
@@ -17,12 +16,8 @@ public class ProductOperationOtherFlux extends BaseOpenmrsObject {
 	private Integer productOperationOtherFluxId;
 	
 	@ManyToOne
-	@JoinColumn(name = "product_id")
-	private Product product;
-	
-	//	@ManyToOne
-	//	@JoinColumn(name = "product_attribute_id")
-	//	private ProductAttribute productAttribute;
+	@JoinColumn(name = "product_code_id")
+	private ProductCode productCode;
 	
 	@Column(name = "label", nullable = false)
 	private String label;
@@ -30,7 +25,6 @@ public class ProductOperationOtherFlux extends BaseOpenmrsObject {
 	@Column(name = "quantity", nullable = false)
 	private Double quantity;
 	
-	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "operation_id", nullable = false)
 	private ProductOperation operation;
@@ -42,6 +36,13 @@ public class ProductOperationOtherFlux extends BaseOpenmrsObject {
 	public ProductOperationOtherFlux() {
 	}
 	
+	public ProductOperationOtherFlux(ProductCode productCode, String label, Double quantity, Location location) {
+		this.productCode = productCode;
+		this.label = label;
+		this.quantity = quantity;
+		this.location = location;
+	}
+	
 	public Integer getProductOperationOtherFluxId() {
 		return productOperationOtherFluxId;
 	}
@@ -50,21 +51,13 @@ public class ProductOperationOtherFlux extends BaseOpenmrsObject {
 		this.productOperationOtherFluxId = productAttributeOtherFluxId;
 	}
 	
-	public Product getProduct() {
-		return product;
+	public ProductCode getProductCode() {
+		return productCode;
 	}
 	
-	public void setProduct(Product product) {
-		this.product = product;
+	public void setProductCode(ProductCode productCode) {
+		this.productCode = productCode;
 	}
-	
-	//	public ProductAttribute getProductAttribute() {
-	//		return productAttribute;
-	//	}
-	//
-	//	public void setProductAttribute(ProductAttribute productAttribute) {
-	//		this.productAttribute = productAttribute;
-	//	}
 	
 	public String getLabel() {
 		return label;

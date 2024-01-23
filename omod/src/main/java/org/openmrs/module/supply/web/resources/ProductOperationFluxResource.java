@@ -9,6 +9,7 @@ import io.swagger.models.properties.StringProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.supply.*;
 import org.openmrs.module.supply.api.ProductOperationService;
+import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.annotation.PropertyGetter;
 import org.openmrs.module.webservices.rest.web.annotation.PropertySetter;
@@ -49,6 +50,10 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 	
 	@Override
 	public void purge(ProductOperationFlux productOperationFlux, RequestContext requestContext) throws ResponseException {
+		//		for (ProductOperationFluxAttribute fluxAttribute : productOperationFlux.getAttributes()) {
+		//			getService().purgeProductOperationFluxAttribute(fluxAttribute);
+		//		}
+		//		Context.getService(ProductService.class).purgeUnusedAttributes(productOperationFlux);
 		getService().purgeProductOperationFlux(productOperationFlux);
 	}
 	
@@ -59,6 +64,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 	
 	@Override
 	public ProductOperationFlux save(ProductOperationFlux ProductOperationFlux) {
+		//		Context.getService(ProductService.class).purgeUnusedAttributes();
 		return getService().saveProductOperationFlux(ProductOperationFlux);
 	}
 	
@@ -72,6 +78,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 			description.addProperty("relatedQuantity");
 			description.addProperty("relatedQuantityLabel");
 			description.addProperty("productCode", Representation.DEFAULT);
+			//			description.addProperty("report", Representation.DEFAULT);
 			description.addProperty("location", Representation.REF);
 			description.addProperty("observation");
 			description.addProperty("attributes", Representation.DEFAULT);
@@ -82,6 +89,7 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 			description = new DelegatingResourceDescription();
 			description.addProperty("attributes", Representation.REF);
 			description.addProperty("productCode", Representation.REF);
+			//			description.addProperty("report", Representation.REF);
 			description.addProperty("quantity");
 			description.addProperty("relatedQuantity");
 			description.addProperty("relatedQuantityLabel");

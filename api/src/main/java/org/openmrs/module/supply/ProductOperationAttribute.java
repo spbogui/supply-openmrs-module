@@ -8,6 +8,7 @@ import org.hibernate.search.annotations.Fields;
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.search.LuceneAnalyzers;
+import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.util.OpenmrsClassLoader;
 import org.openmrs.util.OpenmrsUtil;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ import java.util.Date;
 @Table(name = "supply2_product_operation_attribute")
 public class ProductOperationAttribute extends BaseOpenmrsData implements Serializable, Comparable<ProductOperationAttribute> {
 	
-	public static final long serialVersionUID = 11231211232111L;
+	private static final long serialVersionUID = 11231211232111L;
 	
 	private static final Logger log = LoggerFactory.getLogger(ProductOperationAttribute.class);
 	
@@ -202,7 +203,6 @@ public class ProductOperationAttribute extends BaseOpenmrsData implements Serial
 	 * @return hydrated object or getValue() <strong>Should</strong> load class in format property
 	 *         <strong>Should</strong> still load class in format property if not Attributable
 	 */
-	@SuppressWarnings("unchecked")
 	public Object getHydratedObject() {
 		
 		if (getValue() == null) {
@@ -220,7 +220,12 @@ public class ProductOperationAttribute extends BaseOpenmrsData implements Serial
 					return Context.getEncounterService().getEncounterByUuid(getValue());
 				} else if (o instanceof Provider) {
 					return Context.getProviderService().getProviderByUuid(getValue());
+				} else if (o instanceof ProductRegime) {
+					return Context.getService(ProductService.class).getProductRegime(getValue());
 				}
+				//				else if (o instanceof Date) {
+				//					return o;
+				//				}
 			}
 			catch (InstantiationException e) {
 				// try to hydrate the object with the String constructor

@@ -1,5 +1,7 @@
 package org.openmrs.module.supply.utils;
 
+import org.joda.time.LocalDate;
+import org.joda.time.Months;
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.supply.ProductDispensation;
@@ -9,9 +11,12 @@ import org.openmrs.module.supply.ProductProgram;
 import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.module.supply.api.SupplyService;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class SupplyUtils {
+	
+	public static final DecimalFormat df = new DecimalFormat("0.00");
 	
 	public static Location getUserLocation() {
 		if (Context.getUserContext().getLocation() != null) {
@@ -19,6 +24,18 @@ public class SupplyUtils {
 		}
 		return Context.getLocationService().getDefaultLocation();
 	}
+	
+	public static String generateRandom(Integer targetStringLength) {
+        int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        Random random = new Random();
+
+        return random.ints(leftLimit, rightLimit + 1)
+                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+    }
 	
 	public static List<Location> getUserLocations() {
         List<Location> locations = new ArrayList<>();
@@ -50,7 +67,7 @@ public class SupplyUtils {
 	
 	public static String join(String separator, List<String> input) {
 		
-		if (input == null || input.size() <= 0)
+		if (input == null || input.size() == 0)
 			return "";
 		
 		StringBuilder sb = new StringBuilder();
@@ -154,5 +171,94 @@ public class SupplyUtils {
 	
 	public static Date getPatientTransferDate(Patient patient) {
 		return Context.getService(SupplyService.class).transferDate(patient, SupplyUtils.getUserLocation());
+	}
+	
+	public static Boolean isDirectClient(Location location) {
+		for (LocationAttribute attribute : location.getActiveAttributes()) {
+			if (attribute.getAttributeType().getName().equals("Client Direct NPSP")) {
+				if (attribute.getValue().equals(true)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static String getLocationType(Location location) {
+        String locationType = "CenterAndOrganisations";
+        if (isDirectClient(location)) {
+            locationType = "DirectClient";
+        } else {
+            LocationTag tag = location.getTags().stream().filter(t -> t.getName().equals("DISTRICT SANITAIRE")).findFirst().orElse(null);
+            if (location.getTags().stream().filter(t -> t.getName().equals("DISTRICT SANITAIRE")).findFirst().orElse(null) != null) {
+                locationType = "District";
+            } else {
+                if (location.getTags().stream().filter(t -> t.getName().equals("SERVICE")).findFirst().orElse(null) != null) {
+                    locationType = "PointOfServiceDelivery";
+                }
+            }
+        }
+        return locationType;
+    }
+	
+	public static Double getStockMax() {
+		return getLocationStockMax(getUserLocation());
+	}
+	
+	public static Double getLocationStockMax(Location location) {
+		String locationType = getLocationType(location);
+		String stockMaxInProperty = Context.getAdministrationService().getGlobalProperty(
+		    "supplyInfo.stockMax" + locationType);
+		String unit = stockMaxInProperty.split(" ")[1];
+		double stockMax = 0.0;
+		if (unit.startsWith("M"))
+			stockMax = Double.parseDouble(stockMaxInProperty.split(" ")[0]);
+		else if (unit.startsWith("D")) {
+			stockMax = Double.parseDouble(stockMaxInProperty.split(" ")[0]) / 30;
+		} else if (unit.startsWith("W")) {
+			stockMax = Double.parseDouble(stockMaxInProperty.split(" ")[0]) / 4;
+		}
+		
+		//        System.out.println("|-----------------------------------------------------------> : " + stockMax);
+		return stockMax;
+	}
+	
+	public static Integer getMonthsForCMM(Location location) {
+		if (isDirectClient(location)) {
+			return getMonthsForCMMDirectClient();
+		}
+		return getMonthsForCMMEts();
+	}
+	
+	public static Integer getMonthsForCMMEts() {
+		String months = Context.getAdministrationService().getGlobalProperty("supplyInfo.monthsForCMM");
+		return Integer.parseInt(months);
+	}
+	
+	public static Integer getMonthsForCMMDirectClient() {
+		String months = Context.getAdministrationService().getGlobalProperty("supplyInfo.monthsForCMMDirectClient");
+		return Integer.parseInt(months);
+	}
+	
+	public static Date getMinDate(List<ProductOperation> operations) {
+        List<Date> dates = new ArrayList<>();
+        for (ProductOperation operation : operations) {
+            dates.add(operation.getOperationDate());
+        }
+        return Collections.min(dates);
+    }
+	
+	public static Date getMaxDate(List<ProductOperation> operations) {
+        List<Date> dates = new ArrayList<>();
+        for (ProductOperation operation : operations) {
+            dates.add(operation.getOperationDate());
+        }
+        return Collections.max(dates);
+    }
+	
+	public static Integer getDateDiffInMonth(Date startDate, Date endDate) {
+		LocalDate start = new LocalDate(startDate);
+		LocalDate end = new LocalDate(endDate);
+		return Months.monthsBetween(start, end).getMonths();
 	}
 }

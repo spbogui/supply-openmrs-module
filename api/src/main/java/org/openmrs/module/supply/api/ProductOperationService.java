@@ -1,11 +1,13 @@
 package org.openmrs.module.supply.api;
 
+import org.hibernate.HibernateException;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.supply.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -27,14 +29,52 @@ public interface ProductOperationService extends OpenmrsService {
 	List<ProductOperation> getAllProductOperation(ProductOperationType operationType, Location location,
 	        Boolean validatedOnly, Boolean includeVoided) throws APIException;
 	
+	List<ProductOperation> getAllProductOperation(ProductOperationType operationType, Location location, Date startDate,
+	        Date endDate, Boolean validatedOnly, Boolean includeVoided) throws APIException;
+	
 	List<ProductOperation> getAllProductOperation(ProductOperationType operationType, ProductProgram productProgram,
 	        Location location, Boolean validatedOnly, Boolean includeVoided) throws APIException;
 	
-	List<ProductOperation> getAllProductOperation(ProductOperationType operationType, Date startDate, Date endDate,
-	        Location location, Boolean validatedOnly, Boolean includeVoided) throws APIException;
+	List<ProductOperation> getAllProductOperation(ProductOperationType operationType, ProductProgram program,
+	        Date startDate, Date endDate, Location location, Boolean validatedOnly, Boolean includeVoided)
+	        throws APIException;
+	
+	List<ProductOperation> getAllProductOperation(ProductOperationType operationType, ProductProgram program,
+	        Date startDate, Date endDate, Location location, Boolean validatedOnly, Boolean includeVoided,
+	        Boolean forChildLocations) throws APIException;
+	
+	List<ProductOperation> getAllProductOperation(ProductOperationType operationType, ProductProgram program,
+	        String operationNumber, Date startDate, Date endDate, Location location, Boolean validatedOnly,
+	        Boolean includeVoided, Boolean forChildLocations) throws APIException;
+	
+	List<ProductOperation> getAllProductOperation(ProductOperationType operationType, ProductProgram program,
+	        String operationNumber, Location location, Boolean validatedOnly, Boolean includeVoided,
+	        Boolean forChildLocations) throws APIException;
 	
 	ProductOperation getLastProductOperation(ProductOperationType operationType, ProductProgram program, Location location,
 	        Boolean validated, Boolean includeVoided) throws APIException;
+	
+	ProductOperation getLastProductOperation(ProductOperationType operationType, ProductProgram program, Location location,
+	        Boolean validated, Boolean includeVoided, Date endDate) throws APIException;
+	
+	ProductOperation getLastProductOperation(List<ProductOperationType> operationTypes, ProductProgram program,
+	        Location location, Boolean includeVoided) throws APIException;
+	
+	ProductOperation getLastProductOperation(ProductOperationType operationType, ProductProgram program,
+	        String operationNumber, Location location, Boolean validated, Boolean includeVoided) throws APIException;
+	
+	List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, Location location,
+	        Boolean includeVoided);
+	
+	List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, ProductProgram program,
+	        Date startDate, Date endDate, List<Location> locations, Boolean validatedOnly, Boolean includeVoided,
+	        Boolean forChildLocations) throws APIException;
+	
+	List<ProductOperation> getAllProductOperationByTypes(List<ProductOperationType> operationTypes, ProductProgram program,
+	        Location location, Boolean validatedOnly, Boolean includeVoided);
+	
+	List<ProductOperation> getAllProductOperationByTypes(List<ProductOperationType> operationTypes, Location location,
+	        Boolean validatedOnly, Boolean includeVoided);
 	
 	ProductOperation getLastProductOperation(ProductOperationType operationType, ProductProgram program, Date limitEndDate,
 	        Location location, Boolean validated, Boolean includeVoided) throws APIException;
@@ -42,13 +82,21 @@ public interface ProductOperationService extends OpenmrsService {
 	ProductOperation getProductOperationByOperationNumber(ProductOperationType operationType, String operationNumber,
 	        Location location, Boolean validated) throws APIException;
 	
+	ProductOperation getProductOperationByOperationNumber(ProductOperationType operationType, String operationNumber,
+	        Location location, Boolean validated, Date endDate) throws APIException;
+	
+	ProductOperation getProductOperationByOperationNumber(ProductOperationType operationType, ProductProgram program,
+	        String operationNumber, Location location, Boolean validated) throws APIException;
+	
 	List<ProductOperation> getProductOperationByOperationNumber(String operationNumber, Location location, Boolean validated);
 	
 	List<ProductOperation> getAllProductOperation(Location location, Boolean includeVoided) throws APIException;
 	
-	ProductOperation saveProductOperation(ProductOperation productOperation) throws APIException;
+	ProductOperation saveProductOperation(ProductOperation productOperation) throws APIException, ParseException;
 	
 	void purgeProductOperation(ProductOperation productOperation) throws APIException;
+	
+	List<ProductOperation> findLatestOperationsByProgram(ProductOperationType operationType, Location location, Date endDate);
 	
 	/**
 	 * *********** Operation type
@@ -118,6 +166,12 @@ public interface ProductOperationService extends OpenmrsService {
 	@Transactional
 	void purgeProductOperationFlux(ProductOperationFlux productOperationFlux) throws APIException;
 	
+	List<ProductOperationFlux> getOperationFluxes(List<ProductOperationType> operationTypes, Date startDate, Date endDate,
+	        Location location, ProductProgram program) throws HibernateException;
+	
+	List<ProductOperationFlux> getOperationChildrenLocationFluxes(List<ProductOperationType> operationTypes, Date startDate,
+	        Date endDate, Location location, ProductProgram program) throws HibernateException;
+	
 	//	@Transactional(readOnly = true)
 	//	List<ProductOperationFlux> getAllProductOperationFluxByOperationAndProduct(ProductOperation operation, Product product)
 	//	        throws APIException;
@@ -151,20 +205,11 @@ public interface ProductOperationService extends OpenmrsService {
 	 * *********** Operation other flux
 	 */
 	
-	//	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperationAndProduct(ProductOperation operation,
-	//	        Product product, Location location) throws APIException;
-	//
-	//	Integer getAllProductOperationOtherFluxByOperationAndProductCount(ProductOperation operation, Product product)
-	//	        throws APIException;
-	//
-	//	ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperation(Product product,
-	//	        ProductOperation productOperation) throws APIException;
-	//
-	//	ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperationAndLabel(Product product,
-	//	        ProductOperation productOperation, String label, Location location) throws APIException;
-	//
-	//	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByProductAndOperation(Product product,
-	//	        ProductOperation productOperation, Location location) throws APIException;
+	List<ProductOperationOtherFlux> getAllProductOperationOtherFluxByOperationAndProduct(ProductOperation operation,
+	        ProductCode product, Location location) throws APIException;
+	
+	ProductOperationOtherFlux getProductOperationOtherFluxByProductAndOperationAndLabel(ProductCode product,
+	        ProductOperation productOperation, String label, Location location) throws APIException;
 	
 	/**
 	 * *********** Attribute Stock
@@ -172,10 +217,21 @@ public interface ProductOperationService extends OpenmrsService {
 	
 	List<ProductAttributeStock> getAllProductAttributeStocks(Location location, Boolean includeVoided) throws APIException;
 	
-	List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program, Boolean includeVoided)
-	        throws APIException;
+	List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program,
+	        Boolean availableOnly, Boolean includeVoided) throws APIException;
+	
+	List<ProductAttributeStock> getAllProductAttributeStocks(Location location, ProductProgram program, Date startDate,
+	        Date endDate, Boolean availableOnly, Boolean includeVoided) throws APIException;
 	
 	//	List<ProductAttributeStock> getAllProductAttributeStocks(Boolean includeVoided) throws APIException;
+	List<ProductAttributeStock> getProductAttributeStockByExpiryDate(ProductCode productCode, Date currentDate,
+	        Location location) throws APIException;
+	
+	List<ProductAttributeStock> getProductAttributeStockByExpired(Date currentDate, Location location, ProductProgram program)
+	        throws APIException;
+	
+	List<ProductAttributeStock> getProductAttributeStockByExpiring(Date currentDate, Location location,
+	        ProductProgram program) throws APIException;
 	
 	List<ProductAttributeStock> getAllProductAttributeStockByAttribute(ProductAttribute productAttribute,
 	        Boolean includeVoided) throws APIException;
@@ -190,6 +246,8 @@ public interface ProductOperationService extends OpenmrsService {
 	ProductAttributeStock saveProductAttributeStock(ProductAttributeStock productAttributeStock) throws APIException;
 	
 	void purgeProductAttributeStock(ProductAttributeStock productAttributeStock) throws APIException;
+	
+	Integer getProductQuantityInStock(ProductCode productCode, Location location) throws APIException;
 	
 	//	List<ProductAttributeStock> getProductAttributeStocksByProduct(Product product, ProductProgram program,
 	//	        Location userLocation) throws APIException;
@@ -212,7 +270,7 @@ public interface ProductOperationService extends OpenmrsService {
 	@Transactional(readOnly = true)
 	List<ProductOperationFluxAttribute> getAllProductOperationFluxAttributes(Location userLocation, Boolean includeVoided);
 	
-	@Transactional(readOnly = true)
+	@Transactional
 	void purgeProductOperationFluxAttribute(ProductOperationFluxAttribute productOperationFluxAttribute);
 	
 	@Transactional
@@ -234,4 +292,22 @@ public interface ProductOperationService extends OpenmrsService {
 	List<ProductDispensation> getAllProductDispensation(Location location, Boolean includeVoided);
 	
 	List<ProductDispensation> getAllProductDispensation(String operationNumber, Location location, Boolean includeVoided);
+	
+	List<ProductNotification> getAllProductNotification(Boolean includeRead, Boolean includeClosed);
+	
+	List<ProductNotification> getAllTransferNotification(Boolean includeRead, Boolean includeClosed);
+	
+	List<ProductNotification> getAllRuptureNotification(Boolean includeRead, Boolean includeClosed);
+	
+	List<ProductNotification> getAllProductReturnNotification(Boolean includeRead, Boolean includeClosed);
+	
+	List<ProductNotification> getAllReceptionNotification(boolean includeRead, boolean includeClosed);
+	
+	List<ProductNotification> getAllRejectReportNotification(boolean includeRead, boolean includeClosed);
+	
+	ProductNotification saveNotification(ProductNotification notification);
+	
+	ProductNotification getNotification(String uuid);
+	
+	Double getMonthlyConsumption(ProductCode productCode, Location location, List<Location> locations);
 }

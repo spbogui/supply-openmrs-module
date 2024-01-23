@@ -11,13 +11,13 @@ package org.openmrs.module.supply.api.dao;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.openmrs.Encounter;
-import org.openmrs.Location;
-import org.openmrs.Obs;
-import org.openmrs.Patient;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.openmrs.*;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.supply.*;
+import org.openmrs.module.supply.utils.SupplyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -166,13 +166,56 @@ public class SupplyDao {
 			Query query = getSession().createQuery(
 			    "SELECT pi.patient FROM PatientIdentifier pi WHERE pi.identifier = :identifier AND " + "pi.voided = false ");
 			query.setParameter("identifier", identifier);
-			
-			System.out.println("-------------------------------------->" + query.uniqueResult());
 			return (Patient) query.uniqueResult();
 		}
 		catch (HibernateException e) {
 			System.out.println("-------------------------------------->" + e.getMessage());
 		}
 		return null;
+	}
+	
+	public Obs getPatientLastObs(Person person, Concept concept, EncounterType encounterType) {
+		return (Obs) getSession().createCriteria(Obs.class, "o").createAlias("o.encounter", "e")
+		        .add(Restrictions.eq("o.person", person)).add(Restrictions.eq("o.concept", concept))
+		        .add(Restrictions.eq("e.encounterType", encounterType))
+		        .add(Restrictions.eq("e.location", SupplyUtils.getUserLocation())).addOrder(Order.desc("o.obsDatetime"))
+		        .setMaxResults(1).uniqueResult();
+	}
+	
+	public Obs getPatientLastObs(Person person, Concept concept) {
+		return (Obs) getSession().createCriteria(Obs.class).add(Restrictions.eq("person", person))
+		        .add(Restrictions.eq("concept", concept)).add(Restrictions.eq("location", SupplyUtils.getUserLocation()))
+		        .addOrder(Order.desc("obsDatetime")).setMaxResults(1).uniqueResult();
+	}
+	
+	public Obs getPatientLastObs(Person person, Concept concept, EncounterType encounterType, Date endDate) {
+		return (Obs) getSession().createCriteria(Obs.class, "o").createAlias("o.encounter", "e")
+		        .add(Restrictions.eq("o.person", person)).add(Restrictions.eq("o.concept", concept))
+		        .add(Restrictions.eq("e.encounterType", encounterType))
+		        .add(Restrictions.eq("e.location", SupplyUtils.getUserLocation()))
+		        .add(Restrictions.lt("o.obsDatetime", endDate)).addOrder(Order.desc("o.obsDatetime")).setMaxResults(1)
+		        .uniqueResult();
+	}
+	
+	public Obs getPatientLastObs(Person person, Concept concept, Date endDate) {
+		return (Obs) getSession().createCriteria(Obs.class).add(Restrictions.eq("person", person))
+		        .add(Restrictions.eq("concept", concept)).add(Restrictions.eq("location", SupplyUtils.getUserLocation()))
+		        .add(Restrictions.lt("obsDatetime", endDate)).addOrder(Order.desc("obsDatetime")).setMaxResults(1)
+		        .uniqueResult();
+	}
+	
+	public Encounter getPatientLastEncounter(Patient patient, EncounterType encounterType) {
+		return (Encounter) getSession().createCriteria(Encounter.class).add(Restrictions.eq("patient", patient))
+		        .add(Restrictions.eq("encounterType", encounterType))
+		        .add(Restrictions.eq("location", SupplyUtils.getUserLocation())).addOrder(Order.desc("encounterDatetime"))
+		        .setMaxResults(1).uniqueResult();
+	}
+	
+	public Encounter getPatientLastEncounter(Patient patient, EncounterType encounterType, Date endDate) {
+		return (Encounter) getSession().createCriteria(Encounter.class).add(Restrictions.eq("patient", patient))
+		        .add(Restrictions.eq("encounterType", encounterType))
+		        .add(Restrictions.eq("location", SupplyUtils.getUserLocation()))
+		        .add(Restrictions.lt("encounterDatetime", endDate)).addOrder(Order.desc("encounterDatetime"))
+		        .setMaxResults(1).uniqueResult();
 	}
 }

@@ -4,6 +4,7 @@ import io.swagger.models.Model;
 import io.swagger.models.ModelImpl;
 import io.swagger.models.properties.RefProperty;
 import io.swagger.models.properties.StringProperty;
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.Attributable;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.supply.ProductOperation;
@@ -104,6 +105,7 @@ public class ProductOperationAttributeResource extends DelegatingSubResource<Pro
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
 		description.addRequiredProperty("operationAttributeType");
 		description.addRequiredProperty("value");
+		description.addRequiredProperty("location");
 		description.addProperty("uuid");
 		return description;
 	}
@@ -128,6 +130,7 @@ public class ProductOperationAttributeResource extends DelegatingSubResource<Pro
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
 		description.addProperty("operationAttributeType");
 		description.addProperty("value");
+		description.addProperty("location");
 		return description;
 	}
 	
@@ -149,16 +152,25 @@ public class ProductOperationAttributeResource extends DelegatingSubResource<Pro
 	}
 	
 	@Override
-	public PageableResult doGetAll(ProductOperation productOperation, RequestContext requestContext)
-	        throws ResponseException {
-		List<ProductOperationAttribute> attributes = new ArrayList<ProductOperationAttribute>();
-		for (ProductOperationAttribute attribute : productOperation.getAttributes()) {
-			if (!attribute.getVoided()) {
-				attributes.add(attribute);
-			}
-		}
-		return new NeedsPaging<ProductOperationAttribute>(attributes, requestContext);
-	}
+    public PageableResult doGetAll(ProductOperation productOperation, RequestContext requestContext)
+            throws ResponseException {
+        List<ProductOperationAttribute> attributes = new ArrayList<ProductOperationAttribute>();
+
+        final String attributeType = requestContext.getRequest().getParameter("attributeType");
+
+        if (StringUtils.isNotBlank(attributeType)) {
+            productOperation.getAttributes().stream()
+                    .filter(a -> a.getOperationAttributeType().getUuid().equals(attributeType) && !a.getVoided())
+                    .findFirst().ifPresent(attributes::add);
+        } else {
+            for (ProductOperationAttribute attribute : productOperation.getAttributes()) {
+                if (!attribute.getVoided()) {
+                    attributes.add(attribute);
+                }
+            }
+        }
+        return new NeedsPaging<ProductOperationAttribute>(attributes, requestContext);
+    }
 	
 	@PropertyGetter("display")
 	public String getDisplayString(ProductOperationAttribute attribute) {

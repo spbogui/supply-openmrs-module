@@ -594,7 +594,7 @@ s
     </changeSet>
 
     <changeSet id="supply2-product-operation-attribute-create" author="BOGUI SERGE">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="supply2_product_operation_attribute"/>
             </not>
@@ -638,14 +638,17 @@ s
                                  referencedTableName="supply2_product_operation_attribute_type"
                                  referencedColumnNames="product_operation_attribute_type_id"
                                  constraintName="supply2_product_operation_attribute_attribute_type"/>
+
         <addForeignKeyConstraint baseTableName="supply2_product_operation_attribute"
                                  baseColumnNames="product_operation"
                                  referencedTableName="supply2_product_operation"
                                  referencedColumnNames="product_operation_id"
                                  constraintName="supply2_product_operation_attribute_operation"/>
+
         <addForeignKeyConstraint baseTableName="supply2_product_operation_attribute" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"
                                  constraintName="supply2_product_operation_attribute_location"/>
+
         <addForeignKeyConstraint constraintName="supply2_product_operation_attribute_creator"
                                  baseTableName="supply2_product_operation_attribute" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
@@ -743,44 +746,65 @@ s
                                  referencedTableName="location" referencedColumnNames="location_id"/>
     </changeSet>
 
-    <!--    <changeSet id="supply2-product-operation-other-flux" author="BOGUI SERGE">-->
-    <!--        <preConditions>-->
-    <!--            <not>-->
-    <!--                <tableExists tableName="supply2_product_operation_other_flux"/>-->
-    <!--            </not>-->
-    <!--        </preConditions>-->
-    <!--        <createTable tableName="supply2_product_operation_other_flux">-->
-    <!--            <column name="product_operation_other_flux_id" type="int" autoIncrement="true">-->
-    <!--                <constraints primaryKey="true"/>-->
-    <!--            </column>-->
-    <!--            <column name="product_id" type="int"/>-->
-    <!--            <column name="operation_id" type="int">-->
-    <!--                <constraints nullable="false"/>-->
-    <!--            </column>-->
-    <!--            <column name="label" type="int">-->
-    <!--                <constraints nullable="false"/>-->
-    <!--            </column>-->
-    <!--            <column name="quantity" type="int">-->
-    <!--                <constraints nullable="false"/>-->
-    <!--            </column>-->
-    <!--            <column name="location_id" type="int">-->
-    <!--                <constraints nullable="false"/>-->
-    <!--            </column>-->
-    <!--            <column name="uuid" type="varchar(38)">-->
-    <!--                <constraints nullable="false" unique="true"/>-->
-    <!--            </column>-->
-    <!--        </createTable>-->
-    <!--        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_product_operation"-->
-    <!--                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="operation_id"-->
-    <!--                                 referencedTableName="supply2_product_operation"-->
-    <!--                                 referencedColumnNames="product_operation_id"/>-->
-    <!--        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_location"-->
-    <!--                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="location_id"-->
-    <!--                                 referencedTableName="location" referencedColumnNames="location_id"/>-->
-    <!--        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_product"-->
-    <!--                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="product_id"-->
-    <!--                                 referencedTableName="supply2_product" referencedColumnNames="product_id"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="supply2-product-operation-other-flux-create" author="BOGUI SERGE">
+        <preConditions>
+            <not>
+                <tableExists tableName="supply2_product_operation_other_flux"/>
+            </not>
+        </preConditions>
+        <createTable tableName="supply2_product_operation_other_flux">
+            <column name="product_operation_other_flux_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="product_code_id" type="int"/>
+            <column name="operation_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uuid" type="varchar(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_product_operation"
+                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="operation_id"
+                                 referencedTableName="supply2_product_operation"
+                                 referencedColumnNames="product_operation_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_location"
+                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="location_id"
+                                 referencedTableName="location" referencedColumnNames="location_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_product_code"
+                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="product_code_id"
+                                 referencedTableName="supply2_product_code" referencedColumnNames="product_code_id"/>
+    </changeSet>
+
+    <changeSet id="supply2-update-remove-product-foreign-key-other-flux" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="supply2_product_operation_other_flux_product"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="supply2_product_operation_other_flux"
+                                  constraintName="supply2_product_operation_other_flux_product"/>
+        <renameColumn tableName="supply2_product_operation_other_flux" oldColumnName="product_id"
+                      newColumnName="product_code_id" columnDataType="int"/>
+    </changeSet>
+    <changeSet id="supply2-add-link-operation-other-flux-to-product-code" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="supply2_product_operation_other_flux_product_code"/>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint constraintName="supply2_product_operation_other_flux_product_code"
+                                 baseTableName="supply2_product_operation_other_flux" baseColumnNames="product_code_id"
+                                 referencedTableName="supply2_product_code" referencedColumnNames="product_code_id"/>
+    </changeSet>
 
     <changeSet id="supply2-product-attribute-stock-create" author="BOGUI SERGE">
         <preConditions>
@@ -874,7 +898,8 @@ s
     <changeSet id="supply2-product-operation-type-insert-all" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM supply2_product_operation_type</sqlCheck>
+                                         FROM supply2_product_operation_type
+            </sqlCheck>
         </preConditions>
         <insert tableName="supply2_product_operation_type">
             <column name="product_operation_type_id">1</column>
@@ -1404,7 +1429,8 @@ s
     <changeSet id="supply2-add-attribute-type-to-operation-type" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN" onError="WARN">
             <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM supply2_product_operation_type_attribute_type</sqlCheck>
+                                         FROM supply2_product_operation_type_attribute_type
+            </sqlCheck>
         </preConditions>
         <!-- Inventory -->
         <insert tableName="supply2_product_operation_type_attribute_type">
@@ -1518,7 +1544,8 @@ s
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT COUNT(location_id)
                                          FROM location
-                                         WHERE uuid = 'NPSPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL'</sqlCheck>
+                                         WHERE uuid = 'NPSPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL'
+            </sqlCheck>
         </preConditions>
         <insert tableName="location">
             <column name="name">NOUVELLE PHARMACIE DE LA SANTÉ PUBLIQUE</column>
@@ -1654,7 +1681,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="location_attribute_level-mysql" author="BOGUI SERGE" dbms="postgresql">
+    <changeSet id="location_attribute_level-postgresql" author="BOGUI SERGE" dbms="postgresql">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
@@ -1837,38 +1864,44 @@ s
 
     <!-- ROLES   -->
 
-    <changeSet id="supply-create-role-auxiliary" author="BOGUI SERGE">
+    <changeSet id="supply-create-role-auxiliary-2" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(role)
                 FROM role
-                WHERE role = 'AUXILIAIRE'</sqlCheck>
+                WHERE role = 'AUXILIAIRE'
+            </sqlCheck>
         </preConditions>
         <sql>
-            INSERT INTO role (role, description, uuid) VALUE ('AUXILIAIRE', 'Auxiliaire de la pharmacie', 'AUXILIAIRERRRRRRRRRRRRRRRRRRRRRRRRRR');
+            INSERT INTO role (role, description, uuid) VALUE ('AUXILIAIRE', 'Auxiliaire de la pharmacie',
+            'AUXILIAIRERRRRRRRRRRRRRRRRRRRRRRRRRR');
         </sql>
     </changeSet>
-    <changeSet id="supply-create-role-pgp" author="BOGUI SERGE">
+    <changeSet id="supply-create-role-pgp-2" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(role)
                 FROM role
-                WHERE role = 'PGP'</sqlCheck>
+                WHERE role = 'PGP'
+            </sqlCheck>
         </preConditions>
         <sql>
-            INSERT INTO role (role, description, uuid) VALUE ('PGP', 'Pharmacien de la pharmacie', 'PGPRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR');
+            INSERT INTO role (role, description, uuid) VALUE ('PGP', 'Pharmacien de la pharmacie',
+            'PGPRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR');
         </sql>
     </changeSet>
 
-    <changeSet id="supply-create-role-pharmacist" author="BOGUI SERGE">
+    <changeSet id="supply-create-role-pharmacist-2" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(role)
                 FROM role
-                WHERE role = 'PHARMACIEN'</sqlCheck>
+                WHERE role = 'PHARMACIEN'
+            </sqlCheck>
         </preConditions>
         <sql>
-            INSERT INTO role (role, description, uuid) VALUE ('PHARMACIEN', 'Pharmacien de la pharmacie', 'PHARMACIENRRRRRRRRRRRRRRRRRRRRRRRRRR');
+            INSERT INTO role (role, description, uuid) VALUE ('PHARMACIEN', 'Pharmacien de la pharmacie',
+            'PHARMACIENRRRRRRRRRRRRRRRRRRRRRRRRRR');
         </sql>
     </changeSet>
 
@@ -1878,7 +1911,8 @@ s
                 SELECT COUNT(*)
                 FROM role_role
                 WHERE parent_role = 'AUXILIAIRE'
-                  AND child_role = 'PGP'</sqlCheck>
+                  AND child_role = 'PGP'
+            </sqlCheck>
         </preConditions>
         <sql>
             INSERT INTO role_role (parent_role, child_role)
@@ -1892,7 +1926,8 @@ s
                 SELECT COUNT(*)
                 FROM role_role
                 WHERE parent_role = 'PGP'
-                  AND child_role = 'PHARMACIEN'</sqlCheck>
+                  AND child_role = 'PHARMACIEN'
+            </sqlCheck>
         </preConditions>
         <sql>
             INSERT INTO role_role (parent_role, child_role)
@@ -1907,7 +1942,8 @@ s
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
                 FROM encounter_type
-                WHERE name = 'DISPENSATION'</sqlCheck>
+                WHERE name = 'DISPENSATION'
+            </sqlCheck>
         </preConditions>
         <sql>
             INSERT INTO encounter_type (name, description, creator, date_created, retired, uuid)
@@ -1968,8 +2004,12 @@ s
 
     <changeSet id="supply2-insert-product-unit-to-supply2" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM supply2_product_unit;</sqlCheck>
+            <and>
+                <sqlCheck expectedResult="0">SELECT COUNT(*)
+                    FROM supply2_product_unit;
+                </sqlCheck>
+                <tableExists tableName="supply_product_unit"/>
+            </and>
         </preConditions>
         <sql>
             INSERT INTO supply2_product_unit (name, description, uuid)
@@ -1980,8 +2020,13 @@ s
 
     <changeSet id="supply2-insert-product-program-to-supply2" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM supply2_product_program;</sqlCheck>
+            <and>
+                <sqlCheck expectedResult="0">SELECT COUNT(*)
+                    FROM supply2_product_program;
+                </sqlCheck>
+
+                <tableExists tableName="supply_product_program"/>
+            </and>
         </preConditions>
         <sql>
             INSERT INTO supply2_product_program (name, description, uuid)
@@ -1992,8 +2037,12 @@ s
 
     <changeSet id="supply2-insert-product-supply-to-supply2" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM supply2_product;</sqlCheck>
+            <and>
+                <sqlCheck expectedResult="0">SELECT COUNT(*)
+                    FROM supply2_product;
+                </sqlCheck>
+                <tableExists tableName="supply_product"/>
+            </and>
         </preConditions>
         <sql>
             INSERT INTO supply2_product (product_id, conversion_unit, creator, date_created, changed_by, date_changed,
@@ -2016,10 +2065,14 @@ s
 
     <changeSet id="supply2-insert-product-code-supply-to-supply2" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT COUNT(*)
-                FROM supply2_product_code;
-            </sqlCheck>
+            <and>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*)
+                    FROM supply2_product_code;
+                </sqlCheck>
+
+                <tableExists tableName="supply_product"/>
+            </and>
         </preConditions>
         <sql>
             <![CDATA[
@@ -2046,10 +2099,13 @@ s
 
     <changeSet id="supply2-insert-product-price-to-supply2" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT COUNT(*)
-                FROM supply2_product_price;
-            </sqlCheck>
+            <and>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*)
+                    FROM supply2_product_price;
+                </sqlCheck>
+                <tableExists tableName="supply_product_price"/>
+            </and>
         </preConditions>
         <sql>
             <![CDATA[
@@ -2077,11 +2133,16 @@ s
     </changeSet>
 
     <changeSet id="supply2-insert-supply-product-operation-to-supply2" author="BOGUI SERGE">
+        <!--       supply2-insert-supply-product-operation-to-supply2-->
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT COUNT(*)
-                FROM supply2_product_operation;
-            </sqlCheck>
+            <and>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*)
+                    FROM supply2_product_operation;
+                </sqlCheck>
+
+                <tableExists tableName="supply_product_operation"/>
+            </and>
         </preConditions>
         <sql>
             <![CDATA[
@@ -2139,10 +2200,14 @@ s
 
     <changeSet id="supply2-insert-supply-product-operation-flux-to-supply2" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT COUNT(*)
-                FROM supply2_product_operation_flux;
-            </sqlCheck>
+            <and>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*)
+                    FROM supply2_product_operation_flux;
+                </sqlCheck>
+
+                <tableExists tableName="supply_product_operation_flux"/>
+            </and>
         </preConditions>
         <sql>
             <![CDATA[
@@ -2224,6 +2289,483 @@ s
                    uuid
             FROM supply_product_attribute_stock;
             ]]>
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-update-operation-attribute-uuid-to-38-length" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'INVENTORYSTARTDATEAAAAAAAAAAAAAAAAAA';
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE supply2_product_operation_attribute_type
+            SET uuid = 'INVENTORYSTARTDATEAAAAAAAAAAAAAAAAAAAA'
+            WHERE uuid = 'INVENTORYSTARTDATEAAAAAAAAAAAAAAAAAA';
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-insert-product-regime-members-to-product" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*)
+                    FROM supply2_product_code_regime_members;
+                </sqlCheck>
+
+                <tableExists tableName="supply_product"/>
+            </and>
+        </preConditions>
+        <sql>
+            INSERT INTO supply2_product_code_regime_members (regime_id, product_code_id)
+            SELECT s2pr.product_regime_id,
+                   product_code_id
+            FROM supply_product sp
+                     INNER JOIN supply_product_regime_members sprm ON sp.product_id = sprm.product_id
+                     INNER JOIN supply_product_regime spr ON sprm.regime_id = spr.product_regime_id
+                     INNER JOIN supply2_product s2p ON s2p.product_id = sp.product_id
+                     INNER JOIN (SELECT product_code_id, product_id
+                                 FROM supply2_product_code
+                                 WHERE program_id =
+                                       (SELECT product_program_id
+                                        FROM supply2_product_program pp
+                                        WHERE name LIKE 'PNLS%IO')) s2pc
+                                ON s2p.product_id = s2pc.product_id
+                     INNER JOIN supply2_product_regime s2pr on spr.concept_id = s2pr.concept_id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-add-operation-attribute-type-lead-time" author="BOGUI SERGE" dbms="mariadb,mysql">
+        <preConditions onFail="MARK_RAN" onError="WARN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'LEADTIMEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">3</column>
+            <column name="name">Délai d'approvisionnement</column>
+            <column name="description">Délai d'approvisionnement du rapport</column>
+            <column name="format">java.lang.Double</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">LEADTIMEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="supply2-product-notification-create" author="BOGUI SERGE">
+        <preConditions onError="WARN" onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="supply2_product_notification"/>
+            </not>
+        </preConditions>
+        <createTable tableName="supply2_product_notification">
+            <column name="product_notification_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="product_code_id" type="int"/>
+            <column name="operation_type_id" type="int"/>
+            <column name="notification_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notification" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notification_info" type="varchar(255)" defaultValue="null"/>
+            <column name="location_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notified_to" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notification_read" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notification_closed" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="uuid" type="varchar(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="supply2_product_notification" baseColumnNames="product_code_id"
+                                 referencedTableName="supply2_product_code"
+                                 referencedColumnNames="product_code_id"
+                                 constraintName="supply2_product_notification_product_coded"/>
+
+        <addForeignKeyConstraint baseTableName="supply2_product_notification" baseColumnNames="operation_type_id"
+                                 referencedTableName="supply2_product_operation_type"
+                                 referencedColumnNames="product_operation_type_id"
+                                 constraintName="supply2_product_notification_operation_type"/>
+
+        <addForeignKeyConstraint baseTableName="supply2_product_notification" baseColumnNames="location_id"
+                                 referencedTableName="location" referencedColumnNames="location_id"
+                                 constraintName="supply2_product_notification_location"/>
+
+        <addForeignKeyConstraint baseTableName="supply2_product_notification" baseColumnNames="notified_to"
+                                 referencedTableName="location" referencedColumnNames="location_id"
+                                 constraintName="supply2_product_notification_notified_to"/>
+    </changeSet>
+
+    <changeSet id="supply2-add-operation-attribute-type-submit-date" author="BOGUI SERGE" dbms="mariadb,mysql">
+        <preConditions onFail="MARK_RAN" onError="WARN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'SUBMITDATEAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">4</column>
+            <column name="name">Date de soumission du rapport</column>
+            <column name="description">Date de soumission du rapport</column>
+            <column name="format">java.util.Date</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">SUBMITDATEAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="supply2-add-operation-attribute-type-dispensation" author="BOGUI SERGE" dbms="mariadb,mysql">
+        <preConditions onFail="MARK_RAN" onError="WARN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'PROVIDERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">5</column>
+            <column name="name">Prescripteur</column>
+            <column name="description">Prescripteur au cours de la dispensation</column>
+            <column name="format">org.openmrs.Provider</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">PROVIDERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">6</column>
+            <column name="name">Date de prescription</column>
+            <column name="description">Date de la prescription au cours de la dispensation</column>
+            <column name="format">java.util.Date</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">PRESCIPTIONDATEAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">8</column>
+            <column name="name">Ligne thérapeutique</column>
+            <column name="description">Ligne thérapeutique au cours de la dispensation</column>
+            <column name="format">java.lang.String</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">RIGIMELINEAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">9</column>
+            <column name="name">Age du patient</column>
+            <column name="description">Age du patient pendant la dispensation</column>
+            <column name="format">java.lang.Integer</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">PATIENTAGEAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">10</column>
+            <column name="name">Genre du patient</column>
+            <column name="description">Genre du patient pendant la dispensation</column>
+            <column name="format">java.lang.String</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">PATIENTGENDERAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">11</column>
+            <column name="name">But de la dispensation</column>
+            <column name="description">But pendant la dispensation</column>
+            <column name="format">java.lang.String</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">GOALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">12</column>
+            <column name="name">Date de fin de traitement</column>
+            <column name="description">Date de fin de traitement obtenue au cours de la dispensation</column>
+            <column name="format">java.util.Date</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">TREATMENTENDDATEAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">13</column>
+            <column name="name">Dispensation du patient du site</column>
+            <column name="description">Dispensation au cours de la dispensation</column>
+            <column name="format">org.openmrs.Encounter</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">PATIENTENCOUNTERAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">14</column>
+            <column name="name">Duré du traitement</column>
+            <column name="description">Durée du traitement au cours de la dispensation</column>
+            <column name="format">org.openmrs.Encounter</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">TREATMENTDURATIONAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+    </changeSet>
+    <changeSet id="supply2-add-operation-attribute-type-dispensation-regime" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'REGIMEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">15</column>
+            <column name="name">Regime</column>
+            <column name="description">Regime prescrit au cours de la dispensation</column>
+            <column name="format">org.openmrs.module.supply.ProductRegime</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">REGIMEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+    </changeSet>
+    <changeSet id="supply2-add-operation-attribute-type-lost-days" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'TREATMENTDAYSLOSTAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">16</column>
+            <column name="name">Nombre de jour de comprimés perdus</column>
+            <column name="description">Nombre de jour de comprimés perdus au cours de la dispensation</column>
+            <column name="format">java.lang.Integer</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">TREATMENTDAYSLOSTAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+    </changeSet>
+    <changeSet id="supply2-update-operation-attribute-treatment-duration" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="org.openmrs.Encounter">
+                SELECT format
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'TREATMENTDURATIONAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE supply2_product_operation_attribute_type
+            SET format = 'java.lang.Integer'
+            WHERE uuid = 'TREATMENTDURATIONAAAAAAAAAAAAAAAAAAAAA'
+        </sql>
+    </changeSet>
+    <changeSet id="supply2-add-operation-attribute-type-encounter" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'ENCOUNTERAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">17</column>
+            <column name="name">Encounter dispensation</column>
+            <column name="description">Encounter dispensation for local patient</column>
+            <column name="format">org.openmrs.Encounter</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">ENCOUNTERAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+    </changeSet>
+    <changeSet id="supply2-add-operation-attribute-type-partner" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'PARTNERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">18</column>
+            <column name="name">Partenaire</column>
+            <column name="description">Partenaire destinataire pour les sorties et les entrées de stocks</column>
+            <column name="format">java.lang.String</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">PARTNERAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+
+    </changeSet>
+    <changeSet id="supply2-add-operation-attribute-treatment-date" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'TREATMENTDATEAAAAAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">19</column>
+            <column name="name">Date de traitement du rapport</column>
+            <column name="description">La date de traitement du rapport soumis par le PPS ou le site</column>
+            <column name="format">java.util.Date</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">TREATMENTDATEAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+
+    </changeSet>
+
+    <changeSet id="supply2-update-program-PNLSARVIO" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*)
+                FROM supply2_product_program
+                WHERE name = 'PNLSARVIO'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE supply2_product_program
+            SET name = 'PNLS-ANTIRETROVIRAUX ET IO',
+                uuid = 'PNLSANTIRETROVIRAUXETIOPPPPPPPPPPPPPPP'
+            WHERE name = 'PNLSARVIO';
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-update-program-PNLSCV" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*)
+                FROM supply2_product_program
+                WHERE name = 'PNLS_CHARGE VIRALE'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE supply2_product_program
+            SET name = 'PNLS-CHARGES VIRALES',
+                uuid = 'PNLSCHARGESVIRALESPPPPPPPPPPPPPPPPPPPP'
+            WHERE name = 'PNLS_CHARGE VIRALE';
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-update-program-PNLSLAB" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*)
+                FROM supply2_product_program
+                WHERE name = 'PNLSLAB'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE supply2_product_program
+            SET name = 'PNLS-PRODUITS DE LABORATOIRE',
+                uuid = 'PNLSPRODUITSDELABORATOIREPPPPPPPPPPPPP'
+            WHERE name = 'PNLSLAB';
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-update-program-PNLSTRC" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*)
+                FROM supply2_product_program
+                WHERE name = 'PNLSTRC'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            UPDATE supply2_product_program
+            SET name = 'PNLS-TESTS RAPIDES ET CONSOMMABLES',
+                uuid = 'PNLSTESTSRAPIDESETCONSOMMABLESPPPPPPPP'
+            WHERE name = 'PNLSTRC';
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-update-location-program-PNLSARVIO" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM location_attribute WHERE value_reference LIKE '%PNLSARVIO%';
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <sql>
+            UPDATE location_attribute
+            SET value_reference =
+                    REPLACE(value_reference, 'PNLSARVIO', 'PNLS-ANTIRETROVIRAUX ET IO')
+            WHERE attribute_type_id = (SELECT location_attribute_type_id
+                                       FROM location_attribute_type
+                                       WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-update-location-program-PNLSLAB" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM location_attribute WHERE value_reference LIKE '%PNLSLAB%';
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <sql>
+            UPDATE location_attribute
+            SET value_reference =
+                    REPLACE(value_reference, 'PNLSLAB', 'PNLS-PRODUITS DE LABORATOIRE')
+            WHERE attribute_type_id = (SELECT location_attribute_type_id
+                                       FROM location_attribute_type
+                                       WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-update-location-program-PNLSTRC" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM location_attribute WHERE value_reference LIKE '%PNLSTRC%';
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <sql>
+            UPDATE location_attribute
+            SET value_reference =
+                    REPLACE(value_reference, 'PNLSTRC', 'PNLS-TESTS RAPIDES ET CONSOMMABLES')
+            WHERE attribute_type_id = (SELECT location_attribute_type_id
+                                       FROM location_attribute_type
+                                       WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+
+        </sql>
+    </changeSet>
+
+    <changeSet id="supply2-update-location-program-PNLSCV" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">
+                    SELECT COUNT(*) FROM location_attribute WHERE value_reference LIKE '%PNLS_CHARGE VIRALE%';
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <sql>
+            UPDATE location_attribute
+            SET value_reference =
+                    REPLACE(value_reference, 'PNLS_CHARGE VIRALE', 'PNLS-CHARGES VIRALES')
+            WHERE attribute_type_id = (SELECT location_attribute_type_id
+                                       FROM location_attribute_type
+                                       WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+
         </sql>
     </changeSet>
 

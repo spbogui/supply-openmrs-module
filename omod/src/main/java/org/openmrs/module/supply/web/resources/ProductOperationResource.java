@@ -7,6 +7,7 @@ import io.swagger.models.properties.BooleanProperty;
 import io.swagger.models.properties.RefProperty;
 import io.swagger.models.properties.StringProperty;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.supply.*;
@@ -15,6 +16,7 @@ import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.module.supply.enumerations.Incidence;
 import org.openmrs.module.supply.enumerations.OperationStatus;
 import org.openmrs.module.supply.enumerations.QuantityType;
+import org.openmrs.module.supply.utils.OperationConstants;
 import org.openmrs.module.supply.utils.SupplyUtils;
 import org.openmrs.module.supply.web.controller.SupplyResourceController;
 import org.openmrs.module.webservices.docs.swagger.core.property.EnumProperty;
@@ -34,6 +36,8 @@ import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -67,12 +71,21 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		if (productUnit.getLocation() == null) {
 			productUnit.setLocation(SupplyUtils.getUserLocation());
 		}
-		return getService().saveProductOperation(productUnit);
+		try {
+			return getService().saveProductOperation(productUnit);
+		}
+		catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
 	public void purge(ProductOperation productOperation, RequestContext requestContext) throws ResponseException {
+		String operationType = productOperation.getOperationType().getUuid();
 		getService().purgeProductOperation(productOperation);
+		//		if (!operationType.equals(OperationConstants.REPORT_OPERATION)) {
+		//			Context.getService(ProductService.class).purgeUnusedAttributes();
+		//		}
 	}
 	
 	@Override
@@ -95,7 +108,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 			description.addProperty("attributes", Representation.DEFAULT);
 			description.addProperty("fluxAttributes", Representation.DEFAULT);
 			description.addProperty("fluxes", Representation.DEFAULT);
-			//            description.addProperty("otherFluxes", Representation.DEFAULT);
+			description.addProperty("otherFluxes", Representation.DEFAULT);
 			description.addProperty("exchangeLocation", Representation.DEFAULT);
 			description.addProperty("location", Representation.DEFAULT);
 			description.addProperty("uuid");
@@ -113,7 +126,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 			description.addProperty("observation");
 			description.addProperty("attributes", Representation.REF);
 			description.addProperty("fluxes", Representation.REF);
-			//            description.addProperty("otherFluxes", Representation.REF);
+			description.addProperty("otherFluxes", Representation.REF);
 			description.addProperty("exchangeLocation", Representation.REF);
 			description.addProperty("fluxAttributes", Representation.DEFAULT);
 			description.addProperty("location", Representation.REF);
@@ -137,12 +150,17 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 	
 	@Override
 	public List<String> getPropertiesToExposeAsSubResources() {
-		return Arrays.asList("fluxes", "attributes");
+		return Arrays.asList("fluxes", "attributes", "otherFluxes");
 	}
 	
 	@PropertyGetter("operationType")
 	public static ProductOperationType getOperationType(ProductOperation operation) {
 		return operation.getOperationType();
+	}
+	
+	@PropertyGetter("productList")
+	public static List<ProductCode> getProductList(ProductOperation operation) {
+		return operation.getProductList();
 	}
 	
 	@PropertyGetter("fluxes")
@@ -197,9 +215,9 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		if (operation.getAttributes() != null && operation.getAttributes().containsAll(attributes)) {
 			return;
 		}
-		if (operation.getAttributes() != null && !operation.getAttributes().isEmpty()) {
-			throw new ResourceDoesNotSupportOperationException("Fluxes can only be set for newly created objects !");
-		}
+		//		if (operation.getAttributes() != null && !operation.getAttributes().isEmpty()) {
+		//			throw new ResourceDoesNotSupportOperationException("Fluxes can only be set for newly created objects !");
+		//		}
 		for (ProductOperationAttribute attribute : attributes) {
 			ProductOperationAttribute existingAttribute = operation.getAttributes() != null ? getMatchingAttribute(
 			    attribute, operation.getAttributes()) : null;
@@ -226,53 +244,52 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		return null;
 	}
 	
-	//    @PropertyGetter("otherFluxes")
-	//    public static Set<ProductOperationOtherFlux> getOtherFluxes(ProductOperation operation) {
-	//        return new LinkedHashSet<ProductOperationOtherFlux>(operation.getOtherFluxes());
-	//    }
+	@PropertyGetter("otherFluxes")
+	public static Set<ProductOperationOtherFlux> getOtherFluxes(ProductOperation operation) {
+		return new LinkedHashSet<ProductOperationOtherFlux>(operation.getOtherFluxes());
+	}
 	
 	@PropertyGetter("fluxAttributes")
 	public static Set<ProductOperationFluxAttribute> getFluxAttributes(ProductOperation operation) {
 		return new LinkedHashSet<ProductOperationFluxAttribute>(operation.getFluxAttributes());
 	}
 	
-	//    @PropertySetter("otherFluxes")
-	//    public static void setOtherFluxes(ProductOperation operation, List<ProductOperationOtherFlux> fluxes)
-	//            throws ResourceDoesNotSupportOperationException {
-	//        if (operation.getOtherFluxes() != null && operation.getOtherFluxes().containsAll(fluxes)) {
-	//            return;
-	//        }
-	//        if (operation.getOtherFluxes() != null && !operation.getOtherFluxes().isEmpty()) {
-	//            throw new ResourceDoesNotSupportOperationException("Other fluxes can only be set for newly created objects !");
-	//        }
-	//        for (ProductOperationOtherFlux flux : fluxes) {
-	//            ProductOperationOtherFlux existingFlux = operation.getOtherFluxes() != null ? getMatchingOtherFlux(flux,
-	//                    operation.getOtherFluxes()) : null;
-	//            if (existingFlux != null) {
-	//                copyOtherFluxFields(existingFlux, flux);
-	//            } else {
-	//                operation.addOtherFlux(flux);
-	//            }
-	//        }
-	//    }
-	//
-	//    private static void copyOtherFluxFields(ProductOperationOtherFlux existingFlux, ProductOperationOtherFlux flux) {
-	//        existingFlux.setProduct(flux.getProduct());
-	//        //existingFlux.setProductAttribute(flux.getProductAttribute());
-	//        existingFlux.setLabel(flux.getLabel());
-	//        existingFlux.setQuantity(flux.getQuantity());
-	//        existingFlux.setLocation(flux.getLocation());
-	//    }
-	//
-	//    private static ProductOperationOtherFlux getMatchingOtherFlux(ProductOperationOtherFlux flux,
-	//                                                                  Set<ProductOperationOtherFlux> productAttributeFluxes) {
-	//        for (ProductOperationOtherFlux existingFlux : productAttributeFluxes) {
-	//            if (existingFlux.getUuid() != null && existingFlux.getUuid().equals(flux.getUuid())) {
-	//                return existingFlux;
-	//            }
-	//        }
-	//        return null;
-	//    }
+	@PropertySetter("otherFluxes")
+	public static void setOtherFluxes(ProductOperation operation, List<ProductOperationOtherFlux> fluxes)
+	        throws ResourceDoesNotSupportOperationException {
+		if (operation.getOtherFluxes() != null && operation.getOtherFluxes().containsAll(fluxes)) {
+			return;
+		}
+		//		if (operation.getOtherFluxes() != null && !operation.getOtherFluxes().isEmpty()) {
+		//			throw new ResourceDoesNotSupportOperationException("Other fluxes can only be set for newly created objects !");
+		//		}
+		for (ProductOperationOtherFlux flux : fluxes) {
+			ProductOperationOtherFlux existingFlux = operation.getOtherFluxes() != null ? getMatchingOtherFlux(flux,
+			    operation.getOtherFluxes()) : null;
+			if (existingFlux != null) {
+				copyOtherFluxFields(existingFlux, flux);
+			} else {
+				operation.addOtherFlux(flux);
+			}
+		}
+	}
+	
+	private static void copyOtherFluxFields(ProductOperationOtherFlux existingFlux, ProductOperationOtherFlux flux) {
+		existingFlux.setProductCode(flux.getProductCode());
+		existingFlux.setLabel(flux.getLabel());
+		existingFlux.setQuantity(flux.getQuantity());
+		existingFlux.setLocation(flux.getLocation());
+	}
+	
+	private static ProductOperationOtherFlux getMatchingOtherFlux(ProductOperationOtherFlux flux,
+	        Set<ProductOperationOtherFlux> productAttributeFluxes) {
+		for (ProductOperationOtherFlux existingFlux : productAttributeFluxes) {
+			if (existingFlux.getUuid() != null && existingFlux.getUuid().equals(flux.getUuid())) {
+				return existingFlux;
+			}
+		}
+		return null;
+	}
 	
 	@Override
 	public Model getGETModel(Representation rep) {
@@ -284,7 +301,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		        .property(
 		            "operationStatus",
 		            new EnumProperty(OperationStatus.class)._enum(Arrays.asList("AWAITING_VALIDATION", "DISABLED",
-		                "VALIDATED", "NOT_COMPLETED", "SUBMITTED", "AWAITING_TREATMENT", "TREATED")))
+		                "VALIDATED", "NOT_COMPLETED", "SUBMITTED", "AWAITING_TREATMENT", "TREATED", "APPROVED", "REJECTED")))
 		        .property(
 		            "incidence",
 		            new EnumProperty(Incidence.class)._enum(Arrays.asList(Incidence.EQUAL.name(), Incidence.NONE.name(),
@@ -308,7 +325,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		        .property(
 		            "operationStatus",
 		            new EnumProperty(OperationStatus.class)._enum(Arrays.asList("AWAITING_VALIDATION", "DISABLED",
-		                "VALIDATED", "NOT_COMPLETED", "SUBMITTED", "AWAITING_TREATMENT", "TREATED")))
+		                "VALIDATED", "NOT_COMPLETED", "SUBMITTED", "AWAITING_TREATMENT", "TREATED", "APPROVED", "REJECTED")))
 		        .property("quantityType",
 		            new EnumProperty(QuantityType.class)._enum(Arrays.asList("DISPENSATION", "PACKAGING")))
 		        .property(
@@ -322,7 +339,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 			model.property("location", new RefProperty("#/definitions/LocationCreate"))
 			        .property("exchangeLocation", new RefProperty("#/definitions/LocationCreate"))
 			        .property("fluxes", new RefProperty("#/definitions/ProductOperationFluxCreate"))
-			        //                    .property("otherFluxes", new RefProperty("#/definitions/ProductOperationOtherFluxCreate"))
+			        .property("otherFluxes", new RefProperty("#/definitions/ProductOperationOtherFluxCreate"))
 			        .property("productProgram", new RefProperty("#/definitions/ProductProgramCreate"))
 			        .property("parentOperation", new RefProperty("#/definitions/ProductOperationCreate"))
 			        .property("operationType", new RefProperty("#/definitions/ProductOperationTypeCreate"));
@@ -330,7 +347,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 			model.property("location", new StringProperty().example("uuid"))
 			        .property("exchangeLocation", new StringProperty().example("uuid"))
 			        .property("fluxes", new StringProperty().example("uuid"))
-			        //                    .property("otherFluxes", new StringProperty().example("uuid"))
+			        .property("otherFluxes", new StringProperty().example("uuid"))
 			        .property("productProgram", new StringProperty().example("uuid"))
 			        .property("parentOperation", new StringProperty().example("uuid"))
 			        .property("operationType", new StringProperty().example("uuid"));
@@ -349,19 +366,18 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		        .property(
 		            "operationStatus",
 		            new EnumProperty(OperationStatus.class)._enum(Arrays.asList("AWAITING_VALIDATION", "DISABLED",
-		                "VALIDATED", "NOT_COMPLETED", "SUBMITTED", "AWAITING_TREATMENT", "TREATED")))
+		                "VALIDATED", "NOT_COMPLETED", "SUBMITTED", "AWAITING_TREATMENT", "TREATED", "APPROVED", "REJECTED")))
 		        .property(
 		            "incidence",
 		            new EnumProperty(Incidence.class)._enum(Arrays.asList(Incidence.EQUAL.name(), Incidence.NONE.name(),
 		                Incidence.POSITIVE.name(), Incidence.NEGATIVE.name())))
 		        .property("quantityType",
 		            new EnumProperty(QuantityType.class)._enum(Arrays.asList("DISPENSATION", "PACKAGING")))
-		        .property("observation", new StringProperty())
-		        .property("uuid", new StringProperty())
+		        .property("observation", new StringProperty()).property("uuid", new StringProperty())
 		        .property("location", new StringProperty().example("uuid"))
 		        .property("exchangeLocation", new StringProperty().example("uuid"))
 		        .property("fluxes", new StringProperty().example("uuid"))
-		        //                .property("otherFluxes", new StringProperty().example("uuid"))
+		        .property("otherFluxes", new StringProperty().example("uuid"))
 		        .property("productProgram", new StringProperty().example("uuid"))
 		        .property("parentOperation", new StringProperty().example("uuid"))
 		        .property("operationAttributes", new StringProperty().example("uuid"));
@@ -381,7 +397,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		description.addRequiredProperty("operationType");
 		description.addRequiredProperty("quantityType");
 		description.addProperty("fluxes");
-		//        description.addProperty("otherFluxes");
+		description.addProperty("otherFluxes");
 		description.addProperty("attributes");
 		description.addProperty("parentOperation");
 		description.addProperty("exchangeLocation");
@@ -402,7 +418,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		description.addProperty("fluxes");
 		description.addProperty("operationType");
 		description.addProperty("quantityType");
-		//        description.addProperty("otherFluxes");
+		description.addProperty("otherFluxes");
 		description.addProperty("attributes");
 		description.addProperty("parentOperation");
 		description.addProperty("exchangeLocation");
@@ -423,82 +439,235 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		String program = context.getParameter("program");
 		String filter = context.getParameter("filter");
 		String operationType = context.getParameter("type");
+		String operationTypes = context.getParameter("types");
 		String locationUuid = context.getParameter("location");
 		String includeVoided = context.getParameter("includeVoided");
+		String validatedOnly = context.getParameter("validatedOnly");
+		String contextStartDate = context.getParameter("startDate");
+		String contextEndDate = context.getParameter("endDate");
+		String contextOperationNumber = context.getParameter("operationNumber");
+		String isForChildLocations = context.getParameter("forChildLocations");
 		
 		List<ProductOperation> productOperations = new ArrayList<ProductOperation>();
 		
-		if (StringUtils.isNotBlank(operationType) && !StringUtils.isEmpty(operationType)) {
-			ProductOperationType type = getService().getProductOperationType(operationType);
-			if (type != null) {
-				if (StringUtils.isNotBlank(filter) && !StringUtils.isEmpty(filter)) {
-					if (filter.contains("last")) {
-						//						System.out.println("--------------------------------> filter = " + filter);
+		Location currentLocation = StringUtils.isNotBlank(locationUuid) ? Context.getLocationService().getLocationByUuid(
+		    locationUuid) : SupplyUtils.getUserLocation();
+		
+		if (StringUtils.isNotBlank(operationTypes) && !StringUtils.isEmpty(operationTypes)) {
+			String[] stringTypes = operationTypes.split(",");
+			List<ProductOperationType> operationTypeList = new ArrayList<ProductOperationType>();
+			
+			for (String uuid : stringTypes) {
+				ProductOperationType type = getService().getProductOperationType(uuid);
+				if (type != null) {
+					operationTypeList.add(type);
+				}
+			}
+			if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
+				ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(program);
+				if (productProgram != null && !operationTypeList.isEmpty()) {
+					ProductOperation operation = getService().getLastProductOperation(operationTypeList, productProgram,
+					    SupplyUtils.getUserLocation(), includeVoided != null && includeVoided.equals("true"));
+					if (operation != null) {
+						productOperations.add(operation);
+					}
+				}
+			} else {
+				if (!operationTypeList.isEmpty()) {
+					List<ProductOperation> operations = getService().getAllProductOperationByTypes(operationTypeList,
+					    currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+					    includeVoided != null && includeVoided.equals("true"));
+					if (operations != null) {
+						productOperations.addAll(operations);
+					}
+				}
+			}
+		} else {
+			if (StringUtils.isNotBlank(operationType) && !StringUtils.isEmpty(operationType)) {
+				ProductOperationType type = getService().getProductOperationType(operationType);
+				if (type != null) {
+					if (StringUtils.isNotBlank(filter) && !StringUtils.isEmpty(filter)) {
+						
+						if (filter.contains("latestByProgram")) {
+							List<ProductOperation> operations = getService().findLatestOperationsByProgram(type,
+							    SupplyUtils.getUserLocation(), new Date());
+							if (operations != null) {
+								productOperations.addAll(operations);
+							}
+						} else if (filter.contains("operationNumber")) {
+							String operationNumber = filter.split(":")[1].replaceAll("Ã©", "é").replaceAll("Ã»", "û");
+							Date endDate = null;
+							if (StringUtils.isNotBlank(contextEndDate)) {
+								DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+								try {
+									endDate = sourceFormat.parse(contextEndDate);
+								}
+								catch (ParseException e) {
+									throw new RuntimeException(e);
+								}
+							}
+							if (filter.contains("last")) {
+								if (endDate == null) {
+									ProductOperation operation = getService().getProductOperationByOperationNumber(type,
+									    operationNumber, currentLocation, filter.contains("validated"));
+									if (operation != null) {
+										productOperations.add(operation);
+									}
+								} else {
+									ProductOperation operation = getService().getProductOperationByOperationNumber(type,
+									    operationNumber, currentLocation, filter.contains("validated"), endDate);
+									if (operation != null) {
+										productOperations.add(operation);
+									}
+								}
+							} else {
+								if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
+									ProductProgram productProgram = Context.getService(ProductService.class)
+									        .getProductProgram(program);
+									if (productProgram != null) {
+										ProductOperation operation = getService().getProductOperationByOperationNumber(type,
+										    productProgram, operationNumber, currentLocation, filter.contains("validated"));
+										if (operation != null) {
+											productOperations.add(operation);
+										}
+									}
+								}
+							}
+						} else {
+							
+							if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
+								ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(
+								    program);
+								if (productProgram != null) {
+									if (filter.contains("last")) {
+										
+										Date endDate = null;
+										if (StringUtils.isNotBlank(contextEndDate)) {
+											DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+											try {
+												endDate = sourceFormat.parse(contextEndDate);
+											}
+											catch (ParseException e) {
+												throw new RuntimeException(e);
+											}
+										}
+										if (endDate == null) {
+											ProductOperation operation = getService().getLastProductOperation(type,
+											    productProgram, currentLocation, filter.contains("validated"),
+											    includeVoided != null && includeVoided.equals("true"));
+											if (operation != null) {
+												productOperations.add(operation);
+											}
+										} else {
+											ProductOperation operation = getService().getLastProductOperation(type,
+											    productProgram, currentLocation, filter.contains("validated"),
+											    includeVoided != null && includeVoided.equals("true"), endDate);
+											if (operation != null) {
+												productOperations.add(operation);
+											}
+										}
+									} else if (filter.contains("period")) {
+										DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+										String startDateString = filter.split(",")[0].split(":")[1];
+										String endDateString = filter.split(",")[1].split(":")[1];
+										try {
+											Date startDate = sourceFormat.parse(startDateString);
+											Date endDate = sourceFormat.parse(endDateString);
+											List<ProductOperation> operations = getService().getAllProductOperation(type,
+											    productProgram, startDate, endDate, currentLocation, true,
+											    includeVoided != null && includeVoided.equals("true"));
+											
+											if (operations != null) {
+												productOperations.addAll(operations);
+											}
+										}
+										catch (ParseException e) {
+											throw new RuntimeException(e);
+										}
+									}
+								}
+							}
+						}
+					} else {
+						Date startDate = null;
+						Date endDate = null;
+						if (StringUtils.isNotBlank(contextStartDate)) {
+							DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+							try {
+								startDate = sourceFormat.parse(contextStartDate);
+								if (StringUtils.isNotBlank(contextEndDate)) {
+									endDate = sourceFormat.parse(contextEndDate);
+								} else {
+									endDate = new Date();
+								}
+							}
+							catch (ParseException e) {
+								throw new RuntimeException(e);
+							}
+						}
 						if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
 							ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(
 							    program);
 							if (productProgram != null) {
-								ProductOperation operation = getService().getLastProductOperation(type, productProgram,
-								    SupplyUtils.getUserLocation(), filter.contains("validated"),
-								    includeVoided != null && includeVoided.equals("true"));
-								if (operation != null) {
-									productOperations.add(operation);
+								if (StringUtils.isNotBlank(contextOperationNumber)) {
+									if (startDate != null && endDate != null) {
+										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+										    contextOperationNumber, startDate, endDate, currentLocation,
+										    validatedOnly != null && validatedOnly.equals("true"),
+										    includeVoided != null && includeVoided.equals("true"),
+										    isForChildLocations != null && isForChildLocations.equals("true")));
+									} else if (startDate != null) {
+										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+										    contextOperationNumber, startDate, new Date(), currentLocation,
+										    validatedOnly != null && validatedOnly.equals("true"),
+										    includeVoided != null && includeVoided.equals("true"),
+										    isForChildLocations != null && isForChildLocations.equals("true")));
+									} else {
+										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+										    contextOperationNumber, currentLocation,
+										    validatedOnly != null && validatedOnly.equals("true"),
+										    includeVoided != null && includeVoided.equals("true"),
+										    isForChildLocations != null && isForChildLocations.equals("true")));
+									}
+								} else {
+									if (startDate != null && endDate != null) {
+										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+										    startDate, endDate, currentLocation,
+										    validatedOnly != null && validatedOnly.equals("true"),
+										    includeVoided != null && includeVoided.equals("true"),
+										    isForChildLocations != null && isForChildLocations.equals("true")));
+									} else if (startDate != null) {
+										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+										    startDate, new Date(), currentLocation,
+										    validatedOnly != null && validatedOnly.equals("true"),
+										    includeVoided != null && includeVoided.equals("true"),
+										    isForChildLocations != null && isForChildLocations.equals("true")));
+									}
 								}
-							}
-						}
-						
-					} else if (filter.contains("operationNumber")) {
-						String operationNumber = filter.split(":")[1];
-						
-						Location location = StringUtils.isNotBlank(locationUuid) ? Context.getLocationService()
-						        .getLocationByUuid(locationUuid) : SupplyUtils.getUserLocation();
-						if (filter.contains("last")) {
-							ProductOperation operation = getService().getProductOperationByOperationNumber(type,
-							    operationNumber, location, filter.contains("validated"));
-							if (operation != null) {
-								productOperations.add(operation);
 							}
 							
 						} else {
-							List<ProductOperation> operations = getService().getProductOperationByOperationNumber(
-							    operationNumber, location, filter.contains("validated"));
-							if (operations != null) {
-								productOperations.addAll(operations);
+							if (startDate != null) {
+								productOperations.addAll(getService().getAllProductOperation(type, currentLocation,
+								    startDate, endDate, validatedOnly != null && validatedOnly.equals("true"),
+								    includeVoided != null && includeVoided.equals("true")));
+							} else {
+								productOperations.addAll(getService().getAllProductOperation(type, currentLocation, false,
+								    includeVoided != null && includeVoided.equals("true")));
 							}
 						}
 						
-					} else if (filter.contains("period")) {
-						DateFormat sourceFormat = new SimpleDateFormat("dd/MM/yyyy");
-						String startDateString = filter.split(",")[0].split(":")[1];
-						String endDateString = filter.split(",")[1].split(":")[1];
-						try {
-							Date startDate = sourceFormat.parse(startDateString);
-							Date endDate = sourceFormat.parse(endDateString);
-							List<ProductOperation> operations = getService().getAllProductOperation(type, startDate,
-							    endDate, SupplyUtils.getUserLocation(), true,
-							    includeVoided != null && includeVoided.equals("true"));
-							
-							if (operations != null) {
-								productOperations.addAll(operations);
-							}
-						}
-						catch (ParseException e) {
-							e.printStackTrace();
-						}
 					}
-				} else {
-					productOperations.addAll(getService().getAllProductOperation(type, SupplyUtils.getUserLocation(), false,
-					    includeVoided != null && includeVoided.equals("true")));
 				}
-			}
-		} else {
-			if (StringUtils.isNotBlank(filter) && StringUtils.isNotEmpty(filter)) {
-				if (filter.contains("operationNumber")) {
-					String operationNumber = filter.split(",")[0].split(":")[1];
-					List<ProductOperation> operations = getService().getProductOperationByOperationNumber(operationNumber,
-					    SupplyUtils.getUserLocation(), filter.contains("validated"));
-					if (operations != null) {
-						productOperations.addAll(operations);
+			} else {
+				if (StringUtils.isNotBlank(filter) && StringUtils.isNotEmpty(filter)) {
+					if (filter.contains("operationNumber")) {
+						String operationNumber = filter.split(",")[0].split(":")[1];
+						List<ProductOperation> operations = getService().getProductOperationByOperationNumber(
+						    operationNumber, currentLocation, filter.contains("validated"));
+						if (operations != null) {
+							productOperations.addAll(operations);
+						}
 					}
 				}
 			}

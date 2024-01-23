@@ -3,14 +3,13 @@
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
  * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
  * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- *
+ * <p>
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.supply.api;
 
-import org.openmrs.Location;
-import org.openmrs.Patient;
+import org.openmrs.*;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.supply.*;
@@ -96,4 +95,15 @@ public interface SupplyService extends OpenmrsService {
 	
 	Patient getPatientByIdentifier(String identifier) throws APIException;
 	
+	Obs getPatientLastObs(Person patient, Concept concept, EncounterType encounterType) throws APIException;
+	
+	Obs getPatientLastObs(Person patient, Concept concept) throws APIException;
+	
+	Obs getPatientLastObs(Person patient, Concept concept, EncounterType encounterType, Date endDate) throws APIException;
+	
+	Obs getPatientLastObs(Person patient, Concept concept, Date endDate) throws APIException;
+	
+	Encounter getPatientLastEncounter(Patient patient, EncounterType encounterType);
+	
+	Encounter getPatientLastEncounter(Patient patient, EncounterType encounterType, Date endDate);
 }

@@ -13,7 +13,7 @@ import java.util.*;
 @SuppressWarnings("JpaAttributeTypeInspection")
 @Entity(name = "ProductOperation")
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "supply_product_operation")
+@Table(name = "supply2_product_operation")
 public class ProductOperation extends BaseOpenmrsData implements Auditable {
 	
 	@Id
@@ -83,7 +83,11 @@ public class ProductOperation extends BaseOpenmrsData implements Auditable {
 	
 	public Double getTotalSalePrice() {
 		for (ProductOperationFlux flux : fluxes) {
-			totalSalePrice += flux.getProductCode().getCurrentPrice().getSalePrice() * flux.getQuantity();
+			for (ProductOperationFluxAttribute attribute : flux.getAttributes()) {
+				totalSalePrice += attribute.getAttribute().getProductCode().getCurrentPrice().getSalePrice()
+				        * attribute.getQuantity();
+			}
+			//			totalSalePrice += flux.getProductCode().getCurrentPrice().getSalePrice() * flux.getQuantity();
 		}
 		return totalSalePrice;
 	}
@@ -94,7 +98,11 @@ public class ProductOperation extends BaseOpenmrsData implements Auditable {
 	
 	public Double getTotalPurchasePrice() {
 		for (ProductOperationFlux flux : fluxes) {
-			totalPurchasePrice += flux.getProductCode().getCurrentPrice().getPurchasePrice() * flux.getQuantity();
+			for (ProductOperationFluxAttribute attribute : flux.getAttributes()) {
+				totalPurchasePrice += attribute.getAttribute().getProductCode().getCurrentPrice().getPurchasePrice()
+				        * attribute.getQuantity();
+			}
+			//			totalPurchasePrice += flux.getProductCode().getCurrentPrice().getPurchasePrice() * flux.getQuantity();
 		}
 		return totalPurchasePrice;
 	}
@@ -260,7 +268,7 @@ public class ProductOperation extends BaseOpenmrsData implements Auditable {
 	}
 	
 	public void removeFlux(ProductOperationFlux fluxToRemove) {
-		if (fluxes != null && fluxes.size() != 0) {
+		if (fluxes != null && !fluxes.isEmpty()) {
 			for (ProductOperationFlux flux : fluxes) {
 				if (flux.getUuid().equals(fluxToRemove.getUuid())) {
 					fluxes.remove(fluxToRemove);
@@ -287,8 +295,18 @@ public class ProductOperation extends BaseOpenmrsData implements Auditable {
 		otherFluxes.add(flux);
 	}
 	
+	public void addAllOtherFlux(List<ProductOperationOtherFlux> otherFluxes) {
+		if (this.otherFluxes == null) {
+			this.otherFluxes = new HashSet<ProductOperationOtherFlux>();
+		}
+		for (ProductOperationOtherFlux otherFlux : otherFluxes) {
+			otherFlux.setOperation(this);
+			this.otherFluxes.add(otherFlux);
+		}
+	}
+	
 	public void removeOtherFlux(ProductOperationOtherFlux fluxToRemove) {
-		if (otherFluxes != null && otherFluxes.size() != 0) {
+		if (otherFluxes != null && !otherFluxes.isEmpty()) {
 			for (ProductOperationOtherFlux flux : otherFluxes) {
 				if (flux.getUuid().equals(fluxToRemove.getUuid())) {
 					otherFluxes.remove(fluxToRemove);
@@ -307,7 +325,7 @@ public class ProductOperation extends BaseOpenmrsData implements Auditable {
 	}
 	
 	public void removeOperationAttribute(ProductOperationAttribute operationAttributeToRemove) {
-		if (attributes != null && attributes.size() != 0) {
+		if (attributes != null && !attributes.isEmpty()) {
 			for (ProductOperationAttribute operationAttribute : attributes) {
 				if (operationAttribute.getUuid().equals(operationAttributeToRemove.getUuid())) {
 					attributes.remove(operationAttributeToRemove);
@@ -334,5 +352,20 @@ public class ProductOperation extends BaseOpenmrsData implements Auditable {
         }
 
         return attributes;
+    }
+	
+	public List<ProductCode> getProductList() {
+        List<ProductCode> products = new ArrayList<>();
+        for (ProductOperationFlux flux : fluxes) {
+            if (!products.contains(flux.getProductCode())) {
+                products.add(flux.getProductCode());
+            }
+        }
+        for (ProductOperationOtherFlux otherFlux : otherFluxes) {
+            if (!products.contains(otherFlux.getProductCode())) {
+                products.add(otherFlux.getProductCode());
+            }
+        }
+        return products;
     }
 }

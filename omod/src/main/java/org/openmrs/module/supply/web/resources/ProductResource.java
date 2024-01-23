@@ -112,14 +112,18 @@ public class ProductResource extends DataDelegatingCrudResource<Product> {
 			description = new DelegatingResourceDescription();
 			description.addProperty("conversionUnit");
 			description.addProperty("dispensationName");
+			description.addProperty("dispensationUnit");
 			description.addProperty("packagingName");
+			description.addProperty("packagingUnit");
 			description.addProperty("names", Representation.DEFAULT);
 			description.addProperty("uuid");
 		} else if (representation instanceof DefaultRepresentation) {
 			description = new DelegatingResourceDescription();
 			description.addProperty("conversionUnit");
 			description.addProperty("dispensationName");
+			description.addProperty("dispensationUnit");
 			description.addProperty("packagingName");
+			description.addProperty("packagingUnit");
 			description.addProperty("names", Representation.REF);
 			description.addProperty("uuid");
 		} else if (representation instanceof RefRepresentation) {
@@ -166,7 +170,7 @@ public class ProductResource extends DataDelegatingCrudResource<Product> {
 			model.property("names", new StringProperty().example("uuid"));
 		}
 		
-		model.required("names").required("code").required("conversionUnit");
+		model.required("names").required("conversionUnit");
 		return model;
 	}
 	

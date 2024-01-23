@@ -8,6 +8,7 @@ import io.swagger.models.properties.StringProperty;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.supply.*;
+import org.openmrs.module.supply.api.ProductOperationService;
 import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.module.supply.web.controller.SupplyResourceController;
 import org.openmrs.module.webservices.rest.web.RequestContext;
@@ -127,6 +128,7 @@ public class ProductCodeResource extends DataDelegatingCrudResource<ProductCode>
 			description.addProperty("program", Representation.DEFAULT);
 			description.addProperty("regimes", Representation.DEFAULT);
 			description.addProperty("quantityInStock");
+			description.addProperty("consumption");
 			description.addProperty("uuid");
 		} else if (representation instanceof DefaultRepresentation) {
 			description = new DelegatingResourceDescription();
@@ -248,13 +250,26 @@ public class ProductCodeResource extends DataDelegatingCrudResource<ProductCode>
 						String[] regimeInfo = filter.split(":");
 						if (regimeInfo.length == 2) {
 							String regime = filter.split(":")[1];
-							ProductRegime productRegime = getService().getProductRegimeByConceptName(regime);
+							ProductRegime productRegime = getService().getProductRegimeByConcept(regime);
+							if (productRegime == null) {
+								productRegime = getService().getProductRegimeByConceptName(regime);
+							}
 							if (productRegime != null) {
 								List<ProductCode> result = getService().getProductCodes(program, productRegime);
 								if (result != null) {
 									productCodes.addAll(result);
 								}
 							}
+						} else {
+							List<ProductCode> result = getService().getProductWithoutRegimeByProgram(program);
+							if (result != null) {
+								productCodes.addAll(result);
+							}
+						}
+					} else if (filter.contains("inStock")) {
+						List<ProductCode> productCodeList = getService().getAvailableProductCode(program);
+						if (productCodeList != null) {
+							productCodes.addAll(productCodeList);
 						}
 					}
 				} else {

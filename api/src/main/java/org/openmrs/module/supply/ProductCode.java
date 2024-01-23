@@ -2,10 +2,17 @@ package org.openmrs.module.supply;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.openmrs.BaseOpenmrsData;
+import org.openmrs.Location;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.supply.api.ProductOperationService;
+import org.openmrs.module.supply.utils.SupplyUtils;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity(name = "ProductCode")
 @Table(name = "supply2_product_code")
@@ -40,6 +47,9 @@ public class ProductCode extends BaseOpenmrsData {
 	
 	@Transient
 	private Integer quantityInStock;
+	
+	@Transient
+	private Double consumption;
 	
 	public Integer getProductCodeId() {
 		return productCodeId;
@@ -104,11 +114,25 @@ public class ProductCode extends BaseOpenmrsData {
 	}
 	
 	public Integer getQuantityInStock() {
+		quantityInStock = Context.getService(ProductOperationService.class).getProductQuantityInStock(this,
+		    SupplyUtils.getUserLocation());
 		return quantityInStock;
 	}
 	
 	public void setQuantityInStock(Integer quantityInStock) {
 		this.quantityInStock = quantityInStock;
+	}
+	
+	public Double getConsumption() {
+        consumption = Context.getService(ProductOperationService.class)
+                .getMonthlyConsumption(this, SupplyUtils.getUserLocation(),
+                        new ArrayList<>(SupplyUtils.getUserLocation().getChildLocations())
+                );
+        return consumption;
+    }
+	
+	public void setConsumption(Double consumption) {
+		this.consumption = consumption;
 	}
 	
 	public void addPrice(ProductPrice price) {

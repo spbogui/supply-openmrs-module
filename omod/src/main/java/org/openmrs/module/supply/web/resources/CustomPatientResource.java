@@ -57,14 +57,9 @@ public class CustomPatientResource extends PatientResource1_8 {
 		String identifier = context.getRequest().getParameter("identification");
 		String filter = context.getRequest().getParameter("filter");
 		
-		//		System.out.println("--------------------------------------------> Entered in search Patients");
-		
 		if (StringUtils.isNotBlank(identifier) && StringUtils.isNotEmpty(identifier)) {
-			//			System.out.println("--------------------------------------------> Entered in search identifier");
 			Patient patient = getService().getPatientByIdentifier(identifier);
-			//			System.out.println("--------------------------------------------> Executed search identifier");
 			if (patient != null) {
-				//				System.out.println("--------------------------------------------> " + patient);
 				if (StringUtils.isNotBlank(filter) && StringUtils.isNotEmpty(filter)) {
 					if (filter.equals("dead")) {
 						if (getService().isDead(patient, SupplyUtils.getUserLocation())) {

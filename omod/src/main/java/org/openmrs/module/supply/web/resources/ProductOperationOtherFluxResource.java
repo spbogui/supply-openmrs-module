@@ -65,16 +65,16 @@ public class ProductOperationOtherFluxResource extends DelegatingSubResource<Pro
 		if (representation instanceof FullRepresentation) {
 			description = new DelegatingResourceDescription();
 			//			description.addProperty("productOperation", Representation.REF);
-			description.addProperty("product", Representation.REF);
-			description.addProperty("productAttribute", Representation.REF);
+			description.addProperty("productCode", Representation.REF);
+			//			description.addProperty("productAttribute", Representation.REF);
 			description.addProperty("quantity");
 			description.addProperty("label");
 			description.addProperty("location", Representation.REF);
 			description.addProperty("uuid");
 		} else if (representation instanceof DefaultRepresentation) {
 			description = new DelegatingResourceDescription();
-			description.addProperty("product", Representation.REF);
-			description.addProperty("productAttribute", Representation.REF);
+			description.addProperty("productCode", Representation.REF);
+			//			description.addProperty("productAttribute", Representation.REF);
 			description.addProperty("quantity");
 			description.addProperty("label");
 			description.addProperty("uuid");
@@ -93,14 +93,15 @@ public class ProductOperationOtherFluxResource extends DelegatingSubResource<Pro
 		if (flux.getOperation() == null)
 			return "";
 		
-		return flux.getLabel() + " - " + flux.getProduct().getDispensationName() + " : " + flux.getQuantity();
+		return flux.getLabel() + " - " + flux.getProductCode().getProduct().getDispensationName() + " : "
+		        + flux.getQuantity();
 	}
 	
 	@Override
 	public Model getGETModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
-		model.property("product", new RefProperty("#/definitions/ProductGet"))
-		        .property("productAttribute", new RefProperty("#/definitions/ProductAttributeGet"))
+		model.property("productCode", new RefProperty("#/definitions/ProductCodeGet"))
+		        //                .property("productAttribute", new RefProperty("#/definitions/ProductAttributeGet"))
 		        .property("quantity", new DoubleProperty()).property("label", new StringProperty())
 		        .property("location", new RefProperty("#/definitions/LocationGet")).property("uuid", new StringProperty());
 		return model;
@@ -109,8 +110,8 @@ public class ProductOperationOtherFluxResource extends DelegatingSubResource<Pro
 	@Override
 	public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addProperty("productAttribute");
-		description.addRequiredProperty("product");
+		//        description.addProperty("productAttribute");
+		description.addRequiredProperty("productCode");
 		description.addRequiredProperty("quantity");
 		description.addRequiredProperty("label");
 		description.addRequiredProperty("location");
@@ -125,21 +126,20 @@ public class ProductOperationOtherFluxResource extends DelegatingSubResource<Pro
 		        .property("uuid", new StringProperty()).required("quantity").required("label").required("location");
 		if (rep instanceof FullRepresentation) {
 			model.property("location", new RefProperty("#/definitions/LocationGet"))
-			        .property("productAttribute", new RefProperty("#/definitions/ProductAttributeGet"))
-			        .property("product", new RefProperty("#/definitions/ProductGet"));
+			//                    .property("productAttribute", new RefProperty("#/definitions/ProductAttributeGet"))
+			        .property("productCode", new RefProperty("#/definitions/ProductCodeGet"));
 		} else {
-			model.property("product", new StringProperty().example("uuid")).property("location",
+			model.property("productCode", new StringProperty().example("uuid")).property("location",
 			    new StringProperty().example("uuid"));
 		}
-		model.required("quantity").required("label").required("product").required("location");
+		model.required("quantity").required("label").required("productCode").required("location");
 		return model;
 	}
 	
 	@Override
 	public DelegatingResourceDescription getUpdatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		description.addProperty("product");
-		description.addProperty("product");
+		description.addProperty("productCode");
 		description.addProperty("quantity");
 		description.addProperty("label");
 		description.addProperty("location");
@@ -150,8 +150,8 @@ public class ProductOperationOtherFluxResource extends DelegatingSubResource<Pro
 	@Override
 	public Model getUPDATEModel(Representation rep) {
 		ModelImpl model = new ModelImpl();
-		model.property("product", new StringProperty().example("uuid"))
-		        .property("productAttribute", new StringProperty().example("uuid"))
+		model.property("productCode", new StringProperty().example("uuid"))
+		        //                .property("productAttribute", new StringProperty().example("uuid"))
 		        .property("location", new StringProperty().example("uuid")).property("quantity", new DoubleProperty())
 		        .property("label", new StringProperty()).property("uuid", new StringProperty());
 		return model;

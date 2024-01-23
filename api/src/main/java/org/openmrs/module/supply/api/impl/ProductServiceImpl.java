@@ -6,7 +6,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.supply.*;
 import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.module.supply.api.dao.ProductDao;
-import org.springframework.web.multipart.MultipartFile;
+//import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -51,10 +51,10 @@ public class ProductServiceImpl extends BaseOpenmrsService implements ProductSer
 		dao.purgeProduct(product);
 	}
 	
-	@Override
-	public List<Product> uploadProduct(MultipartFile file) {
-		return dao.uploadProduct(file);
-	}
+	//	@Override
+	//	public List<Product> uploadProduct(MultipartFile file) {
+	//		return dao.uploadProduct(file);
+	//	}
 	
 	@Override
 	public ProductPrice getProductPrice(Integer id) {
@@ -190,10 +190,10 @@ public class ProductServiceImpl extends BaseOpenmrsService implements ProductSer
 		return dao.getAllProductRegimes();
 	}
 	
-	@Override
-	public void uploadProductRegimens(MultipartFile file) {
-		dao.uploadProductRegimens(file);
-	}
+	//	@Override
+	//	public void uploadProductRegimens(MultipartFile file) {
+	//		dao.uploadProductRegimens(file);
+	//	}
 	
 	@Override
 	public ProductRegime saveProductRegime(ProductRegime productRegime) throws APIException {
@@ -236,8 +236,13 @@ public class ProductServiceImpl extends BaseOpenmrsService implements ProductSer
 	}
 	
 	@Override
-	public Integer purgeUnusedAttributes() {
-		return dao.purgeUnusedAttributes();
+	public void purgeUnusedAttributes(ProductOperationFlux flux) {
+		dao.purgeUnusedAttributes(flux);
+	}
+	
+	@Override
+	public void purgeUnusedAttributes() {
+		dao.purgeUnusedAttributes();
 	}
 	
 	@Override
@@ -271,8 +276,13 @@ public class ProductServiceImpl extends BaseOpenmrsService implements ProductSer
 	}
 	
 	@Override
-	public List<Product> getProductWithoutRegimeByProgram(ProductProgram productProgram) {
+	public List<ProductCode> getProductWithoutRegimeByProgram(ProductProgram productProgram) {
 		return dao.getProductWithoutRegimeByProgram(productProgram);
+	}
+	
+	@Override
+	public List<ProductCode> getAvailableProductCode(ProductProgram program) {
+		return dao.getAvailableProductCode(program);
 	}
 	
 }

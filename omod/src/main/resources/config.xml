@@ -1,575 +1,580 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <module configVersion="1.2">
-	
-	<!-- Base Module Properties -->
-	<id>${project.parent.artifactId}</id>
-	<name>${project.parent.name}</name>
-	<version>${project.parent.version}</version>
-	<package>org.openmrs.module.supply</package>
-	<author>bogui</author>
-	<description>
-			${project.parent.description}
-	</description>
 
-	<activator>org.openmrs.module.supply.SupplyActivator</activator>
-	
-	<!-- <updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL> -->
-	<!-- /Base Module Properties -->
-	
-	<require_version>2.3.2</require_version>
-	
-	<!-- Extensions -->
-	<extension>
-		<point>org.openmrs.admin.list</point>
-		<class>org.openmrs.module.supply.extension.html.AdminList</class>
-	</extension>
+    <!-- Base Module Properties -->
+    <id>${project.parent.artifactId}</id>
+    <name>${project.parent.name}</name>
+    <version>${project.parent.version}</version>
+    <package>org.openmrs.module.supply</package>
+    <author>bogui</author>
+    <description>
+        ${project.parent.description}
+    </description>
 
-	<extension>
-		<point>org.openmrs.gutter.tools</point>
-		<class>org.openmrs.module.supply.extension.html.SupplyGutterLink
-		</class>
-	</extension>
+    <activator>org.openmrs.module.supply.SupplyActivator</activator>
 
-	<aware_of_modules>
-		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
-		<aware_of_module>org.openmrs.module.webservices.rest</aware_of_module>
-	</aware_of_modules>
+    <!-- <updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL> -->
+    <!-- /Base Module Properties -->
 
-	<require_modules>
+    <require_version>2.3.2</require_version>
 
-		<require_module version="2.26">
-			org.openmrs.module.webservices.rest
-		</require_module>
+    <!-- Extensions -->
+    <extension>
+        <point>org.openmrs.admin.list</point>
+        <class>org.openmrs.module.supply.extension.html.AdminList</class>
+    </extension>
 
-		<require_module version="1.8.1">
-			org.openmrs.module.legacyui
-		</require_module>
+    <extension>
+        <point>org.openmrs.gutter.tools</point>
+        <class>org.openmrs.module.supply.extension.html.SupplyGutterLink
+        </class>
+    </extension>
 
-	</require_modules>
-	
-	<!-- AOP
-	<advice>
-		<point>org.openmrs.api.FormService</point>
-		<class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
-	</advice>
-	 /AOP -->
-	
-	<!--
-	<dwr>
-		<allow>
-			<create creator="new" javascript="DWRFormEntryService">
-				<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/>
-				<include method="enterForm"/>
-			</create>
-		</allow>
+    <aware_of_modules>
+        <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
+        <aware_of_module>org.openmrs.module.webservices.rest</aware_of_module>
+    </aware_of_modules>
 
-		<signatures>
-			<![CDATA[
-			import @MODULE_PACKAGE@.web.DWRFormEntryService;
-			DWRFormEntryService.enterForm(Integer patientId, Integer formId, boolean useEncounter, List<String> fields);
-			]]>
-		</signatures>	
-	</dwr>
-	-->
-	
-	<!-- Servlets -->
-	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> 
-	<servlet>
-		<servlet-name>formDownload</servlet-name>
-		<servlet-class>@MODULE_PACKAGE@.web.FormDownloadServlet</servlet-class>
-	</servlet>
-	-->
-	<!-- /Servlets -->
-	
-	
-	<!-- Internationalization -->
-	<!-- All message codes should start with @MODULE_ID@.* -->
-	<messages>
-		<lang>en</lang>
-		<file>messages.properties</file>
-	</messages>
-	<messages>
-		<lang>fr</lang>
-		<file>messages_fr.properties</file>
-	</messages>
-	<messages>
-		<lang>es</lang>
-		<file>messages_es.properties</file>
-	</messages>
-	<!-- /Internationalization -->
+    <require_modules>
 
-	<!-- Global Properties -->
-	<globalProperty>
-		<property>supplyInfo.dispensationDispensationDateConcept</property>
-		<defaultValue>165010</defaultValue>
-		<description>Insert here the concept for the dispensation date concept for dispensation</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.dispensationTreatmentDaysConcept</property>
-		<defaultValue>165011</defaultValue>
-		<description>Insert here the concept for the treatment days concept for dispensation </description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.dispensationGoalConcept</property>
-		<defaultValue>163000</defaultValue>
-		<description>Insert here the concept for the goal concept for dispensation</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.dispensationTreatmentEndDateConcept</property>
-		<defaultValue>165040</defaultValue>
-		<description>Insert here the concept for the treatment end date concept for dispensation</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.dispensationRegimenConcept</property>
-		<defaultValue>165033</defaultValue>
-		<description>Insert here the concept for the regimen concept for dispensation</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.dispensationRegimenLineConcept</property>
-		<defaultValue>164767</defaultValue>
-		<description>Insert here the concept for the regimen line concept for dispensation</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.stockMaxDistrict</property>
-		<defaultValue>4 Months</defaultValue>
-		<description>Insert here the stock max for district</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.stockMaxDirectClient</property>
-		<defaultValue>4 Months</defaultValue>
-		<description>Insert here the stock max for direct client</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.stockMaxCenterAndOrganisations</property>
-		<defaultValue>2 Months</defaultValue>
-		<description>Insert here the stock max for Center and NGOs</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.stockMaxPointOfServiceDelivery</property>
-		<defaultValue>2 Weeks</defaultValue>
-		<description>Insert here the stock max for point of service delivery</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.emergencyControlPointDistrict</property>
-		<defaultValue>1 Months</defaultValue>
-		<description>Insert here the emergency control point for district</description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.emergencyControlPointDirectClient</property>
-		<defaultValue>1 Months</defaultValue>
-		<description>Insert here the emergency control point for direct client </description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.emergencyControlPointCenterAndNGOs</property>
-		<defaultValue>2 Weeks</defaultValue>
-		<description>Insert here the emergency control point for Center and NGOs  </description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.emergencyControlPointPointOfServiceDelivery</property>
-		<defaultValue>2 Days</defaultValue>
-		<description>Insert here the emergency control point for point of service delivery </description>
-	</globalProperty>
-	<globalProperty>
-		<property>supplyInfo.monthsForCMM</property>
-		<defaultValue>3</defaultValue>
-		<description>Insert here the number of months for CMM </description>
-	</globalProperty>
+        <require_module version="2.26">
+            org.openmrs.module.webservices.rest
+        </require_module>
 
-	<!-- Privileges  -->
-	<privilege>
-		<name>Manage Pharmacy</name>
-		<description>Can Manage Manage Stock</description>
-	</privilege>
+        <require_module version="1.8.1">
+            org.openmrs.module.legacyui
+        </require_module>
 
-	<privilege>
-		<name>Manage Product</name>
-		<description>Can Manage Product</description>
-	</privilege>
-	<privilege>
-		<name>View Product</name>
-		<description>Can View Product</description>
-	</privilege>
-	<privilege>
-		<name>Save Product</name>
-		<description>Can Save and Edit Product</description>
-	</privilege>
-	<privilege>
-		<name>Import Product</name>
-		<description>Can Import Product</description>
-	</privilege>
-	<privilege>
-		<name>Delete Product</name>
-		<description>Can Delete Product</description>
-	</privilege>
+    </require_modules>
 
-	<privilege>
-		<name>Manage Product Attribute</name>
-		<description>Can Manage Product Attribute</description>
-	</privilege>
-	<privilege>
-		<name>View Product Attribute</name>
-		<description>Can View Product Attribute</description>
-	</privilege>
-	<privilege>
-		<name>Save Product Attribute</name>
-		<description>Can Save and Edit Product Attribute</description>
-	</privilege>
-	<privilege>
-		<name>Delete Product Attribute</name>
-		<description>Can Delete Product Attribute</description>
-	</privilege>
+    <!-- AOP
+    <advice>
+        <point>org.openmrs.api.FormService</point>
+        <class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
+    </advice>
+     /AOP -->
 
-	<privilege>
-		<name>Manage Regimen</name>
-		<description>Can Manage Regimen</description>
-	</privilege>
-	<privilege>
-		<name>View Regimen</name>
-		<description>Can View Regimen</description>
-	</privilege>
-	<privilege>
-		<name>Save Regimen</name>
-		<description>Can Save and Edit Regimen</description>
-	</privilege>
-	<privilege>
-		<name>Import Regimen</name>
-		<description>Can Import Regimen</description>
-	</privilege>
+    <!--
+    <dwr>
+        <allow>
+            <create creator="new" javascript="DWRFormEntryService">
+                <param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/>
+                <include method="enterForm"/>
+            </create>
+        </allow>
 
-	<privilege>
-		<name>Manage Supplier</name>
-		<description>Can Manage Supplier</description>
-	</privilege>
-	<privilege>
-		<name>View Supplier</name>
-		<description>Can View Supplier</description>
-	</privilege>
-	<privilege>
-		<name>Save Supplier</name>
-		<description>Can Save and Edit Supplier</description>
-	</privilege>
-	<privilege>
-		<name>Delete Supplier</name>
-		<description>Can Delete Supplier</description>
-	</privilege>
+        <signatures>
+            <![CDATA[
+            import @MODULE_PACKAGE@.web.DWRFormEntryService;
+            DWRFormEntryService.enterForm(Integer patientId, Integer formId, boolean useEncounter, List<String> fields);
+            ]]>
+        </signatures>
+    </dwr>
+    -->
 
-	<privilege>
-		<name>Manage Unit</name>
-		<description>Can Manage Unit</description>
-	</privilege>
-	<privilege>
-		<name>View Unit</name>
-		<description>Can View Unit</description>
-	</privilege>
-	<privilege>
-		<name>Save Unit</name>
-		<description>Can Save and Edit Unit</description>
-	</privilege>
-	<privilege>
-		<name>Delete Unit</name>
-		<description>Can Delete Unit</description>
-	</privilege>
+    <!-- Servlets -->
+    <!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name>
+    <servlet>
+        <servlet-name>formDownload</servlet-name>
+        <servlet-class>@MODULE_PACKAGE@.web.FormDownloadServlet</servlet-class>
+    </servlet>
+    -->
+    <!-- /Servlets -->
 
-	<privilege>
-		<name>Manage Exchange Entity</name>
-		<description>Can Manage Exchange Entity</description>
-	</privilege>
-	<privilege>
-		<name>View Exchange Entity</name>
-		<description>Can View Exchange Entity</description>
-	</privilege>
-	<privilege>
-		<name>Save Exchange Entity</name>
-		<description>Can Save and Edit Exchange Entity</description>
-	</privilege>
-	<privilege>
-		<name>Delete Exchange Entity</name>
-		<description>Can Delete Exchange Entity</description>
-	</privilege>
 
-	<privilege>
-		<name>Manage Price</name>
-		<description>Can Manage Price</description>
-	</privilege>
-	<privilege>
-		<name>View Price</name>
-		<description>Can View Price</description>
-	</privilege>
-	<privilege>
-		<name>Save Price</name>
-		<description>Can Save and Edit Price</description>
-	</privilege>
-	<privilege>
-		<name>Delete Price</name>
-		<description>Can Delete Price</description>
-	</privilege>
+    <!-- Internationalization -->
+    <!-- All message codes should start with @MODULE_ID@.* -->
+    <messages>
+        <lang>en</lang>
+        <file>messages.properties</file>
+    </messages>
+    <messages>
+        <lang>fr</lang>
+        <file>messages_fr.properties</file>
+    </messages>
+    <messages>
+        <lang>es</lang>
+        <file>messages_es.properties</file>
+    </messages>
+    <!-- /Internationalization -->
 
-	<privilege>
-		<name>Manage Program</name>
-		<description>Can Manage Program</description>
-	</privilege>
-	<privilege>
-		<name>View Program</name>
-		<description>Can View Program</description>
-	</privilege>
-	<privilege>
-		<name>Save Program</name>
-		<description>Can Save and Edit Program</description>
-	</privilege>
-	<privilege>
-		<name>Delete Program</name>
-		<description>Can Delete Program</description>
-	</privilege>
+    <!-- Global Properties -->
+    <globalProperty>
+        <property>supplyInfo.dispensationDispensationDateConcept</property>
+        <defaultValue>165010</defaultValue>
+        <description>Insert here the concept for the dispensation date concept for dispensation</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.dispensationTreatmentDaysConcept</property>
+        <defaultValue>165011</defaultValue>
+        <description>Insert here the concept for the treatment days concept for dispensation</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.dispensationGoalConcept</property>
+        <defaultValue>163000</defaultValue>
+        <description>Insert here the concept for the goal concept for dispensation</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.dispensationTreatmentEndDateConcept</property>
+        <defaultValue>165040</defaultValue>
+        <description>Insert here the concept for the treatment end date concept for dispensation</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.dispensationRegimenConcept</property>
+        <defaultValue>165033</defaultValue>
+        <description>Insert here the concept for the regimen concept for dispensation</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.dispensationRegimenLineConcept</property>
+        <defaultValue>164767</defaultValue>
+        <description>Insert here the concept for the regimen line concept for dispensation</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.stockMaxDistrict</property>
+        <defaultValue>4 Months</defaultValue>
+        <description>Insert here the stock max for district</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.stockMaxDirectClient</property>
+        <defaultValue>4 Months</defaultValue>
+        <description>Insert here the stock max for direct client</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.stockMaxCenterAndOrganisations</property>
+        <defaultValue>2 Months</defaultValue>
+        <description>Insert here the stock max for Center and NGOs</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.stockMaxPointOfServiceDelivery</property>
+        <defaultValue>2 Weeks</defaultValue>
+        <description>Insert here the stock max for point of service delivery</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.emergencyControlPointDistrict</property>
+        <defaultValue>1 Months</defaultValue>
+        <description>Insert here the emergency control point for district</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.emergencyControlPointDirectClient</property>
+        <defaultValue>1 Months</defaultValue>
+        <description>Insert here the emergency control point for direct client</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.emergencyControlPointCenterAndOrganisations</property>
+        <defaultValue>2 Weeks</defaultValue>
+        <description>Insert here the emergency control point for Center and NGOs</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.emergencyControlPointPointOfServiceDelivery</property>
+        <defaultValue>2 Days</defaultValue>
+        <description>Insert here the emergency control point for point of service delivery</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.monthsForCMM</property>
+        <defaultValue>3</defaultValue>
+        <description>Insert here the number of months for CMM</description>
+    </globalProperty>
+    <globalProperty>
+        <property>supplyInfo.monthsForCMMDirectClient</property>
+        <defaultValue>6</defaultValue>
+        <description>Insert here the number of months for CMM for the direct clients</description>
+    </globalProperty>
 
-	<privilege>
-		<name>Manage Inventory</name>
-		<description>Can Manage Inventory</description>
-	</privilege>
-	<privilege>
-		<name>View Inventory</name>
-		<description>Can View Inventory</description>
-	</privilege>
-	<privilege>
-		<name>Save Inventory</name>
-		<description>Can Save and Edit Inventory</description>
-	</privilege>
-	<privilege>
-		<name>Delete Inventory</name>
-		<description>Can Delete Inventory</description>
-	</privilege>
-	<privilege>
-		<name>Validate Inventory</name>
-		<description>Can Validate Inventory</description>
-	</privilege>
+    <!-- Privileges  -->
+    <privilege>
+        <name>Manage Pharmacy</name>
+        <description>Can Manage Manage Stock</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Reception</name>
-		<description>Can Manage Reception</description>
-	</privilege>
-	<privilege>
-		<name>View Reception</name>
-		<description>Can View Reception</description>
-	</privilege>
-	<privilege>
-		<name>Save Reception</name>
-		<description>Can Save and Edit Reception</description>
-	</privilege>
-	<privilege>
-		<name>Delete Reception</name>
-		<description>Can Delete Reception</description>
-	</privilege>
-	<privilege>
-		<name>Validate Reception</name>
-		<description>Can Validate Reception</description>
-	</privilege>
+    <privilege>
+        <name>Manage Product</name>
+        <description>Can Manage Product</description>
+    </privilege>
+    <privilege>
+        <name>View Product</name>
+        <description>Can View Product</description>
+    </privilege>
+    <privilege>
+        <name>Save Product</name>
+        <description>Can Save and Edit Product</description>
+    </privilege>
+    <privilege>
+        <name>Import Product</name>
+        <description>Can Import Product</description>
+    </privilege>
+    <privilege>
+        <name>Delete Product</name>
+        <description>Can Delete Product</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Transfer</name>
-		<description>Can Manage Transfer</description>
-	</privilege>
-	<privilege>
-		<name>View Transfer</name>
-		<description>Can View Transfer</description>
-	</privilege>
-	<privilege>
-		<name>Save Transfer</name>
-		<description>Can Save and Edit Transfer</description>
-	</privilege>
-	<privilege>
-		<name>Delete Transfer</name>
-		<description>Can Delete Transfer</description>
-	</privilege>
-	<privilege>
-		<name>Validate Transfer</name>
-		<description>Can Validate Transfer</description>
-	</privilege>
+    <privilege>
+        <name>Manage Product Attribute</name>
+        <description>Can Manage Product Attribute</description>
+    </privilege>
+    <privilege>
+        <name>View Product Attribute</name>
+        <description>Can View Product Attribute</description>
+    </privilege>
+    <privilege>
+        <name>Save Product Attribute</name>
+        <description>Can Save and Edit Product Attribute</description>
+    </privilege>
+    <privilege>
+        <name>Delete Product Attribute</name>
+        <description>Can Delete Product Attribute</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Movement</name>
-		<description>Can Manage Movement</description>
-	</privilege>
-	<privilege>
-		<name>View Movement</name>
-		<description>Can View Movement</description>
-	</privilege>
-	<privilege>
-		<name>Save Movement</name>
-		<description>Can Save and Edit Movement</description>
-	</privilege>
-	<privilege>
-		<name>Delete Movement</name>
-		<description>Can Delete Movement</description>
-	</privilege>
-	<privilege>
-		<name>Validate Movement</name>
-		<description>Can Validate Movement</description>
-	</privilege>
+    <privilege>
+        <name>Manage Regimen</name>
+        <description>Can Manage Regimen</description>
+    </privilege>
+    <privilege>
+        <name>View Regimen</name>
+        <description>Can View Regimen</description>
+    </privilege>
+    <privilege>
+        <name>Save Regimen</name>
+        <description>Can Save and Edit Regimen</description>
+    </privilege>
+    <privilege>
+        <name>Import Regimen</name>
+        <description>Can Import Regimen</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Distribution</name>
-		<description>Can Manage Distribution</description>
-	</privilege>
-	<privilege>
-		<name>View Distribution</name>
-		<description>Can View Distribution</description>
-	</privilege>
-	<privilege>
-		<name>Save Distribution</name>
-		<description>Can Save and Edit Distribution</description>
-	</privilege>
-	<privilege>
-		<name>Delete Distribution</name>
-		<description>Can Delete Distribution</description>
-	</privilege>
-	<privilege>
-		<name>Validate Distribution</name>
-		<description>Can Validate Distribution</description>
-	</privilege>
+    <privilege>
+        <name>Manage Supplier</name>
+        <description>Can Manage Supplier</description>
+    </privilege>
+    <privilege>
+        <name>View Supplier</name>
+        <description>Can View Supplier</description>
+    </privilege>
+    <privilege>
+        <name>Save Supplier</name>
+        <description>Can Save and Edit Supplier</description>
+    </privilege>
+    <privilege>
+        <name>Delete Supplier</name>
+        <description>Can Delete Supplier</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Dispensation</name>
-		<description>Can Manage Dispensation</description>
-	</privilege>
-	<privilege>
-		<name>View Dispensation</name>
-		<description>Can View Dispensation</description>
-	</privilege>
-	<privilege>
-		<name>Save Dispensation</name>
-		<description>Can Save and Edit Dispensation</description>
-	</privilege>
-	<privilege>
-		<name>Delete Dispensation</name>
-		<description>Can Delete Dispensation</description>
-	</privilege>
-	<privilege>
-		<name>Validate Dispensation</name>
-		<description>Can Validate Dispensation</description>
-	</privilege>
-	<privilege>
-		<name>Transform Dispensation</name>
-		<description>Can Transform Dispensation</description>
-	</privilege>
+    <privilege>
+        <name>Manage Unit</name>
+        <description>Can Manage Unit</description>
+    </privilege>
+    <privilege>
+        <name>View Unit</name>
+        <description>Can View Unit</description>
+    </privilege>
+    <privilege>
+        <name>Save Unit</name>
+        <description>Can Save and Edit Unit</description>
+    </privilege>
+    <privilege>
+        <name>Delete Unit</name>
+        <description>Can Delete Unit</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Operation</name>
-		<description>Can Manage Operation</description>
-	</privilege>
-	<privilege>
-		<name>View Operation</name>
-		<description>Can View Operation</description>
-	</privilege>
-	<privilege>
-		<name>Save Operation</name>
-		<description>Can Save and Edit Operation</description>
-	</privilege>
-	<privilege>
-		<name>Delete Operation</name>
-		<description>Can Delete Operation</description>
-	</privilege>
-	<privilege>
-		<name>Validate Operation</name>
-		<description>Can Validate Operation</description>
-	</privilege>
-	<privilege>
-		<name>Cancel Operation</name>
-		<description>Can Cancel Operation</description>
-	</privilege>
+    <privilege>
+        <name>Manage Exchange Entity</name>
+        <description>Can Manage Exchange Entity</description>
+    </privilege>
+    <privilege>
+        <name>View Exchange Entity</name>
+        <description>Can View Exchange Entity</description>
+    </privilege>
+    <privilege>
+        <name>Save Exchange Entity</name>
+        <description>Can Save and Edit Exchange Entity</description>
+    </privilege>
+    <privilege>
+        <name>Delete Exchange Entity</name>
+        <description>Can Delete Exchange Entity</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Flux</name>
-		<description>Can Manage Flux</description>
-	</privilege>
-	<privilege>
-		<name>View Flux</name>
-		<description>Can View Flux</description>
-	</privilege>
-	<privilege>
-		<name>Save Flux</name>
-		<description>Can Save and Edit Flux</description>
-	</privilege>
-	<privilege>
-		<name>Delete Flux</name>
-		<description>Can Delete Flux</description>
-	</privilege>
-	<privilege>
-		<name>Validate Flux</name>
-		<description>Can Validate Flux</description>
-	</privilege>
+    <privilege>
+        <name>Manage Price</name>
+        <description>Can Manage Price</description>
+    </privilege>
+    <privilege>
+        <name>View Price</name>
+        <description>Can View Price</description>
+    </privilege>
+    <privilege>
+        <name>Save Price</name>
+        <description>Can Save and Edit Price</description>
+    </privilege>
+    <privilege>
+        <name>Delete Price</name>
+        <description>Can Delete Price</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Product Back Supplier</name>
-		<description>Can Manage Product Back Supplier</description>
-	</privilege>
-	<privilege>
-		<name>View Product Back Supplier</name>
-		<description>Can View Product Back Supplier</description>
-	</privilege>
-	<privilege>
-		<name>View Product Back Supplier</name>
-		<description>Can View Product Back Supplier</description>
-	</privilege>
-	<privilege>
-		<name>Save Product Back Supplier</name>
-		<description>Can Save and Edit Product Back Supplier</description>
-	</privilege>
-	<privilege>
-		<name>Delete Product Back Supplier</name>
-		<description>Can Delete Product Back Supplier</description>
-	</privilege>
-	<privilege>
-		<name>Validate Product Back Supplier</name>
-		<description>Can Validate Product Back Supplier</description>
-	</privilege>
+    <privilege>
+        <name>Manage Program</name>
+        <description>Can Manage Program</description>
+    </privilege>
+    <privilege>
+        <name>View Program</name>
+        <description>Can View Program</description>
+    </privilege>
+    <privilege>
+        <name>Save Program</name>
+        <description>Can Save and Edit Program</description>
+    </privilege>
+    <privilege>
+        <name>Delete Program</name>
+        <description>Can Delete Program</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Stock</name>
-		<description>Can Manage Stock</description>
-	</privilege>
-	<privilege>
-		<name>View Stock</name>
-		<description>Can View Stock</description>
-	</privilege>
+    <privilege>
+        <name>Manage Inventory</name>
+        <description>Can Manage Inventory</description>
+    </privilege>
+    <privilege>
+        <name>View Inventory</name>
+        <description>Can View Inventory</description>
+    </privilege>
+    <privilege>
+        <name>Save Inventory</name>
+        <description>Can Save and Edit Inventory</description>
+    </privilege>
+    <privilege>
+        <name>Delete Inventory</name>
+        <description>Can Delete Inventory</description>
+    </privilege>
+    <privilege>
+        <name>Validate Inventory</name>
+        <description>Can Validate Inventory</description>
+    </privilege>
 
-	<privilege>
-		<name>Manage Report</name>
-		<description>Can Manage Report</description>
-	</privilege>
-	<privilege>
-		<name>View Report</name>
-		<description>Can View Report</description>
-	</privilege>
-	<privilege>
-		<name>Save Report</name>
-		<description>Can Save and Edit Report</description>
-	</privilege>
-	<privilege>
-		<name>Delete Report</name>
-		<description>Can Delete Report</description>
-	</privilege>
-	<privilege>
-		<name>Validate Report</name>
-		<description>Can Validate Report</description>
-	</privilege>
-	<privilege>
-		<name>Treat Report</name>
-		<description>Can Manage Report</description>
-	</privilege>
-	<privilege>
-		<name>Import Report</name>
-		<description>Can Import Report</description>
-	</privilege>
-	<privilege>
-		<name>Submit Report</name>
-		<description>Can Submit Report</description>
-	</privilege>
+    <privilege>
+        <name>Manage Reception</name>
+        <description>Can Manage Reception</description>
+    </privilege>
+    <privilege>
+        <name>View Reception</name>
+        <description>Can View Reception</description>
+    </privilege>
+    <privilege>
+        <name>Save Reception</name>
+        <description>Can Save and Edit Reception</description>
+    </privilege>
+    <privilege>
+        <name>Delete Reception</name>
+        <description>Can Delete Reception</description>
+    </privilege>
+    <privilege>
+        <name>Validate Reception</name>
+        <description>Can Validate Reception</description>
+    </privilege>
 
-	<privilege>
-		<name>View Parameters</name>
-		<description>Can View Parameters</description>
-	</privilege>
+    <privilege>
+        <name>Manage Transfer</name>
+        <description>Can Manage Transfer</description>
+    </privilege>
+    <privilege>
+        <name>View Transfer</name>
+        <description>Can View Transfer</description>
+    </privilege>
+    <privilege>
+        <name>Save Transfer</name>
+        <description>Can Save and Edit Transfer</description>
+    </privilege>
+    <privilege>
+        <name>Delete Transfer</name>
+        <description>Can Delete Transfer</description>
+    </privilege>
+    <privilege>
+        <name>Validate Transfer</name>
+        <description>Can Validate Transfer</description>
+    </privilege>
 
-	<!-- /Privileges  -->
+    <privilege>
+        <name>Manage Movement</name>
+        <description>Can Manage Movement</description>
+    </privilege>
+    <privilege>
+        <name>View Movement</name>
+        <description>Can View Movement</description>
+    </privilege>
+    <privilege>
+        <name>Save Movement</name>
+        <description>Can Save and Edit Movement</description>
+    </privilege>
+    <privilege>
+        <name>Delete Movement</name>
+        <description>Can Delete Movement</description>
+    </privilege>
+    <privilege>
+        <name>Validate Movement</name>
+        <description>Can Validate Movement</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Distribution</name>
+        <description>Can Manage Distribution</description>
+    </privilege>
+    <privilege>
+        <name>View Distribution</name>
+        <description>Can View Distribution</description>
+    </privilege>
+    <privilege>
+        <name>Save Distribution</name>
+        <description>Can Save and Edit Distribution</description>
+    </privilege>
+    <privilege>
+        <name>Delete Distribution</name>
+        <description>Can Delete Distribution</description>
+    </privilege>
+    <privilege>
+        <name>Validate Distribution</name>
+        <description>Can Validate Distribution</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Dispensation</name>
+        <description>Can Manage Dispensation</description>
+    </privilege>
+    <privilege>
+        <name>View Dispensation</name>
+        <description>Can View Dispensation</description>
+    </privilege>
+    <privilege>
+        <name>Save Dispensation</name>
+        <description>Can Save and Edit Dispensation</description>
+    </privilege>
+    <privilege>
+        <name>Delete Dispensation</name>
+        <description>Can Delete Dispensation</description>
+    </privilege>
+    <privilege>
+        <name>Validate Dispensation</name>
+        <description>Can Validate Dispensation</description>
+    </privilege>
+    <privilege>
+        <name>Transform Dispensation</name>
+        <description>Can Transform Dispensation</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Operation</name>
+        <description>Can Manage Operation</description>
+    </privilege>
+    <privilege>
+        <name>View Operation</name>
+        <description>Can View Operation</description>
+    </privilege>
+    <privilege>
+        <name>Save Operation</name>
+        <description>Can Save and Edit Operation</description>
+    </privilege>
+    <privilege>
+        <name>Delete Operation</name>
+        <description>Can Delete Operation</description>
+    </privilege>
+    <privilege>
+        <name>Validate Operation</name>
+        <description>Can Validate Operation</description>
+    </privilege>
+    <privilege>
+        <name>Cancel Operation</name>
+        <description>Can Cancel Operation</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Flux</name>
+        <description>Can Manage Flux</description>
+    </privilege>
+    <privilege>
+        <name>View Flux</name>
+        <description>Can View Flux</description>
+    </privilege>
+    <privilege>
+        <name>Save Flux</name>
+        <description>Can Save and Edit Flux</description>
+    </privilege>
+    <privilege>
+        <name>Delete Flux</name>
+        <description>Can Delete Flux</description>
+    </privilege>
+    <privilege>
+        <name>Validate Flux</name>
+        <description>Can Validate Flux</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Product Back Supplier</name>
+        <description>Can Manage Product Back Supplier</description>
+    </privilege>
+    <privilege>
+        <name>View Product Back Supplier</name>
+        <description>Can View Product Back Supplier</description>
+    </privilege>
+    <privilege>
+        <name>View Product Back Supplier</name>
+        <description>Can View Product Back Supplier</description>
+    </privilege>
+    <privilege>
+        <name>Save Product Back Supplier</name>
+        <description>Can Save and Edit Product Back Supplier</description>
+    </privilege>
+    <privilege>
+        <name>Delete Product Back Supplier</name>
+        <description>Can Delete Product Back Supplier</description>
+    </privilege>
+    <privilege>
+        <name>Validate Product Back Supplier</name>
+        <description>Can Validate Product Back Supplier</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Stock</name>
+        <description>Can Manage Stock</description>
+    </privilege>
+    <privilege>
+        <name>View Stock</name>
+        <description>Can View Stock</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Report</name>
+        <description>Can Manage Report</description>
+    </privilege>
+    <privilege>
+        <name>View Report</name>
+        <description>Can View Report</description>
+    </privilege>
+    <privilege>
+        <name>Save Report</name>
+        <description>Can Save and Edit Report</description>
+    </privilege>
+    <privilege>
+        <name>Delete Report</name>
+        <description>Can Delete Report</description>
+    </privilege>
+    <privilege>
+        <name>Validate Report</name>
+        <description>Can Validate Report</description>
+    </privilege>
+    <privilege>
+        <name>Treat Report</name>
+        <description>Can Manage Report</description>
+    </privilege>
+    <privilege>
+        <name>Import Report</name>
+        <description>Can Import Report</description>
+    </privilege>
+    <privilege>
+        <name>Submit Report</name>
+        <description>Can Submit Report</description>
+    </privilege>
+
+    <privilege>
+        <name>View Parameters</name>
+        <description>Can View Parameters</description>
+    </privilege>
+
+    <!-- /Privileges  -->
 </module>
 

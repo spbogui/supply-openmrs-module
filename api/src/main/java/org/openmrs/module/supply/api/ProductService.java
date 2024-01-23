@@ -5,7 +5,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.supply.*;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
+//import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface ProductService extends OpenmrsService {
 	@Transactional(readOnly = true)
 	List<Product> getAllProducts(Boolean includeVoided) throws APIException;
 	
-	List<Product> getProductWithoutRegimeByProgram(ProductProgram productProgram);
+	List<ProductCode> getProductWithoutRegimeByProgram(ProductProgram productProgram);
 	
 	Product getProductByCode(String code) throws APIException;
 	
@@ -29,7 +29,7 @@ public interface ProductService extends OpenmrsService {
 	
 	void purgeProduct(Product product) throws APIException;
 	
-	List<Product> uploadProduct(MultipartFile flie) throws APIException;
+	//	List<Product> uploadProduct(MultipartFile flie) throws APIException;
 	
 	/**
 	 * *********** Price
@@ -126,7 +126,7 @@ public interface ProductService extends OpenmrsService {
 	@Transactional(readOnly = true)
 	List<ProductRegime> getAllProductRegimes() throws APIException;
 	
-	void uploadProductRegimens(MultipartFile file);
+	//    void uploadProductRegimens(MultipartFile file);
 	
 	/**
 	 * *********** Attribute
@@ -154,7 +154,10 @@ public interface ProductService extends OpenmrsService {
 	ProductAttribute getOtherProductAttributeByBatchNumber(String batchNumber, Product product, Location location);
 	
 	@Transactional
-	Integer purgeUnusedAttributes();
+	void purgeUnusedAttributes(ProductOperationFlux flux);
+	
+	@Transactional
+	void purgeUnusedAttributes();
 	
 	@Transactional(readOnly = true)
 	ProductCode getProductCode(String uuid);
@@ -173,4 +176,6 @@ public interface ProductService extends OpenmrsService {
 	
 	@Transactional(readOnly = true)
 	List<ProductCode> getProductCodes(Boolean includeVoided);
+	
+	List<ProductCode> getAvailableProductCode(ProductProgram program);
 }

@@ -23,10 +23,6 @@ public class ProductAttributeStock extends BaseOpenmrsData {
 	@JoinColumn(name = "operation_id")
 	private ProductOperation operation;
 	
-	//    @ManyToOne
-	//    @JoinColumn(name = "program_id")
-	//    private ProductProgram program;
-	
 	@Column(name = "quantity_in_stock", nullable = false)
 	private Integer quantityInStock;
 	
@@ -81,14 +77,6 @@ public class ProductAttributeStock extends BaseOpenmrsData {
 		return attribute.getProductCode().getProduct().getPackagingName() + " - " + attribute.getProductCode().getCode()
 		        + " [" + attribute.getBatchNumber() + "]";
 	}
-	
-	//    public ProductProgram getProgram() {
-	//        return program;
-	//    }
-	//
-	//    public void setProgram(ProductProgram program) {
-	//        this.program = program;
-	//    }
 	
 	@Override
 	public Integer getId() {

@@ -9,7 +9,8 @@
 <%--<openmrs:htmlInclude--%>
 <%--        file="${pageContext.request.contextPath}/moduleResources/supply/assests/index-5bec27c4.js"--%>
 <%--/>--%>
-<script type="module" crossorigin
-        src="${pageContext.request.contextPath}/moduleResources/supply/assets/index-8b1fefa6.js"></script>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/moduleResources/supply/assets/index-38c6c332.css">
+<script type="module" crossorigin
+        src="${pageContext.request.contextPath}/moduleResources/supply/assets/index-43c4b769.js"></script>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/moduleResources/supply/assets/index-ecdf81c3.css">

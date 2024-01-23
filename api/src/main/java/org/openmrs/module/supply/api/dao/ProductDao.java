@@ -2,6 +2,7 @@ package org.openmrs.module.supply.api.dao;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -13,11 +14,12 @@ import org.openmrs.module.supply.utils.CSVHelper;
 import org.openmrs.module.supply.utils.SupplyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.multipart.MultipartFile;
+//import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository("supply.ProductDao")
 public class ProductDao {
@@ -61,18 +63,18 @@ public class ProductDao {
 		getSession().delete(product);
 	}
 	
-	public List<Product> uploadProduct(MultipartFile file) {
-		try {
-			List<Product> products = CSVHelper.csvProducts(file.getInputStream());
-			for (Product product : products) {
-				saveProduct(product);
-			}
-			return products;
-		}
-		catch (IOException e) {
-			throw new RuntimeException("fail to store csv data: " + e.getMessage());
-		}
-	}
+	//	public List<Product> uploadProduct(MultipartFile file) {
+	//		try {
+	//			List<Product> products = CSVHelper.csvProducts(file.getInputStream());
+	//			for (Product product : products) {
+	//				saveProduct(product);
+	//			}
+	//			return products;
+	//		}
+	//		catch (IOException e) {
+	//			throw new RuntimeException("fail to store csv data: " + e.getMessage());
+	//		}
+	//	}
 	
 	public ProductPrice getProductPrice(Integer id) {
 		return (ProductPrice) getSession().get(ProductPrice.class, id);
@@ -191,7 +193,7 @@ public class ProductDao {
 	}
 	
 	public ProductRegime getProductRegimeByConcept(String conceptUuid) {
-		Concept concept = Context.getConceptService().getConcept(conceptUuid);
+		Concept concept = Context.getConceptService().getConceptByUuid(conceptUuid);
 		Criteria criteria = getSession().createCriteria(ProductRegime.class);
 		return (ProductRegime) criteria.add(Restrictions.eq("concept", concept)).uniqueResult();
 	}
@@ -208,18 +210,18 @@ public class ProductDao {
 		return productRegime;
 	}
 	
-	public void uploadProductRegimens(MultipartFile file) {
-		try {
-			List<Product> products = CSVHelper.csvProductRegimes(file.getInputStream());
-			for (Product product : products) {
-				saveProduct(product);
-			}
-			
-		}
-		catch (IOException e) {
-			throw new RuntimeException("fail to store csv data: " + e.getMessage());
-		}
-	}
+	//	public void uploadProductRegimens(MultipartFile file) {
+	//		try {
+	//			List<Product> products = CSVHelper.csvProductRegimes(file.getInputStream());
+	//			for (Product product : products) {
+	//				saveProduct(product);
+	//			}
+	//
+	//		}
+	//		catch (IOException e) {
+	//			throw new RuntimeException("fail to store csv data: " + e.getMessage());
+	//		}
+	//	}
 	
 	@SuppressWarnings("unchecked")
 	public List<ProductAttribute> getAllProductAttributes(Location location, Boolean includeVoided) {
@@ -262,41 +264,74 @@ public class ProductDao {
 		        .add(Restrictions.eq("location", location)).add(Restrictions.ne("product", product)).uniqueResult();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public Integer purgeUnusedAttributes() {
-		List<ProductAttribute> productAttributes = getSession()
-		        .createQuery(
-		            "FROM ProductAttribute p WHERE p.productAttributeId NOT IN (SELECT pf.productAttribute.productAttributeId FROM ProductOperationFluxAttribute pf)")
-		        .list();
-		for (ProductAttribute attribute : productAttributes) {
-			getSession().delete(attribute);
+	public void purgeUnusedAttributes(ProductOperationFlux flux) {
+		if (!flux.getAttributes().isEmpty()) {
+			for (ProductOperationFluxAttribute attribute : flux.getAttributes()) {
+				if (!attributeIsUsed(attribute)) {
+					getSession().delete(attribute);
+				}
+			}
 		}
-		return productAttributes.size();
 	}
 	
 	@SuppressWarnings("unchecked")
-    public List<Product> getProductWithoutRegimeByProgram(ProductProgram productProgram) {
-        String sqlQuery =
-                "SELECT product_id FROM ( " +
-                        "SELECT pp.product_id, count(ppr.product_regime_id) countRegimen  FROM supply_product pp " +
-                        "LEFT JOIN supply_product_regime_members pprm on pp.product_id = pprm.product_id " +
-                        "LEFT JOIN supply_product_regime ppr on ppr.product_regime_id = pprm.regime_id " +
-                        "LEFT JOIN supply_product_program_members pppm on pp.product_id = pppm.product_id " +
-                        "WHERE program_id = " + productProgram.getProductProgramId() + " " +
-                        "GROUP BY pp.product_id " +
-                        "HAVING countRegimen = (SELECT COUNT(*) FROM supply_product_regime) OR countRegimen = 0) _";
+	public void purgeUnusedAttributes() {
+		String queryString = "SELECT p FROM ProductAttribute p WHERE p.location = :location p NOT IN ("
+		        + " SELECT paf.attribute FROM ProductOperationFluxAttribute paf)";
+		List<ProductAttribute> attributes = getSession().createQuery(queryString)
+		        .setParameter("location", SupplyUtils.getUserLocation()).list();
+		if (attributes != null) {
+			if (!attributes.isEmpty()) {
+				for (ProductAttribute attribute : attributes) {
+					getSession().delete(attribute);
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Boolean attributeIsUsed(ProductOperationFluxAttribute attribute) {
+		List<ProductOperationFluxAttribute> fluxAttributes = getSession()
+		        .createCriteria(ProductOperationFluxAttribute.class)
+		        .add(Restrictions.eq("location", SupplyUtils.getUserLocation()))
+		        .add(Restrictions.eq("attribute", attribute)).list();
+		if (!fluxAttributes.isEmpty()) {
+			return true;
+		}
+		return false;
+	}
+	
+	@SuppressWarnings("unchecked")
+    public List<ProductCode> getProductWithoutRegimeByProgram(ProductProgram productProgram) {
+        //        String sqlQuery =
+        //                "SELECT product_id FROM ( " +
+        //                        "SELECT pp.product_id, count(ppr.product_regime_id) countRegimen  FROM supply_product pp " +
+        //                        "LEFT JOIN supply_product_regime_members pprm on pp.product_id = pprm.product_id " +
+        //                        "LEFT JOIN supply_product_regime ppr on ppr.product_regime_id = pprm.regime_id " +
+        //                        "LEFT JOIN supply_product_program_members pppm on pp.product_id = pppm.product_id " +
+        //                        "WHERE program_id = " + productProgram.getProductProgramId() + " " +
+        //                        "GROUP BY pp.product_id " +
+        //                        "HAVING countRegimen = (SELECT COUNT(*) FROM supply_product_regime) OR countRegimen = 0) _";
 
-        Query query = getSession().createSQLQuery(sqlQuery);
-        List<Integer> productIds = query.list();
+        //        Query query = getSession().createSQLQuery(sqlQuery);
+        List<ProductRegime> regimes = getAllProductRegimes();
 
-        List<Product> productList = new ArrayList<>();
+        Query query = getSession().createQuery(
+                "SELECT p FROM ProductCode p LEFT JOIN p.regimes r WHERE p.program = :program GROUP BY p");
+        query.setParameter("program", productProgram);
 
-        if (productIds != null) {
-            for (Integer productId : productIds) {
-                productList.add(getProduct(productId));
-            }
-        }
-        return productList;
+        List<ProductCode> products = query.list();
+
+        return products.stream().filter((p) -> p.getRegimes().isEmpty() || p.getRegimes().size() == regimes.size()).collect(Collectors.toList());
+
+        //        List<Product> productList = new ArrayList<>();
+        //
+        //        if (productIds != null) {
+        //            for (Integer productId : productIds) {
+        //                productList.add(getProduct(productId));
+        //            }
+        //        }
+        //        return productList;
     }
 	
 	public ProductCode getProductCode(String uuid) {
@@ -316,8 +351,27 @@ public class ProductDao {
 	
 	@SuppressWarnings("unchecked")
 	public List<ProductCode> getProductCodes(ProductProgram program, ProductRegime productRegime) {
-		return getSession().createCriteria(ProductCode.class, "p").createAlias("p.regimes", "r")
-		        .add(Restrictions.eq("p.program", program)).add(Restrictions.eq("r.regime", productRegime)).list();
+		//        String sqlQuery = "SELECT DISTINCT spc.* " +
+		//                "FROM " +
+		//                "    (SELECT * FROM supply2_product_code WHERE program_id = " + program.getProductProgramId() + ") spc " +
+		//                "        LEFT JOIN " +
+		//                "    supply2_product_code_regime_members spcrm ON spcrm.product_code_id = spc.product_code_id " +
+		//                "        LEFT JOIN " +
+		//                "    supply2_product_regime spr ON spcrm.regime_id = spr.product_regime_id" +
+		//                "WHERE concept_id = " + productRegime.getConcept().getConceptId();
+		
+		Query query = getSession().createQuery(
+		    "SELECT DISTINCT p FROM ProductCode p JOIN p.regimes r WHERE r.concept = :concept AND p.program = :program");
+		query.setParameter("program", program);
+		query.setParameter("concept", productRegime.getConcept());
+		return query.list();
+		
+		//        Query query = getSession().createSQLQuery(sqlQuery);
+		
+		//        return getSession().createCriteria(ProductCode.class, "p").createAlias("p.regimes", "r")
+		//                .add(Restrictions.eq("p.program", program))
+		//                .add(Restrictions.eq("r.concept", productRegime.getConcept()))
+		//                .list();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -338,4 +392,27 @@ public class ProductDao {
 		}
 		return criteria.list();
 	}
+	
+	@SuppressWarnings("unchecked")
+    public List<ProductCode> getAvailableProductCode(ProductProgram program) {
+        Criteria criteria = getSession().createCriteria(ProductAttributeStock.class, "s")
+                .createAlias("s.attribute", "a")
+                .createAlias("a.productCode", "p")
+                .add(Restrictions.eq("s.voided", false))
+                .add(Restrictions.eq("p.program", program))
+                .add(Restrictions.gt("s.quantityInStock", 0));
+        List<ProductAttributeStock> stocks = criteria.list();
+
+        List<ProductCode> productCodes = new ArrayList<>();
+
+        if (stocks != null) {
+            for (ProductAttributeStock stock : stocks) {
+                ProductCode productCode = stock.getAttribute().getProductCode();
+                if (!productCodes.contains(productCode)) {
+                    productCodes.add(productCode);
+                }
+            }
+        }
+        return productCodes;
+    }
 }

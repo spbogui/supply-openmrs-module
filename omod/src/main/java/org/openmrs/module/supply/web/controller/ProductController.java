@@ -62,20 +62,20 @@ public class ProductController {
 		if (Context.isAuthenticated()) {
 			HttpSession session = request.getSession();
 			String message = "";
-			if (CSVHelper.hasCSVFormat(file)) {
-				try {
-					List<Product> reports = productService.uploadProduct(file);
-					message = "Produits importés avec succès";
-					session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message + ". [" + reports.size() + "]");
-				}
-				catch (Exception e) {
-					message = "Could not upload the file : " + file.getOriginalFilename() + " : " + e.getMessage();
-					System.out.println("---------------------" + e.getMessage());
-					session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
-				}
-			} else {
-				session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "S'il vous plait importez un fichier CSV !");
-			}
+			//			if (CSVHelper.hasCSVFormat(file)) {
+			//				try {
+			//					List<Product> reports = productService.uploadProduct(file);
+			//					message = "Produits importés avec succès";
+			//					session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message + ". [" + reports.size() + "]");
+			//				}
+			//				catch (Exception e) {
+			//					message = "Could not upload the file : " + file.getOriginalFilename() + " : " + e.getMessage();
+			//					System.out.println("---------------------" + e.getMessage());
+			//					session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
+			//				}
+			//			} else {
+			//				session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "S'il vous plait importez un fichier CSV !");
+			//			}
 		}
 		return VIEW_LIST;
 	}

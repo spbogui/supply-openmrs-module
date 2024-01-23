@@ -6,7 +6,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.supply.*;
 import org.openmrs.module.supply.api.ProductService;
-import org.springframework.web.multipart.MultipartFile;
+//import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,10 +26,10 @@ public class CSVHelper {
 	static String[] HEADERs = { "#Code", "#Designation", "#Designation de dispensation", "#Unite de conditionnement",
 	        "#Nombre unite", "#Unite de dispensation", "#Prix de vente", "#Programme" };
 	
-	public static boolean hasCSVFormat(MultipartFile file) {
-		System.out.println("----------------------------------------> " + file.getContentType());
-		return CSV_APP_TYPE.equals(file.getContentType()) || CSV_TEXT_TYPE.equals(file.getContentType());
-	}
+	//	public static boolean hasCSVFormat(MultipartFile file) {
+	//		System.out.println("----------------------------------------> " + file.getContentType());
+	//		return CSV_APP_TYPE.equals(file.getContentType()) || CSV_TEXT_TYPE.equals(file.getContentType());
+	//	}
 	
 	public static List<Product> csvProductRegimes(InputStream is) {
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
