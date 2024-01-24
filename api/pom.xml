@@ -117,7 +117,7 @@
                     <execution>
                         <phase>validate</phase>
                         <goals>
-                            <goal>create</goal>
+                            <goal>create-metadata</goal>
                         </goals>
                     </execution>
                 </executions>
