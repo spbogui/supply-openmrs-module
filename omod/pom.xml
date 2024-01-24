@@ -86,7 +86,7 @@
 
     <build>
         <!--suppress UnresolvedMavenProperty -->
-        <finalName>${project.parent.artifactId}-${project.parent.version}.${revisionNumber}</finalName>
+        <finalName>${project.parent.artifactId}-${project.parent.version}.${buildNumber}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.openmrs.maven.plugins</groupId>

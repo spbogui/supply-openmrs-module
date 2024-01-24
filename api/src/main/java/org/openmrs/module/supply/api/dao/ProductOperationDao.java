@@ -1766,14 +1766,32 @@ public class ProductOperationDao {
                     otherFluxes.add(getAdjustmentQuantity(productCode, inventory, adjustmentFLuxes));
 //                    otherFluxes.add(getAverageMonthlyConsumption(productCode, lastConsumptionReportFluxes, inventory.getLocation()));
 
+                    Double lostQuantity = getProductFluxQuantity(
+                            productCode,
+                            lossFLuxes.stream().filter(f -> f.getProductCode().equals(productCode)).collect(Collectors.toList()));
+                    if (!getChildLocationListWithPrograms(currentReport.getLocation()).isEmpty()) {
+                        for (Location location : getChildLocationListWithPrograms(currentReport.getLocation())) {
+                            ProductOperation childReport = getProductOperationByOperationNumber(
+                                    getProductOperationType(OperationConstants.REPORT_OPERATION),
+                                    currentReport.getProductProgram(),
+                                    currentReport.getOperationNumber(),
+                                    location, true);
+                            if (childReport != null) {
+                                ProductOperationOtherFlux otherFlux = childReport.getOtherFluxes().stream()
+                                        .filter(o -> o.getProductCode().equals(productCode) && o.getLabel().equals(ReportConstants.LOSS_QUANTITY)).findFirst().orElse(null);
+                                if (otherFlux != null) {
+                                    lostQuantity += otherFlux.getQuantity();
+                                }
+                            }
+                        }
+                    }
                     otherFluxes.add(createOtherFlux(
-                            getProductFluxQuantity(
-                                    productCode,
-                                    lossFLuxes.stream().filter(f -> f.getProductCode().equals(productCode)).collect(Collectors.toList())),
+                            lostQuantity,
                             ReportConstants.LOSS_QUANTITY,
                             productCode,
                             inventory.getLocation())
                     );
+
 
                     if (previousReport != null) {
                         otherFluxes.add(createOtherFlux(

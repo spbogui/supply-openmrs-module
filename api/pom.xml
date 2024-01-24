@@ -86,7 +86,6 @@
     </dependencies>
 
     <build>
-        <finalName>${project.parent.artifactId}-${project.parent.version}-${buildNumber}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
