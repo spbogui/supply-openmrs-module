@@ -170,6 +170,7 @@
                     </configuration>
                 </plugin>
             </plugins>
+
         </pluginManagement>
     </build>
     <!--	Add myself -->
