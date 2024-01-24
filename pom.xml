@@ -160,7 +160,7 @@
                         <execution>
                             <phase>validate</phase>
                             <goals>
-                                <goal>create-metadata</goal>
+                                <goal>create-timestamp</goal>
                             </goals>
                         </execution>
                     </executions>
