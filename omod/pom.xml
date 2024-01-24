@@ -113,6 +113,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <shortRevisionLength>5</shortRevisionLength>
                     <format>{0,number}.{1,number}.{2,number}</format>
                     <items>
                         <item>buildNumber0</item>
