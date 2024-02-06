@@ -501,4 +501,36 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 		return dao.getMonthlyConsumption(productCode, location, locations);
 	}
 	
+	@Override
+	public ProductStockStatus getProductStockStatus(String uuid) {
+		return dao.getProductStockStatus(uuid);
+	}
+	
+	@Override
+	public ProductStockStatus saveProductStockStatus(ProductStockStatus productStockStatus) {
+		return dao.saveProductStockStatus(productStockStatus);
+	}
+	
+	@Override
+	public List<ProductStockStatus> getAllProductStockStatuses(Location location, ProductProgram program) {
+		return dao.getAllProductStockStatuses(location, program);
+	}
+	
+	@Override
+	public List<ProductStockStatus> getAllProductStockStatuses(Location location) {
+		return dao.getAllProductStockStatuses(location);
+	}
+	
+	@Override
+	public List<ProductStockStatus> getAllProductStockStatuses(Location location, ProductProgram program, Date startDate,
+	        Boolean forChildren) {
+		return dao.getAllProductStockStatuses(location, program, startDate, forChildren);
+	}
+	
+	@Override
+	public List<ProductStockStatus> getProductStockStatusByProductCode(ProductCode productCode, ProductProgram program,
+	        Location currentLocation, Date startDate, Boolean forChildren) {
+		return dao.getProductStockStatusByProductCode(productCode, program, currentLocation, startDate, forChildren);
+	}
+	
 }

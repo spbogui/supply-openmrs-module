@@ -133,7 +133,11 @@ public class ProductAttributeResource extends DelegatingCrudResource<ProductAttr
 		
 		List<ProductAttribute> attributes = new ArrayList<ProductAttribute>();
 		if (batchNumber != null) {
-			attributes.add(getService().getProductAttributeByBatchNumber(batchNumber, SupplyUtils.getUserLocation()));
+			ProductAttribute attribute = getService().getProductAttributeByBatchNumber(batchNumber,
+			    SupplyUtils.getUserLocation());
+			if (attribute != null) {
+				attributes.add(attribute);
+			}
 		}
 		return new NeedsPaging<ProductAttribute>(attributes, context);
 	}

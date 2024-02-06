@@ -21,7 +21,7 @@
         <connection>scm:git:git@github.com:openmrs/openmrs-module-supply.git</connection>
         <developerConnection>scm:git:git@github.com:openmrs/openmrs-module-supply.git</developerConnection>
         <url>https://github.com/openmrs/openmrs-module-supply/</url>
-        <tag>3.0</tag>
+        <tag>3.0.1</tag>
     </scm>
 
     <modules>
@@ -55,6 +55,15 @@
 
     <properties>
         <openmrsPlatformVersion>2.3.1</openmrsPlatformVersion>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
+
+        <MODULE_ID>${project.parent.artifactId}</MODULE_ID>
+        <MODULE_NAME>${project.name}</MODULE_NAME>
+        <MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
+        <MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
+        <apacheTomcatVersion>6.0.53</apacheTomcatVersion>
+        <javaxVersion>4.0.1</javaxVersion>
     </properties>
 
     <!--	Add myself -->
@@ -147,6 +156,16 @@
                     <groupId>org.openmrs.maven.plugins</groupId>
                     <artifactId>maven-openmrs-plugin</artifactId>
                     <version>1.0.1</version>
+                    <extensions>true</extensions>
+                    <executions>
+                        <execution>
+                            <id>pack</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>package-module</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

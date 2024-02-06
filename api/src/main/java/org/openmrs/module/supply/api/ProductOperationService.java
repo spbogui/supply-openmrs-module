@@ -310,4 +310,18 @@ public interface ProductOperationService extends OpenmrsService {
 	ProductNotification getNotification(String uuid);
 	
 	Double getMonthlyConsumption(ProductCode productCode, Location location, List<Location> locations);
+	
+	ProductStockStatus getProductStockStatus(String uuid);
+	
+	ProductStockStatus saveProductStockStatus(ProductStockStatus productStockStatus);
+	
+	List<ProductStockStatus> getAllProductStockStatuses(Location location, ProductProgram program);
+	
+	List<ProductStockStatus> getAllProductStockStatuses(Location location);
+	
+	List<ProductStockStatus> getAllProductStockStatuses(Location location, ProductProgram program, Date startDate,
+	        Boolean forChildren);
+	
+	List<ProductStockStatus> getProductStockStatusByProductCode(ProductCode productCode, ProductProgram program,
+	        Location currentLocation, Date startDate, Boolean forChildren);
 }

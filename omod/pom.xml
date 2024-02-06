@@ -17,11 +17,6 @@
     <description>Omod submodule for Supply</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>supply-api</artifactId>
-            <version>3.0</version>
-        </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
@@ -79,6 +74,13 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>supply-api</artifactId>
+            <version>3.0.1</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- End OpenMRS core -->
 
@@ -104,7 +106,10 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 

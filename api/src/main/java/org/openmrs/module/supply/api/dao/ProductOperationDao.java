@@ -45,6 +45,119 @@ public class ProductOperationDao {
 		}
 	}
 	
+	private ProductAttribute getProductAttributeWithNextExpiryDate(ProductCode productCode) {
+		return (ProductAttribute) getSession().createCriteria(ProductAttribute.class)
+		        .add(Restrictions.eq("productCode", productCode)).add(Restrictions.ge("expiryDate", new Date()))
+		        .addOrder(Order.asc("expiryDate")).setMaxResults(1).uniqueResult();
+	}
+	
+	private void generateStockStatus(ProductOperation operation) {
+        List<ProductCode> productCodes = operation.getProductList();
+        List<ProductStockStatus> productStockStatus = getAllProductStockStatuses(operation.getLocation(), operation.getProductProgram());
+
+        boolean isReportOperation = operation.getOperationType().getUuid().equals(OperationConstants.REPORT_OPERATION) ||
+                operation.getOperationType().getUuid().equals(OperationConstants.URGENT_REPORT_OPERATION);
+
+        for (ProductCode productCode : productCodes) {
+            ProductStockStatus productCodeInStatus = productStockStatus.stream().filter(p -> p.getProductCode().equals(productCode)).findFirst().orElse(null);
+            Double available = 0.;
+            Double monthlyConsumption = 0.;
+
+            if (operation.getOperationStatus().equals(OperationStatus.SUBMITTED)) {
+                ProductOperationOtherFlux otherFluxMonthlyConsumption = operation.getOtherFluxes().stream()
+                        .filter(o -> o.getLabel().equals(ReportConstants.MONTHLY_CONSUMPTION) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
+                if (otherFluxMonthlyConsumption != null) {
+                    monthlyConsumption = otherFluxMonthlyConsumption.getQuantity();
+                }
+                ProductOperationOtherFlux otherFluxAvailable = operation.getOtherFluxes().stream()
+                        .filter(o -> o.getLabel().equals(ReportConstants.AVAILABLE_QUANTITY) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
+                if (otherFluxAvailable != null) {
+                    available = otherFluxAvailable.getQuantity();
+                }
+            } else if (!operation.getOperationType().getUuid().equals(OperationConstants.REPORT_OPERATION) &&
+                    !operation.getOperationType().getUuid().equals(OperationConstants.URGENT_REPORT_OPERATION)) {
+                available = getProductQuantityInStock(productCode, operation.getLocation()) * 1.;
+//
+//                if (available.equals(0.)) {
+//                    ProductOperationOtherFlux otherFluxAvailable = latestReport.getOtherFluxes().stream()
+//                            .filter(o -> o.getLabel().equals(ReportConstants.AVAILABLE_QUANTITY) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
+//                    if (otherFluxAvailable != null) {
+//                        available = otherFluxAvailable.getQuantity();
+//                    }
+//                }
+//
+//                if (operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION) ||
+//                        operation.getOperationType().getUuid().equals(OperationConstants.PARTIAL_INVENTORY_OPERATION)) {
+//
+//
+//                } else {
+//                    if (otherFluxMonthlyConsumption != null) {
+//                        monthlyConsumption = otherFluxMonthlyConsumption.getQuantity();
+//                    }
+//
+//                    latestInventory = getLastProductOperation(getProductOperationType(OperationConstants.INVENTORY_OPERATION), operation.getProductProgram(), operation.getLocation(), true, false);
+//                    if (latestInventory != null) {
+//                        ProductOperation latestReport = isReportOperation ? operation : getLastProductOperation(Arrays.asList(
+//                                        getProductOperationType(OperationConstants.REPORT_OPERATION),
+//                                        getProductOperationType(OperationConstants.URGENT_REPORT_OPERATION)),
+//                                productCode, operation.getOperationDate(), latestInventory.getOperationDate(),
+//                                operation.getProductProgram(), operation.getLocation(), false);
+//
+//                        if (latestReport != null) {
+//                            ProductOperationOtherFlux otherFluxMonthlyConsumption = latestReport.getOtherFluxes().stream()
+//                                    .filter(o -> o.getLabel().equals(ReportConstants.MONTHLY_CONSUMPTION) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
+//                            if (otherFluxMonthlyConsumption != null) {
+//                                monthlyConsumption = otherFluxMonthlyConsumption.getQuantity();
+//                            }
+//                            if (available.equals(0.)) {
+//                                ProductOperationOtherFlux otherFluxAvailable = latestReport.getOtherFluxes().stream()
+//                                        .filter(o -> o.getLabel().equals(ReportConstants.AVAILABLE_QUANTITY) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
+//                                if (otherFluxAvailable != null) {
+//                                    available = otherFluxAvailable.getQuantity();
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+            }
+
+            ProductAttribute productAttribute = getProductAttributeWithNextExpiryDate(productCode);
+
+            if (productCodeInStatus != null) {
+                if (!productCodeInStatus.getAverageConsumedQuantity().equals(monthlyConsumption) ||
+                        !productCodeInStatus.getQuantityInStock().equals(available)) {
+                    if (operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION)) {
+                        productCodeInStatus.setAverageConsumedQuantity(0.);
+                    } else {
+                        if (monthlyConsumption != 0. && productCodeInStatus.getAverageConsumedQuantity() == 0) {
+                            productCodeInStatus.setAverageConsumedQuantity(monthlyConsumption);
+                        }
+                    }
+                    productCodeInStatus.setQuantityInStock(available);
+                    productCodeInStatus.setStockDate(new Date());
+                    if (productAttribute != null) {
+                        productCodeInStatus.setExpiryNextDate(productAttribute.getExpiryDate());
+                    }
+                    saveProductStockStatus(productCodeInStatus);
+                }
+            } else {
+                productCodeInStatus = new ProductStockStatus(
+                        productCode,
+                        operation.getLocation(),
+                        available,
+                        monthlyConsumption,
+                        new Date()
+                );
+
+                if (productAttribute != null) {
+                    productCodeInStatus.setExpiryNextDate(productAttribute.getExpiryDate());
+                }
+                saveProductStockStatus(productCodeInStatus);
+            }
+
+        }
+    }
+	
 	public void cancelOperation(ProductOperation operation) {
 		if (!operation.getIncidence().equals(Incidence.NONE)) {
 			createStocks(operation);
@@ -112,20 +225,23 @@ public class ProductOperationDao {
                                 }
                             }
                         }
-                        if (flux.getProductCode().getQuantityInStock() == 0) {
-                            ProductNotification notification = new ProductNotification();
-                            notification.setProductCode(flux.getProductCode());
-                            notification.setNotification(OperationConstants.PRODUCT_RUPTURE_NOTIFICATION);
-                            notification.setNotificationInfo("Produit en rupture depuis le : "
-                                    + operation.getOperationDate().toString());
-                            notification.setLocation(operation.getLocation());
-                            notification.setNotifiedTo(operation.getLocation());
-                            notification.setNotificationDate(operation.getOperationDate());
-                            getSession().save(notification);
+                        if (operation.getIncidence().equals(Incidence.NEGATIVE)) {
+                            if (flux.getProductCode().getQuantityInStock() == 0) {
+                                ProductNotification notification = new ProductNotification();
+                                notification.setProductCode(flux.getProductCode());
+                                notification.setNotification(OperationConstants.PRODUCT_RUPTURE_NOTIFICATION);
+                                notification.setNotificationInfo("Produit en rupture depuis le : "
+                                        + operation.getOperationDate().toString());
+                                notification.setLocation(operation.getLocation());
+                                notification.setNotifiedTo(operation.getLocation());
+                                notification.setNotificationDate(operation.getOperationDate());
+                                getSession().save(notification);
+                            }
                         }
                     }
                 }
             }
+
             createNotification(operation);
         }
 //        if (fluxes != null && !fluxes.isEmpty()) {
@@ -600,6 +716,27 @@ public class ProductOperationDao {
 		
 	}
 	
+	public ProductOperation getLastProductOperation(List<ProductOperationType> operationTypes, ProductCode productCode,
+	        Date limitDate, Date beforeDate, ProductProgram program, Location location, Boolean includeVoided) {
+		Criteria criteria = getSession()
+		        .createCriteria(ProductOperation.class, "o")
+		        .createAlias("o.fluxes", "f")
+		        .add(Restrictions.in("o.operationType", operationTypes))
+		        .add(Restrictions.eq("o.productProgram", program))
+		        .add(Restrictions.eq("o.location", location))
+		        .add(Restrictions.eq("o.voided", includeVoided))
+		        .add(Restrictions.eq("f.productCode", productCode))
+		        .add(Restrictions.lt("o.operationDate", limitDate))
+		        .add(Restrictions.gt("o.operationDate", beforeDate))
+		        .add(
+		            Restrictions.or(Restrictions.eq("operationStatus", OperationStatus.VALIDATED),
+		                Restrictions.eq("operationStatus", OperationStatus.SUBMITTED),
+		                Restrictions.eq("operationStatus", OperationStatus.TREATED),
+		                Restrictions.eq("operationStatus", OperationStatus.APPROVED)));
+		return (ProductOperation) criteria.addOrder(Order.desc("operationDate")).setMaxResults(1).uniqueResult();
+		
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<ProductOperation> getAllProductOperationByTypes(List<ProductOperationType> operationTypes,
 	        ProductProgram program, Location location, Boolean validatedOnly, Boolean includeVoided) {
@@ -796,7 +933,10 @@ public class ProductOperationDao {
             }
         }
 
+        ProductNotification notification = null;
+
         if (operation.getOperationStatus().equals(OperationStatus.NOT_COMPLETED)) {
+
             if (operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION)) {
                 operation.addAllFluxes(createInventoryFluxes(operation));
             } else if (operation.getOperationType().getUuid().equals(OperationConstants.RECEPTION_OPERATION)
@@ -814,32 +954,20 @@ public class ProductOperationDao {
                     operation.addAllOtherFlux(createEmergencyReportOtherFluxes(operation));
                 }
             }
-        } else if (operation.getOperationStatus().equals(OperationStatus.VALIDATED)) {
+
+        } else if (operation.getOperationStatus().equals(OperationStatus.VALIDATED) ||
+                operation.getOperationStatus().equals(OperationStatus.TREATED)) {
+
             if (operation.getOperationType().getUuid().equals(OperationConstants.REPORT_OPERATION)) {
                 createReportMonthlyConsumption(operation);
             } else if (operation.getOperationType().getUuid().equals(OperationConstants.URGENT_REPORT_OPERATION)) {
                 System.out.println("Urgent report calculating monthly consumption");
-            }
-        }
-
-        if ((operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION)
-                || operation.getOperationType().getUuid().equals(OperationConstants.PARTIAL_INVENTORY_OPERATION)) &&
-                !operation.getOperationStatus().equals(OperationStatus.VALIDATED) && !operation.getFluxes().isEmpty()) {
-            updateInventoryFluxesRelatedQuantity(operation);
-        }
-
-        getSession().saveOrUpdate(operation);
-
-        ProductNotification notification = null;
-
-        if (operation.getOperationStatus().equals(OperationStatus.VALIDATED)
-                || operation.getOperationStatus().equals(OperationStatus.TREATED)) {
-            validateOperation(operation);
-            if (operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION)
+            } else if (operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION)
                     || operation.getOperationType().getUuid().equals(OperationConstants.PARTIAL_INVENTORY_OPERATION)) {
-
                 createInventoryAdjustment(operation);
             }
+
+            validateOperation(operation);
         } else if (operation.getOperationStatus().equals(OperationStatus.CANCELED)) {
             if (operation.getOperationType().getUuid().equals(OperationConstants.DISPENSATION_OPERATION)) {
                 ProductOperationAttribute attribute = operation.getAttributes()
@@ -880,10 +1008,59 @@ public class ProductOperationDao {
             createDistribution(operation);
         }
 
+        if ((operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION)
+                || operation.getOperationType().getUuid().equals(OperationConstants.PARTIAL_INVENTORY_OPERATION)) &&
+                !operation.getOperationStatus().equals(OperationStatus.VALIDATED) && !operation.getFluxes().isEmpty()) {
+            updateInventoryFluxesRelatedQuantity(operation);
+        }
+
+        if (operation.getOperationStatus().equals(OperationStatus.VALIDATED) ||
+                operation.getOperationStatus().equals(OperationStatus.TREATED) ||
+                operation.getOperationStatus().equals(OperationStatus.CANCELED) ||
+                operation.getOperationStatus().equals(OperationStatus.SUBMITTED)) {
+            generateStockStatus(operation);
+        }
+
+        getSession().saveOrUpdate(operation);
+
         if (notification != null) {
             getSession().save(notification);
         }
+
         return operation;
+
+//        if (operation.getOperationStatus().equals(OperationStatus.VALIDATED)
+//                || operation.getOperationStatus().equals(OperationStatus.TREATED)) {
+//            validateOperation(operation);
+//
+//        } else if (operation.getOperationStatus().equals(OperationStatus.CANCELED)) {
+//
+//        } else if (operation.getOperationStatus().equals(OperationStatus.SUBMITTED)) {
+//            notification = getProductNotification(
+//                    operation,
+//                    OperationConstants.REPORT_SUBMISSION_NOTIFICATION,
+//                    operation.getLocation().getParentLocation());
+//            if (SupplyUtils.isDirectClient(SupplyUtils.getUserLocation())) {
+//                List<ProductCode> productCodes = operation.getProductList();
+//                Double leadTime = 0.;
+//
+//                ProductOperationAttribute attribute = operation.getAttributes().stream()
+//                        .filter(a -> a.getOperationAttributeType().getUuid().equals("LEADTIMEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+//                        .findFirst().orElse(null);
+//
+//                if (attribute != null) {
+//                    leadTime = Double.parseDouble(attribute.getValue());
+//                }
+//
+//                for (ProductCode productCode :
+//                        productCodes) {
+//                    createProposedQuantity(productCode, operation, leadTime);
+//                }
+//            }
+//        } else if (operation.getOperationStatus().equals(OperationStatus.APPROVED)) {
+//            createDistribution(operation);
+//        }
+
     }
 	
 	private void createReportMonthlyConsumption(ProductOperation operation) {
@@ -1101,12 +1278,12 @@ public class ProductOperationDao {
             if (!fluxContainsAttribute(fluxes, stock.getAttribute())) {
                 ProductOperationFlux flux = createFlux(operation, 0., stock.getAttribute().getProductCode());
                 flux.setRelatedQuantity(stock.getQuantityInStock().doubleValue());
-                flux.setRelatedQuantityLabel("Quantité Théortique");
+                flux.setRelatedQuantityLabel("Quantité Théorique");
                 flux.setProductCode(stock.getAttribute().getProductCode());
 
                 ProductOperationFluxAttribute attribute = new ProductOperationFluxAttribute();
                 attribute.setAttribute(stock.getAttribute());
-                attribute.setQuantity(stock.getQuantityInStock().doubleValue());
+                attribute.setQuantity(0.);
                 attribute.setLocation(operation.getLocation());
 
                 flux.addAttribute(attribute);
@@ -1763,7 +1940,7 @@ public class ProductOperationDao {
                     otherFluxes.add(getAvailableQuantity(productCode, inventory, childrenAvailableFluxes));
                     otherFluxes.add(getReceivedQuantity(productCode, receptionFLuxes, inventory.getLocation()));
                     otherFluxes.add(getDistributedQuantity(productCode, dispensationFLuxes, childrenUsedFluxes, inventory.getLocation()));
-                    otherFluxes.add(getAdjustmentQuantity(productCode, inventory, adjustmentFLuxes));
+                    otherFluxes.add(getAdjustmentQuantity(productCode, inventory, currentReport, adjustmentFLuxes));
 //                    otherFluxes.add(getAverageMonthlyConsumption(productCode, lastConsumptionReportFluxes, inventory.getLocation()));
 
                     Double lostQuantity = getProductFluxQuantity(
@@ -1892,7 +2069,7 @@ public class ProductOperationDao {
                 otherFluxes.add(getAvailableQuantity(productCode, inventory, null));
                 otherFluxes.add(getReceivedQuantity(productCode, receptionFLuxes, inventory.getLocation()));
                 otherFluxes.add(getDistributedQuantity(productCode, dispensationFLuxes, null, inventory.getLocation()));
-                otherFluxes.add(getAdjustmentQuantity(productCode, inventory, adjustmentFLuxes));
+                otherFluxes.add(getAdjustmentQuantity(productCode, inventory, currentReport, adjustmentFLuxes));
                 otherFluxes.add(createOtherFlux(
                         getProductFluxQuantity(
                                 productCode,
@@ -2105,7 +2282,7 @@ public class ProductOperationDao {
         return new ProductOperationOtherFlux(productCode, ReportConstants.AVAILABLE_QUANTITY, quantity, inventory.getLocation());
     }
 	
-	private ProductOperationOtherFlux getAdjustmentQuantity(ProductCode productCode, ProductOperation inventory, List<ProductOperationFlux> adjustmentFluxes) {
+	private ProductOperationOtherFlux getAdjustmentQuantity(ProductCode productCode, ProductOperation inventory, ProductOperation currentReport, List<ProductOperationFlux> adjustmentFluxes) {
         Double positiveQuantity = 0.;
         Double negativeQuantity = 0.;
 
@@ -2139,11 +2316,7 @@ public class ProductOperationDao {
 
         Double adjustmentQuantity = positiveQuantity - negativeQuantity;
 
-        ProductOperation currentReport = inventory.getChildrenOperation()
-                .stream().filter(o -> o.getOperationType().getUuid().equals(OperationConstants.REPORT_OPERATION))
-                .findFirst().orElse(null);
-
-        if (!getChildLocationListWithPrograms(inventory.getLocation()).isEmpty() && currentReport != null) {
+        if (!getChildLocationListWithPrograms(inventory.getLocation()).isEmpty()) {
             for (Location location : getChildLocationListWithPrograms(currentReport.getLocation())) {
                 ProductOperation childReport = getProductOperationByOperationNumber(
                         getProductOperationType(OperationConstants.REPORT_OPERATION),
@@ -2332,5 +2505,54 @@ public class ProductOperationDao {
 		                Restrictions.eq("o.operationStatus", OperationStatus.SUBMITTED)));
 		
 		return (ProductOperation) criteria.addOrder(Order.asc("o.operationDate")).setMaxResults(1).uniqueResult();
+	}
+	
+	public ProductStockStatus getProductStockStatus(String uuid) {
+		Criteria criteria = getSession().createCriteria(ProductStockStatus.class);
+		return (ProductStockStatus) criteria.add(Restrictions.eq("uuid", uuid)).uniqueResult();
+	}
+	
+	public ProductStockStatus saveProductStockStatus(ProductStockStatus productStockStatus) {
+		getSession().saveOrUpdate(productStockStatus);
+		return productStockStatus;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ProductStockStatus> getAllProductStockStatuses(Location location, ProductProgram program) {
+		Criteria criteria = getSession().createCriteria(ProductStockStatus.class, "s").createAlias("s.productCode", "p")
+		        .add(Restrictions.eq("p.program", program));
+		return criteria.add(Restrictions.eq("s.location", location)).list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ProductStockStatus> getAllProductStockStatuses(Location location) {
+		Criteria criteria = getSession().createCriteria(ProductStockStatus.class);
+		return criteria.add(Restrictions.eq("location", location)).list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ProductStockStatus> getAllProductStockStatuses(Location location, ProductProgram program, Date startDate,
+	        Boolean forChildren) {
+		Criteria criteria = getSession().createCriteria(ProductStockStatus.class, "s").createAlias("s.productCode", "p")
+		        .add(Restrictions.eq("p.program", program));
+		if (forChildren) {
+			criteria.add(Restrictions.in("s.location", getChildLocationListWithPrograms(location)));
+		} else {
+			criteria.add(Restrictions.eq("s.location", location));
+		}
+		return criteria.add(Restrictions.ge("s.stockDate", startDate)).list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ProductStockStatus> getProductStockStatusByProductCode(ProductCode productCode, ProductProgram program,
+	        Location location, Date startDate, Boolean forChildren) {
+		Criteria criteria = getSession().createCriteria(ProductStockStatus.class, "s").createAlias("s.productCode", "p");
+		if (forChildren) {
+			criteria.add(Restrictions.in("s.location", getChildLocationListWithPrograms(location)));
+		} else {
+			criteria.add(Restrictions.eq("s.location", location));
+		}
+		return criteria.add(Restrictions.eq("s.productCode", productCode)).add(Restrictions.eq("p.program", program))
+		        .add(Restrictions.ge("s.stockDate", startDate)).list();
 	}
 }

@@ -2769,4 +2769,159 @@ s
         </sql>
     </changeSet>
 
+    <changeSet id="supply2-product-stock-status" author="BOGUI SERGE">
+        <preConditions>
+            <not>
+                <tableExists tableName="supply2_product_stock_status"/>
+            </not>
+        </preConditions>
+        <createTable tableName="supply2_product_stock_status">
+            <column name="product_stock_status_id" type="integer" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="product_code_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_id" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity_in_stock" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="average_consumed_quantity" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stock_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uuid" type="varchar(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="supply2_product_stock_status_location"
+                                 baseTableName="supply2_product_stock_status" baseColumnNames="location_id"
+                                 referencedTableName="location"
+                                 referencedColumnNames="location_id"/>
+        <addForeignKeyConstraint constraintName="supply2_product_stock_status_product_code"
+                                 baseTableName="supply2_product_stock_status" baseColumnNames="product_code_id"
+                                 referencedTableName="supply2_product_code"
+                                 referencedColumnNames="product_code_id"/>
+
+    </changeSet>
+
+    <changeSet id="supply2-add-column-expiry-next-date-stock-status" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="supply2_product_stock_status" columnName="expiry_next_date"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="supply2_product_stock_status">
+            <column name="expiry_next_date" type="date"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="supply2-add-column-product-stock-status-unique" author="BOGUI SERGE">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="supply2_product_stock_status" columnNames="product_code_id,location_id"
+                             indexName="uniqueness_product_code_location_stock_status"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint tableName="supply2_product_stock_status" columnNames="product_code_id,location_id"
+                             constraintName="uniqueness_product_code_location_stock_status"/>
+    </changeSet>
+
+    <!--    <changeSet id="supply2-fill-product-stock-status-first-data" author="BOGUI SERGE">-->
+    <!--        &lt;!&ndash;            <preConditions onFail="MARK_RAN">&ndash;&gt;-->
+    <!--        &lt;!&ndash;                <sqlCheck expectedResult="0">SELECT COUNT(*)&ndash;&gt;-->
+    <!--        &lt;!&ndash;                                             FROM supply2_product_stock_status</sqlCheck>&ndash;&gt;-->
+    <!--        &lt;!&ndash;            </preConditions>&ndash;&gt;-->
+    <!--        <sql>-->
+    <!--                <![CDATA[-->
+    <!--            INSERT INTO supply2_product_stock_status (product_code_id, location_id, quantity_in_stock,-->
+    <!--                                                      average_consumed_quantity, stock_date, uuid, expiry_next_date)-->
+    <!--            SELECT S.product_code_id,-->
+    <!--                   S.location_id,-->
+    <!--                   quantityInStock,-->
+    <!--                   IF(quantity, quantity, 0) averageConsumedQuantity,-->
+    <!--                   NOW(),-->
+    <!--                   uuid(),-->
+    <!--                   minExpiryDate-->
+
+    <!--            FROM (SELECT product_code_id,-->
+    <!--                         SUM(quantity_in_stock) quantityInStock,-->
+    <!--                         s2pas.location_id-->
+    <!--                  FROM supply2_product_attribute_stock s2pas,-->
+    <!--                       supply2_product_attribute s2pa-->
+    <!--                  WHERE s2pas.product_attribute = s2pa.product_attribute_id-->
+    <!--                    AND s2pas.voided = 0-->
+    <!--                  GROUP BY s2pa.product_code_id, s2pas.location_id) S-->
+    <!--                     LEFT JOIN (SELECT location_id, MAX(operation_date) date_operation-->
+    <!--                                FROM supply2_product_operation-->
+    <!--                                WHERE operation_type IN (16, 17)-->
+    <!--                                  AND operation_status = 8-->
+    <!--                                GROUP BY location_id) lr-->
+    <!--                               ON S.location_id = lr.location_id-->
+    <!--                     LEFT JOIN (SELECT quantity, location_id, product_code_id-->
+    <!--                                FROM supply2_product_operation_other_flux-->
+    <!--                                WHERE label = 'CMM') CMM-->
+    <!--                               ON CMM.product_code_id = S.product_code_id AND CMM.location_id = S.location_id-->
+    <!--                     LEFT JOIN (SELECT product_code_id,-->
+    <!--                                       location_id,-->
+    <!--                                       MIN(expiry_date) minExpiryDate-->
+    <!--                                FROM supply2_product_attribute a-->
+    <!--                                WHERE product_attribute_id IN (SELECT product_attribute-->
+    <!--                                                               FROM supply2_product_attribute_stock s-->
+    <!--                                                               WHERE s.voided = 0-->
+    <!--                                                                 AND a.product_attribute_id = s.product_attribute)-->
+    <!--                                GROUP BY product_code_id, location_id) LE-->
+    <!--                               ON LE.location_id = S.location_id AND LE.product_code_id = S.product_code_id-->
+    <!--            WHERE (S.product_code_id, S.location_id) NOT IN (SELECT product_code_id, location_id-->
+    <!--                                                             FROM supply2_product_stock_status ss-->
+    <!--                                                             WHERE S.product_code_id = ss.product_code_id-->
+    <!--                                                               AND S.location_id = ss.location_id)-->
+    <!--            GROUP BY S.product_code_id,-->
+    <!--                     S.location_id,-->
+    <!--                     quantityInStock,-->
+    <!--                     quantity-->
+    <!--            UNION-->
+    <!--            SELECT CMM.product_code_id,-->
+    <!--                   LR.location_id,-->
+    <!--                   QD.quantityInStock,-->
+    <!--                   CMM.quantity,-->
+    <!--                   NOW(),-->
+    <!--                   uuid(),-->
+    <!--                   NULL AS minExpiryDate-->
+    <!--            FROM (SELECT location_id, MAX(operation_date) MaxOperationDate-->
+    <!--                  FROM supply2_product_operation-->
+    <!--                  WHERE operation_type IN (16, 17)-->
+    <!--                    AND operation_status = 8-->
+    <!--                  GROUP BY location_id) LR-->
+    <!--                     LEFT JOIN (SELECT location_id, operation_date, product_operation_id-->
+    <!--                                FROM supply2_product_operation-->
+    <!--                                WHERE operation_type IN (16, 17)-->
+    <!--                                  AND operation_status = 8) R-->
+    <!--                               ON R.location_id = LR.location_id AND R.operation_date = LR.MaxOperationDate-->
+    <!--                     LEFT JOIN (SELECT quantity, location_id, product_code_id, operation_id-->
+    <!--                                FROM supply2_product_operation_other_flux-->
+    <!--                                WHERE label = 'CMM') CMM-->
+    <!--                               ON CMM.operation_id = R.product_operation_id-->
+    <!--                     LEFT JOIN (SELECT quantity quantityInStock, location_id, product_code_id, operation_id-->
+    <!--                                FROM supply2_product_operation_other_flux-->
+    <!--                                WHERE label = 'QD') QD-->
+    <!--                               ON QD.operation_id = R.product_operation_id AND CMM.product_code_id = QD.product_code_id-->
+    <!--            WHERE CMM.product_code_id NOT IN-->
+    <!--                  (SELECT product_code_id FROM supply2_product_attribute WHERE QD.product_code_id = product_code_id)-->
+    <!--              AND (CMM.product_code_id, CMM.location_id) NOT IN (SELECT product_code_id, location_id-->
+    <!--                                                                 FROM supply2_product_stock_status ss-->
+    <!--                                                                 WHERE CMM.product_code_id = ss.product_code_id-->
+    <!--                                                                   AND CMM.location_id = ss.location_id)-->
+    <!--            GROUP BY CMM.product_code_id,-->
+    <!--                     LR.location_id,-->
+    <!--                     QD.quantityInStock,-->
+    <!--                     CMM.quantity;-->
+    <!--            ]]>-->
+    <!--            </sql>-->
+    <!--    </changeSet>-->
+
 </databaseChangeLog>
