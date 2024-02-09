@@ -55,12 +55,12 @@ public class ProductOperationDao {
         List<ProductCode> productCodes = operation.getProductList();
         List<ProductStockStatus> productStockStatus = getAllProductStockStatuses(operation.getLocation(), operation.getProductProgram());
 
-        boolean isReportOperation = operation.getOperationType().getUuid().equals(OperationConstants.REPORT_OPERATION) ||
-                operation.getOperationType().getUuid().equals(OperationConstants.URGENT_REPORT_OPERATION);
+//        boolean isReportOperation = operation.getOperationType().getUuid().equals(OperationConstants.REPORT_OPERATION) ||
+//                operation.getOperationType().getUuid().equals(OperationConstants.URGENT_REPORT_OPERATION);
 
         for (ProductCode productCode : productCodes) {
             ProductStockStatus productCodeInStatus = productStockStatus.stream().filter(p -> p.getProductCode().equals(productCode)).findFirst().orElse(null);
-            Double available = 0.;
+            Double available = getProductQuantityInStock(productCode, operation.getLocation()) * 1.;
             Double monthlyConsumption = 0.;
 
             if (operation.getOperationStatus().equals(OperationStatus.SUBMITTED)) {
@@ -69,56 +69,16 @@ public class ProductOperationDao {
                 if (otherFluxMonthlyConsumption != null) {
                     monthlyConsumption = otherFluxMonthlyConsumption.getQuantity();
                 }
-                ProductOperationOtherFlux otherFluxAvailable = operation.getOtherFluxes().stream()
-                        .filter(o -> o.getLabel().equals(ReportConstants.AVAILABLE_QUANTITY) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
-                if (otherFluxAvailable != null) {
-                    available = otherFluxAvailable.getQuantity();
+                if (available == 0) {
+                    ProductOperationOtherFlux otherFluxAvailable = operation.getOtherFluxes().stream()
+                            .filter(o -> o.getLabel().equals(ReportConstants.AVAILABLE_QUANTITY) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
+                    if (otherFluxAvailable != null) {
+                        available = otherFluxAvailable.getQuantity();
+                    }
                 }
             } else if (!operation.getOperationType().getUuid().equals(OperationConstants.REPORT_OPERATION) &&
                     !operation.getOperationType().getUuid().equals(OperationConstants.URGENT_REPORT_OPERATION)) {
                 available = getProductQuantityInStock(productCode, operation.getLocation()) * 1.;
-//
-//                if (available.equals(0.)) {
-//                    ProductOperationOtherFlux otherFluxAvailable = latestReport.getOtherFluxes().stream()
-//                            .filter(o -> o.getLabel().equals(ReportConstants.AVAILABLE_QUANTITY) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
-//                    if (otherFluxAvailable != null) {
-//                        available = otherFluxAvailable.getQuantity();
-//                    }
-//                }
-//
-//                if (operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION) ||
-//                        operation.getOperationType().getUuid().equals(OperationConstants.PARTIAL_INVENTORY_OPERATION)) {
-//
-//
-//                } else {
-//                    if (otherFluxMonthlyConsumption != null) {
-//                        monthlyConsumption = otherFluxMonthlyConsumption.getQuantity();
-//                    }
-//
-//                    latestInventory = getLastProductOperation(getProductOperationType(OperationConstants.INVENTORY_OPERATION), operation.getProductProgram(), operation.getLocation(), true, false);
-//                    if (latestInventory != null) {
-//                        ProductOperation latestReport = isReportOperation ? operation : getLastProductOperation(Arrays.asList(
-//                                        getProductOperationType(OperationConstants.REPORT_OPERATION),
-//                                        getProductOperationType(OperationConstants.URGENT_REPORT_OPERATION)),
-//                                productCode, operation.getOperationDate(), latestInventory.getOperationDate(),
-//                                operation.getProductProgram(), operation.getLocation(), false);
-//
-//                        if (latestReport != null) {
-//                            ProductOperationOtherFlux otherFluxMonthlyConsumption = latestReport.getOtherFluxes().stream()
-//                                    .filter(o -> o.getLabel().equals(ReportConstants.MONTHLY_CONSUMPTION) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
-//                            if (otherFluxMonthlyConsumption != null) {
-//                                monthlyConsumption = otherFluxMonthlyConsumption.getQuantity();
-//                            }
-//                            if (available.equals(0.)) {
-//                                ProductOperationOtherFlux otherFluxAvailable = latestReport.getOtherFluxes().stream()
-//                                        .filter(o -> o.getLabel().equals(ReportConstants.AVAILABLE_QUANTITY) && o.getProductCode().equals(productCode)).findFirst().orElse(null);
-//                                if (otherFluxAvailable != null) {
-//                                    available = otherFluxAvailable.getQuantity();
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
             }
 
             ProductAttribute productAttribute = getProductAttributeWithNextExpiryDate(productCode);
@@ -1822,6 +1782,15 @@ public class ProductOperationDao {
                         currentReport.getProductProgram()
                 );
 
+//                ProductOperation previousReport = getLastProductOperation(
+//                        getProductOperationType(OperationConstants.REPORT_OPERATION),
+//                        inventory.getProductProgram(),
+//                        endDate,
+//                        inventory.getLocation(),
+//                        true,
+//                        false
+//                );
+
                 List<ProductOperationFlux> dispensationFLuxes = getOperationFluxes(
                         Collections.singletonList(getProductOperationType(
                                 OperationConstants.DISPENSATION_OPERATION)
@@ -1906,9 +1875,18 @@ public class ProductOperationDao {
                 List<ProductCode> productCodes = getAllActivitiesProducts(startDate, endDate, currentReport.getProductProgram(), currentReport.getLocation());
 
                 for (ProductCode productCode : productCodes) {
+                    Double initialQuantity = 0.;
+                    ProductOperationOtherFlux availableOtherFlux = null;
+                    if (previousReport != null) {
+                        availableOtherFlux = previousReport.getOtherFluxes().stream()
+                                .filter(o -> o.getProductCode().equals(productCode) && o.getLabel().equals(ReportConstants.AVAILABLE_QUANTITY)).findFirst().orElse(null);
+                        if (availableOtherFlux != null) {
+                            initialQuantity = availableOtherFlux.getQuantity();
+                        }
 
-                    if (previousInventory != null) {
-                        Double initialQuantity = getProductFluxQuantity(
+                    }
+                    if (availableOtherFlux == null && previousInventory != null) {
+                        initialQuantity = getProductFluxQuantity(
                                 productCode,
                                 previousInventory.getFluxes().stream().filter(f -> f.getProductCode().equals(productCode)).collect(Collectors.toList()));
 
@@ -1928,14 +1906,13 @@ public class ProductOperationDao {
                                 }
                             }
                         }
-
-                        otherFluxes.add(createOtherFlux(
-                                initialQuantity,
-                                ReportConstants.INITIAL_QUANTITY,
-                                productCode,
-                                inventory.getLocation()));
-
                     }
+
+                    otherFluxes.add(createOtherFlux(
+                            initialQuantity,
+                            ReportConstants.INITIAL_QUANTITY,
+                            productCode,
+                            inventory.getLocation()));
 
                     otherFluxes.add(getAvailableQuantity(productCode, inventory, childrenAvailableFluxes));
                     otherFluxes.add(getReceivedQuantity(productCode, receptionFLuxes, inventory.getLocation()));
