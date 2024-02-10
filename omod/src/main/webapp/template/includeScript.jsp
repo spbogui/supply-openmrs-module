@@ -11,6 +11,6 @@
 <%--/>--%>
 
 <script type="module" crossorigin
-        src="${pageContext.request.contextPath}/moduleResources/supply/assets/index-eafdaa33.js"></script>
+        src="${pageContext.request.contextPath}/moduleResources/supply/assets/index-b91f00c6.js"></script>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/moduleResources/supply/assets/index-f84cb3ac.css">
