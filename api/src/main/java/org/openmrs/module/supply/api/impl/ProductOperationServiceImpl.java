@@ -86,6 +86,22 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 	}
 	
 	@Override
+	public List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, ProductProgram program,
+	        Date startDate, Date endDate, Location location, Boolean validatedOnly, Boolean includeVoided,
+	        Boolean forChildLocations) throws APIException {
+		return dao.getAllProductOperation(operationTypes, program, startDate, endDate, location, validatedOnly,
+		    includeVoided, forChildLocations);
+	}
+	
+	@Override
+	public List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, Date startDate,
+	        Date endDate, Location location, Boolean validatedOnly, Boolean includeVoided, Boolean forChildLocations)
+	        throws APIException {
+		return dao.getAllProductOperation(operationTypes, startDate, endDate, location, validatedOnly, includeVoided,
+		    forChildLocations);
+	}
+	
+	@Override
 	public List<ProductOperation> getAllProductOperation(ProductOperationType operationType, ProductProgram program,
 	        String operationNumber, Date startDate, Date endDate, Location location, Boolean validatedOnly,
 	        Boolean includeVoided, Boolean forChildLocations) throws APIException {

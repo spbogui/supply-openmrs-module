@@ -489,6 +489,28 @@ public class ProductOperationDao {
 		return getHistoricalProductOperations(locations, validatedOnly, includeVoided, criteria);
 	}
 	
+	public List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, ProductProgram program,
+	        Date startDate, Date endDate, Location location, Boolean validatedOnly, Boolean includeVoided,
+	        Boolean forChildLocations) {
+		Criteria criteria = getSession().createCriteria(ProductOperation.class)
+		        .add(Restrictions.in("operationType", operationTypes)).add(Restrictions.eq("productProgram", program))
+		        .add(Restrictions.between("operationDate", startDate, endDate));
+		return getHistoricalProductOperations(location, validatedOnly, includeVoided, forChildLocations, criteria);
+	}
+	
+	public List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, Date startDate,
+	        Date endDate, Location location, Boolean validatedOnly, Boolean includeVoided, Boolean forChildLocations) {
+		Criteria criteria = getSession().createCriteria(ProductOperation.class)
+		        .add(Restrictions.in("operationType", operationTypes))
+		        .add(Restrictions.between("operationDate", startDate, endDate));
+		if (forChildLocations) {
+			criteria.add(Restrictions.eq("exchangeLocation", location));
+		}
+		List<Location> locations = forChildLocations ? getChildLocationListWithPrograms(location) : Collections
+		        .singletonList(location);
+		return getHistoricalProductOperations(locations, validatedOnly, includeVoided, criteria);
+	}
+	
 	public List<ProductOperation> getAllProductOperation(ProductOperationType operationType, ProductProgram program,
 	        String operationNumber, Date startDate, Date endDate, Location location, Boolean validatedOnly,
 	        Boolean includeVoided, Boolean forChildLocations) {
@@ -542,8 +564,9 @@ public class ProductOperationDao {
 			        Restrictions.eq("operationStatus", OperationStatus.APPROVED),
 			        Restrictions.eq("operationStatus", OperationStatus.SUBMITTED),
 			        Restrictions.eq("operationStatus", OperationStatus.TREATED))).list();
-		} else if (!includeVoided) {
-			return criteria.add(Restrictions.eq("voided", false)).list();
+		}
+		if (!includeVoided) {
+			criteria.add(Restrictions.eq("voided", false));
 		}
 		return criteria.list();
 	}
@@ -1109,51 +1132,56 @@ public class ProductOperationDao {
     }
 	
 	private void createDistribution(ProductOperation operation) throws ParseException {
-        List<ProductCode> productCodes = operation.getProductList();
+        ProductOperation existingDistribution = operation.getChildrenOperation().stream()
+                .filter(o -> o.getOperationType().getUuid().equals(OperationConstants.DISTRIBUTION_OPERATION)).findFirst().orElse(null);
+        if (existingDistribution == null) {
+            List<ProductCode> productCodes = operation.getProductList();
 
-        ProductOperation distribution = new ProductOperation();
-        ProductOperationAttribute treatmentAttribute = operation.getAttributes().stream()
-                .filter(a -> a.getOperationAttributeType().getUuid().equals(ReportConstants.TREATMENT_DATE)).findFirst().orElse(null);
-        if (treatmentAttribute != null) {
-            DateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date treatmentDate = sourceFormat.parse(treatmentAttribute.getValue());
-            distribution.setOperationDate(treatmentDate);
-        } else {
-            distribution.setOperationDate(new Date());
+            ProductOperation distribution = new ProductOperation();
+            ProductOperationAttribute treatmentAttribute = operation.getAttributes().stream()
+                    .filter(a -> a.getOperationAttributeType().getUuid().equals(ReportConstants.TREATMENT_DATE)).findFirst().orElse(null);
+            if (treatmentAttribute != null) {
+                DateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date treatmentDate = sourceFormat.parse(treatmentAttribute.getValue());
+                distribution.setOperationDate(treatmentDate);
+            } else {
+                distribution.setOperationDate(new Date());
+            }
+
+            distribution.setProductProgram(operation.getProductProgram());
+            distribution.setOperationType(getProductOperationType(OperationConstants.DISTRIBUTION_OPERATION));
+            distribution.setQuantityType(QuantityType.DISPENSATION);
+            distribution.setIncidence(Incidence.NEGATIVE);
+            distribution.setLocation(SupplyUtils.getUserLocation());
+            distribution.setExchangeLocation(operation.getLocation());
+            distribution.setOperationStatus(OperationStatus.NOT_COMPLETED);
+            distribution.setOperationNumber(generateDeliveryNumber());
+            distribution.setParentOperation(operation);
+
+            Double leadTime = 0.;
+
+            ProductOperationAttribute attribute = operation.getAttributes().stream()
+                    .filter(a -> a.getOperationAttributeType().getUuid().equals("LEADTIMEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+                    .findFirst().orElse(null);
+
+            if (attribute != null) {
+                leadTime = Double.parseDouble(attribute.getValue());
+            }
+
+            for (ProductCode productCode : productCodes) {
+                Double quantity = createProposedQuantity(productCode, operation, leadTime);
+                ProductOperationFlux flux = new ProductOperationFlux();
+                flux.setLocation(SupplyUtils.getUserLocation());
+                flux.setProductCode(productCode);
+                flux.setQuantity(productCode.getQuantityInStock() <= quantity ? quantity - productCode.getQuantityInStock() : quantity);
+                flux.setRelatedQuantity(productCode.getQuantityInStock() <= quantity ? quantity - productCode.getQuantityInStock() : quantity);
+                flux.setRelatedQuantityLabel("Quantité proposée");
+                distribution.addFlux(flux);
+            }
+
+            getSession().saveOrUpdate(distribution);
         }
 
-        distribution.setProductProgram(operation.getProductProgram());
-        distribution.setOperationType(getProductOperationType(OperationConstants.DISTRIBUTION_OPERATION));
-        distribution.setQuantityType(QuantityType.DISPENSATION);
-        distribution.setIncidence(Incidence.NEGATIVE);
-        distribution.setLocation(SupplyUtils.getUserLocation());
-        distribution.setExchangeLocation(operation.getLocation());
-        distribution.setOperationStatus(OperationStatus.NOT_COMPLETED);
-        distribution.setOperationNumber(generateDeliveryNumber());
-        distribution.setParentOperation(operation);
-
-        Double leadTime = 0.;
-
-        ProductOperationAttribute attribute = operation.getAttributes().stream()
-                .filter(a -> a.getOperationAttributeType().getUuid().equals("LEADTIMEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-                .findFirst().orElse(null);
-
-        if (attribute != null) {
-            leadTime = Double.parseDouble(attribute.getValue());
-        }
-
-        for (ProductCode productCode : productCodes) {
-            Double quantity = createProposedQuantity(productCode, operation, leadTime);
-            ProductOperationFlux flux = new ProductOperationFlux();
-            flux.setLocation(SupplyUtils.getUserLocation());
-            flux.setProductCode(productCode);
-            flux.setQuantity(productCode.getQuantityInStock() <= quantity ? quantity - productCode.getQuantityInStock() : quantity);
-            flux.setRelatedQuantity(productCode.getQuantityInStock() <= quantity ? quantity - productCode.getQuantityInStock() : quantity);
-            flux.setRelatedQuantityLabel("Quantité proposée");
-            distribution.addFlux(flux);
-        }
-
-        getSession().saveOrUpdate(distribution);
     }
 	
 	private String generateDeliveryNumber() {

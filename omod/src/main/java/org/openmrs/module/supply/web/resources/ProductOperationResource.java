@@ -447,6 +447,7 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 		String contextEndDate = context.getParameter("endDate");
 		String contextOperationNumber = context.getParameter("operationNumber");
 		String isForChildLocations = context.getParameter("forChildLocations");
+		String statuses = context.getParameter("statuses");
 		
 		List<ProductOperation> productOperations = new ArrayList<ProductOperation>();
 		
@@ -474,11 +475,32 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 				}
 			} else {
 				if (!operationTypeList.isEmpty()) {
-					List<ProductOperation> operations = getService().getAllProductOperationByTypes(operationTypeList,
-					    currentLocation, validatedOnly != null && validatedOnly.equals("true"),
-					    includeVoided != null && includeVoided.equals("true"));
-					if (operations != null) {
-						productOperations.addAll(operations);
+					if (StringUtils.isNotBlank(filter) && !StringUtils.isEmpty(filter)) {
+						if (filter.contains("allFromLatestInventories")) {
+							List<ProductOperation> inventories = getService().findLatestOperationsByProgram(
+							    getService().getProductOperationType(OperationConstants.INVENTORY_OPERATION),
+							    SupplyUtils.getUserLocation(), new Date());
+							
+							if (inventories != null) {
+								for (ProductOperation operation : inventories) {
+									List<ProductOperation> operations = getService().getAllProductOperation(
+									    operationTypeList, operation.getProductProgram(), operation.getOperationDate(),
+									    new Date(), currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+									    includeVoided != null && includeVoided.equals("true"),
+									    isForChildLocations != null && isForChildLocations.equals("true"));
+									if (operations != null) {
+										productOperations.addAll(operations);
+									}
+								}
+							}
+						}
+					} else {
+						List<ProductOperation> operations = getService().getAllProductOperationByTypes(operationTypeList,
+						    currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+						    includeVoided != null && includeVoided.equals("true"));
+						if (operations != null) {
+							productOperations.addAll(operations);
+						}
 					}
 				}
 			}
@@ -494,6 +516,24 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 							if (operations != null) {
 								productOperations.addAll(operations);
 							}
+						} else if (filter.contains("allFromLatestInventories")) {
+							List<ProductOperation> inventories = getService().findLatestOperationsByProgram(
+							    getService().getProductOperationType(OperationConstants.INVENTORY_OPERATION),
+							    SupplyUtils.getUserLocation(), new Date());
+							
+							if (inventories != null) {
+								
+								for (ProductOperation operation : inventories) {
+									List<ProductOperation> operations = getService().getAllProductOperation(type,
+									    operation.getProductProgram(), operation.getOperationDate(), new Date(),
+									    currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+									    includeVoided != null && includeVoided.equals("true"), false);
+									if (operations != null) {
+										productOperations.addAll(operations);
+									}
+								}
+							}
+							
 						} else if (filter.contains("operationNumber")) {
 							String operationNumber = filter.split(":")[1].replaceAll("Ã©", "é").replaceAll("Ã»", "û");
 							Date endDate = null;

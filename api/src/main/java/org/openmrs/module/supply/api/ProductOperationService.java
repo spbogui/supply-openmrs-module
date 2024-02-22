@@ -70,6 +70,13 @@ public interface ProductOperationService extends OpenmrsService {
 	        Date startDate, Date endDate, List<Location> locations, Boolean validatedOnly, Boolean includeVoided,
 	        Boolean forChildLocations) throws APIException;
 	
+	List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, ProductProgram program,
+	        Date startDate, Date endDate, Location location, Boolean validatedOnly, Boolean includeVoided,
+	        Boolean forChildLocations);
+	
+	List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, Date startDate, Date endDate,
+	        Location location, Boolean validatedOnly, Boolean includeVoided, Boolean forChildLocations) throws APIException;
+	
 	List<ProductOperation> getAllProductOperationByTypes(List<ProductOperationType> operationTypes, ProductProgram program,
 	        Location location, Boolean validatedOnly, Boolean includeVoided);
 	
