@@ -534,7 +534,7 @@ public class ProductOperationDao {
 	private List<ProductOperation> getHistoricalProductOperations(Location location, Boolean validatedOnly,
 	        Boolean includeVoided, Boolean forChildLocations, Criteria criteria) {
 		if (forChildLocations) {
-			criteria.add(Restrictions.eq("exchangeLocation", location));
+			criteria.add(Restrictions.in("location", getChildLocationListWithPrograms(location)));
 		} else {
 			criteria.add(Restrictions.eq("location", location));
 		}
@@ -918,6 +918,8 @@ public class ProductOperationDao {
 
         ProductNotification notification = null;
 
+        getSession().saveOrUpdate(operation);
+
         if (operation.getOperationStatus().equals(OperationStatus.NOT_COMPLETED)) {
 
             if (operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION)) {
@@ -1003,8 +1005,6 @@ public class ProductOperationDao {
                 operation.getOperationStatus().equals(OperationStatus.SUBMITTED)) {
             generateStockStatus(operation);
         }
-
-        getSession().saveOrUpdate(operation);
 
         if (notification != null) {
             getSession().save(notification);
@@ -2015,6 +2015,7 @@ public class ProductOperationDao {
                     inventory.getOperationDate(),
                     currentReport.getProductProgram(), currentReport.getLocation(), false);
 
+
             ProductOperation latestReport = getLastProductOperation(
                     Arrays.asList(getProductOperationType(
                                     OperationConstants.REPORT_OPERATION),
@@ -2023,6 +2024,16 @@ public class ProductOperationDao {
             );
 
             if (inventoryBefore != null) {
+                ProductOperation totalInventoryBefore = null;
+                if (inventoryBefore.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION)) {
+                    totalInventoryBefore = getLastProductOperation(Collections.singletonList(getProductOperationType(
+                                    OperationConstants.INVENTORY_OPERATION)
+                            ),
+                            productCode,
+                            inventory.getOperationDate(),
+                            currentReport.getProductProgram(), currentReport.getLocation(), false);
+                }
+
                 List<ProductOperationFlux> dispensationFLuxes = getOperationFluxes(
                         Arrays.asList(getProductOperationType(
                                         OperationConstants.DISPENSATION_OPERATION),
@@ -2189,8 +2200,17 @@ public class ProductOperationDao {
             return Collections.emptyList();
         }
         for (Location childLocation : location.getChildLocations()) {
-            if (childLocation.getAttributes()
-                    .stream().anyMatch(a -> a.getAttributeType().getUuid().equals("AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC") && a.getValueReference() != null)) {
+            LocationAttribute availableProgramLocationAttribute = childLocation.getAttributes()
+                    .stream().filter(a ->
+                            a.getAttributeType().getUuid().equals("AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC") && a.getValueReference() != null
+                    ).findFirst().orElse(null);
+
+            LocationAttribute directClientLocationAttribute = childLocation.getAttributes()
+                    .stream().filter(a ->
+                            a.getAttributeType().getUuid().equals("NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC") && a.getValueReference() != null
+                    ).findFirst().orElse(null);
+
+            if (availableProgramLocationAttribute != null && (directClientLocationAttribute == null || directClientLocationAttribute.getValueReference().equals("false"))) {
                 childLocationList.add(childLocation);
             }
         }

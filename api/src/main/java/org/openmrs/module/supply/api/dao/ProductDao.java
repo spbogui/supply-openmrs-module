@@ -2,7 +2,6 @@ package org.openmrs.module.supply.api.dao;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -10,13 +9,11 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.supply.*;
-import org.openmrs.module.supply.utils.CSVHelper;
 import org.openmrs.module.supply.utils.SupplyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 //import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -276,8 +273,9 @@ public class ProductDao {
 	
 	@SuppressWarnings("unchecked")
 	public void purgeUnusedAttributes() {
-		String queryString = "SELECT p FROM ProductAttribute p WHERE p.location = :location p NOT IN ("
-		        + " SELECT paf.attribute FROM ProductOperationFluxAttribute paf)";
+		String queryString = "SELECT p FROM ProductAttribute p WHERE p.location = :location AND p NOT IN ("
+		        + " SELECT paf.attribute FROM ProductOperationFluxAttribute paf) AND p NOT IN ("
+		        + "SELECT pas.attribute FROM ProductAttributeStock pas) ";
 		List<ProductAttribute> attributes = getSession().createQuery(queryString)
 		        .setParameter("location", SupplyUtils.getUserLocation()).list();
 		if (attributes != null) {

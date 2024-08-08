@@ -50,11 +50,8 @@ public class ProductOperationFluxResource extends DelegatingSubResource<ProductO
 	
 	@Override
 	public void purge(ProductOperationFlux productOperationFlux, RequestContext requestContext) throws ResponseException {
-		//		for (ProductOperationFluxAttribute fluxAttribute : productOperationFlux.getAttributes()) {
-		//			getService().purgeProductOperationFluxAttribute(fluxAttribute);
-		//		}
-		//		Context.getService(ProductService.class).purgeUnusedAttributes(productOperationFlux);
 		getService().purgeProductOperationFlux(productOperationFlux);
+		Context.getService(ProductService.class).purgeUnusedAttributes();
 	}
 	
 	@Override

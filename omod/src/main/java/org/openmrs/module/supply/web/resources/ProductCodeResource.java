@@ -2,13 +2,11 @@ package org.openmrs.module.supply.web.resources;
 
 import io.swagger.models.Model;
 import io.swagger.models.ModelImpl;
-import io.swagger.models.properties.DoubleProperty;
 import io.swagger.models.properties.RefProperty;
 import io.swagger.models.properties.StringProperty;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.supply.*;
-import org.openmrs.module.supply.api.ProductOperationService;
 import org.openmrs.module.supply.api.ProductService;
 import org.openmrs.module.supply.web.controller.SupplyResourceController;
 import org.openmrs.module.webservices.rest.web.RequestContext;

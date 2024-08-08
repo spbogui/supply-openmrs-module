@@ -2,7 +2,6 @@ package org.openmrs.module.supply;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.openmrs.BaseOpenmrsData;
-import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.supply.api.ProductOperationService;
 import org.openmrs.module.supply.utils.SupplyUtils;
@@ -10,9 +9,7 @@ import org.openmrs.module.supply.utils.SupplyUtils;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity(name = "ProductCode")
 @Table(name = "supply2_product_code")

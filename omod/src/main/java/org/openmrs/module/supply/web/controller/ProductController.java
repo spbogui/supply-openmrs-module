@@ -1,10 +1,7 @@
 package org.openmrs.module.supply.web.controller;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.supply.Product;
 import org.openmrs.module.supply.api.ProductService;
-import org.openmrs.module.supply.utils.CSVHelper;
-import org.openmrs.web.WebConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -15,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.List;
 
 @Controller("${rootrootArtifactid}.ProductController")
 @RequestMapping("module/supply/product")

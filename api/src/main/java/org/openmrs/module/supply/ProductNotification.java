@@ -5,8 +5,6 @@ import org.openmrs.Location;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity(name = "ProductNotification")
 @Table(name = "supply2_product_notification")
