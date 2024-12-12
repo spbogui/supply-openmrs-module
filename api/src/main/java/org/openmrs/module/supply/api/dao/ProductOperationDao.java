@@ -1717,8 +1717,8 @@ public class ProductOperationDao {
 	public List<ProductAttributeStock> getProductAttributeStockByExpiryDate(ProductCode productCode, Date currentDate,
 	        Location location) {
 		return getSession().createCriteria(ProductAttributeStock.class, "s").createAlias("s.attribute", "a")
-		        .add(Restrictions.eq("a.productCode", productCode)).add(Restrictions.lt("a.expiryDate", currentDate))
-		        .add(Restrictions.eq("s.location", location)).add(Restrictions.eq("s.voided", false)).list();
+		        .add(Restrictions.eq("s.voided", false)).add(Restrictions.eq("a.productCode", productCode))
+		        .add(Restrictions.lt("a.expiryDate", currentDate)).add(Restrictions.eq("s.location", location)).list();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -1728,6 +1728,15 @@ public class ProductOperationDao {
 		        .createAlias("a.productCode", "p").add(Restrictions.lt("a.expiryDate", currentDate))
 		        .add(Restrictions.eq("p.program", program)).add(Restrictions.gt("s.quantityInStock", 0))
 		        .add(Restrictions.eq("s.location", location)).add(Restrictions.eq("s.voided", false)).list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<ProductAttributeStock> getProductAttributeStockByExpiredByProduct(ProductCode productCode, Date currentDate,
+	        Location location) {
+		return getSession().createCriteria(ProductAttributeStock.class, "s").createAlias("s.attribute", "a")
+		        .createAlias("a.productCode", "p").add(Restrictions.eq("s.voided", false))
+		        .add(Restrictions.eq("a.productCode", productCode)).add(Restrictions.lt("a.expiryDate", currentDate))
+		        .add(Restrictions.gt("s.quantityInStock", 0)).add(Restrictions.eq("s.location", location)).list();
 	}
 	
 	@SuppressWarnings("unchecked")

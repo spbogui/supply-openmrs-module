@@ -225,7 +225,8 @@ public class ProductAttributeStockResource extends DelegatingCrudResource<Produc
 									
 									if (productCode != null && operationDate != null) {
 										List<ProductAttributeStock> productAttributeStocks = getService()
-										        .getProductAttributeStockByExpiryDate(productCode, operationDate, location);
+										        .getProductAttributeStockByExpiredByProduct(productCode, operationDate,
+										            location);
 										if (productAttributeStocks != null) {
 											stocks.addAll(productAttributeStocks);
 										}

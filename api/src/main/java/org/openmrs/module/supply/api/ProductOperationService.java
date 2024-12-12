@@ -234,6 +234,9 @@ public interface ProductOperationService extends OpenmrsService {
 	List<ProductAttributeStock> getProductAttributeStockByExpiryDate(ProductCode productCode, Date currentDate,
 	        Location location) throws APIException;
 	
+	List<ProductAttributeStock> getProductAttributeStockByExpiredByProduct(ProductCode productCode, Date currentDate,
+	        Location location) throws APIException;
+	
 	List<ProductAttributeStock> getProductAttributeStockByExpired(Date currentDate, Location location, ProductProgram program)
 	        throws APIException;
 	

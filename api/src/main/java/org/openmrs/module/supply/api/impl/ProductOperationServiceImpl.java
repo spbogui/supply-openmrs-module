@@ -9,6 +9,7 @@ import org.openmrs.module.supply.api.ProductOperationService;
 import org.openmrs.module.supply.api.dao.ProductOperationDao;
 
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -362,6 +363,12 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 	public List<ProductAttributeStock> getProductAttributeStockByExpiryDate(ProductCode productCode, Date currentDate,
 	        Location location) throws APIException {
 		return dao.getProductAttributeStockByExpiryDate(productCode, currentDate, location);
+	}
+	
+	@Override
+	public List<ProductAttributeStock> getProductAttributeStockByExpiredByProduct(ProductCode productCode, Date currentDate,
+	        Location location) throws APIException {
+		return dao.getProductAttributeStockByExpiredByProduct(productCode, currentDate, location);
 	}
 	
 	@Override
