@@ -898,7 +898,7 @@ s
     <changeSet id="supply2-product-operation-type-insert-all" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM supply2_product_operation_type
+                FROM supply2_product_operation_type
             </sqlCheck>
         </preConditions>
         <insert tableName="supply2_product_operation_type">
@@ -1429,7 +1429,7 @@ s
     <changeSet id="supply2-add-attribute-type-to-operation-type" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN" onError="WARN">
             <sqlCheck expectedResult="0">SELECT COUNT(*)
-                                         FROM supply2_product_operation_type_attribute_type
+                FROM supply2_product_operation_type_attribute_type
             </sqlCheck>
         </preConditions>
         <!-- Inventory -->
@@ -1529,10 +1529,10 @@ s
             INSERT INTO supply2_product_regime (concept_id, uuid)
             SELECT answer_concept, c.uuid
             FROM concept_answer ca,
-                 concept c
+            concept c
             WHERE c.concept_id = ca.answer_concept
-              AND ca.concept_id = 162240
-              AND c.concept_id NOT IN (SELECT concept_id FROM supply2_product_regime);
+            AND ca.concept_id = 162240
+            AND c.concept_id NOT IN (SELECT concept_id FROM supply2_product_regime);
         </sql>
     </changeSet>
     <!--    <changeSet id="supply2-operation-flux-remove-location-unique-key" author="BOGUI SERGE">-->
@@ -1543,8 +1543,8 @@ s
     <changeSet id="supply-add-country-local-supplier" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT COUNT(location_id)
-                                         FROM location
-                                         WHERE uuid = 'NPSPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL'
+                FROM location
+                WHERE uuid = 'NPSPLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL'
             </sqlCheck>
         </preConditions>
         <insert tableName="location">
@@ -1576,9 +1576,9 @@ s
         </preConditions>
         <sql>
             INSERT INTO location_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('Client Direct NPSP', 'org.openmrs.customdatatype.datatype.BooleanDatatype', 0, 1,
-                    '2020-12-15 21:10:08', false, 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            '2020-12-15 21:10:08', false, 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC');
 
         </sql>
     </changeSet>
@@ -1593,59 +1593,59 @@ s
         </preConditions>
         <sql>
             INSERT INTO location_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('Client Direct NPSP', 'org.openmrs.customdatatype.datatype.BooleanDatatype', 0, 1,
-                    '2020-12-15 21:10:08', 0, 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            '2020-12-15 21:10:08', 0, 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC');
         </sql>
     </changeSet>
 
     <changeSet id="supply-create-direct-clients-postgresql" author="BOGUI SERGE" runAlways="true" dbms="postgresql">
         <sql>
             INSERT INTO location_attribute (location_attribute_id, location_id, attribute_type_id, value_reference,
-                                            uuid, creator, date_created, voided)
-            SELECT NULL   AS                                             location_attribute_id,
-                   location_id,
-                   (SELECT location_attribute_type_id
-                    FROM location_attribute_type
-                    WHERE uuid = 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC') attribute_type_id,
-                   'true' AS                                             value_reference,
-                   uuid() AS                                             uuid,
-                   1,
-                   '2021-01-01 00:00:00',
-                   false
+            uuid, creator, date_created, voided)
+            SELECT NULL AS location_attribute_id,
+            location_id,
+            (SELECT location_attribute_type_id
+            FROM location_attribute_type
+            WHERE uuid = 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC') attribute_type_id,
+            'true' AS value_reference,
+            uuid() AS uuid,
+            1,
+            '2021-01-01 00:00:00',
+            false
             FROM location l
             WHERE (name LIKE 'CHU %' OR name LIKE 'CHR %' OR name LIKE 'HG %' OR name LIKE 'DISTRICT SANITAIRE %')
-              AND location_id NOT IN (SELECT location_id
-                                      FROM location_attribute la
-                                      WHERE attribute_type_id = (SELECT location_attribute_type_id
-                                                                 FROM location_attribute_type lat
-                                                                 WHERE uuid = 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC')
-                                        AND la.location_id = l.location_id)
+            AND location_id NOT IN (SELECT location_id
+            FROM location_attribute la
+            WHERE attribute_type_id = (SELECT location_attribute_type_id
+            FROM location_attribute_type lat
+            WHERE uuid = 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC')
+            AND la.location_id = l.location_id)
         </sql>
     </changeSet>
 
     <changeSet id="supply-create-direct-clients-mysql" author="BOGUI SERGE" runAlways="true" dbms="mysql,mariadb">
         <sql>
             INSERT INTO location_attribute (location_attribute_id, location_id, attribute_type_id, value_reference,
-                                            uuid, creator, date_created, voided)
-            SELECT NULL   AS                                             location_attribute_id,
-                   location_id,
-                   (SELECT location_attribute_type_id
-                    FROM location_attribute_type
-                    WHERE uuid = 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC') attribute_type_id,
-                   'true' AS                                             value_reference,
-                   uuid() AS                                             uuid,
-                   1,
-                   '2021-01-01 00:00:00',
-                   0
+            uuid, creator, date_created, voided)
+            SELECT NULL AS location_attribute_id,
+            location_id,
+            (SELECT location_attribute_type_id
+            FROM location_attribute_type
+            WHERE uuid = 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC') attribute_type_id,
+            'true' AS value_reference,
+            uuid() AS uuid,
+            1,
+            '2021-01-01 00:00:00',
+            0
             FROM location l
             WHERE (name LIKE 'CHU %' OR name LIKE 'CHR %' OR name LIKE 'HG %' OR name LIKE 'DISTRICT SANITAIRE %')
-              AND location_id NOT IN (SELECT location_id
-                                      FROM location_attribute la
-                                      WHERE attribute_type_id = (SELECT location_attribute_type_id
-                                                                 FROM location_attribute_type lat
-                                                                 WHERE uuid = 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC')
-                                        AND la.location_id = l.location_id)
+            AND location_id NOT IN (SELECT location_id
+            FROM location_attribute la
+            WHERE attribute_type_id = (SELECT location_attribute_type_id
+            FROM location_attribute_type lat
+            WHERE uuid = 'NPSPCLIENTCCCCCCCCCCCCCCCCCCCCCCCCCC')
+            AND la.location_id = l.location_id)
         </sql>
     </changeSet>
 
@@ -1659,9 +1659,9 @@ s
         </preConditions>
         <sql>
             INSERT INTO location_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('Programmes Disponibles', 'org.openmrs.customdatatype.datatype.FreeTextDatatype', 0, 1,
-                    '2021-01-01 21:10:08', false, 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            '2021-01-01 21:10:08', false, 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
         </sql>
     </changeSet>
 
@@ -1675,9 +1675,9 @@ s
         </preConditions>
         <sql>
             INSERT INTO location_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('Programmes Disponibles', 'org.openmrs.customdatatype.datatype.FreeTextDatatype', 0, 1,
-                    '2021-01-01 21:10:08', 0, 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            '2021-01-01 21:10:08', 0, 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
         </sql>
     </changeSet>
 
@@ -1691,9 +1691,9 @@ s
         </preConditions>
         <sql>
             INSERT INTO location_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('Niveau', 'org.openmrs.customdatatype.datatype.FreeTextDatatype', 0, 1, '2021-01-01 21:10:08',
-                    false, 'LEVELCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            false, 'LEVELCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
         </sql>
     </changeSet>
 
@@ -1707,9 +1707,9 @@ s
         </preConditions>
         <sql>
             INSERT INTO location_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('Niveau', 'org.openmrs.customdatatype.datatype.FreeTextDatatype', 0, 1, '2021-01-01 21:10:08', 0,
-                    'LEVELCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            'LEVELCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
         </sql>
     </changeSet>
 
@@ -1723,9 +1723,9 @@ s
         </preConditions>
         <sql>
             INSERT INTO location_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('CODE NPSP', 'org.openmrs.customdatatype.datatype.FreeTextDatatype', 0, 1, '2021-02-06 13:00:00',
-                    false, 'CODENPSPCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            false, 'CODENPSPCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
         </sql>
     </changeSet>
 
@@ -1739,9 +1739,9 @@ s
         </preConditions>
         <sql>
             INSERT INTO location_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('CODE NPSP', 'org.openmrs.customdatatype.datatype.FreeTextDatatype', 0, 1, '2021-02-06 13:00:00', 0,
-                    'CODENPSPCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            'CODENPSPCCCCCCCCCCCCCCCCCCCCCCCCCCCC');
         </sql>
     </changeSet>
 
@@ -1774,9 +1774,9 @@ s
         </preConditions>
         <sql>
             INSERT INTO provider_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('Location', 'org.openmrs.customdatatype.datatype.FreeTextDatatype', 0, 1, '2021-02-27 21:10:08', 0,
-                    'LOCATIONPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
+            'LOCATIONPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
         </sql>
     </changeSet>
 
@@ -1790,9 +1790,9 @@ s
         </preConditions>
         <sql>
             INSERT INTO provider_attribute_type
-                (name, datatype, min_occurs, creator, date_created, retired, uuid)
+            (name, datatype, min_occurs, creator, date_created, retired, uuid)
             VALUES ('Location', 'org.openmrs.customdatatype.datatype.FreeTextDatatype', 0, 1, '2021-02-27 21:10:08',
-                    false, 'LOCATIONPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
+            false, 'LOCATIONPPPPPPPPPPPPPPPPPPPPPPPPPPPP');
         </sql>
     </changeSet>
 
@@ -1810,13 +1810,13 @@ s
             VALUES (163000, false, 3, 7, 0, 1, '2020-11-27 00:00:00', '163000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
 
             INSERT INTO concept_name (concept_id, name, date_created, concept_name_type, creator, locale,
-                                      locale_preferred, voided, uuid)
+            locale_preferred, voided, uuid)
             VALUES (163000, 'But', '2020-11-27 00:00:00', 'FULLY_SPECIFIED', 1, 'fr', 1, false,
-                    '163000FRAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+            '163000FRAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
             INSERT INTO concept_name (concept_id, name, date_created, concept_name_type, creator, locale,
-                                      locale_preferred, voided, uuid)
+            locale_preferred, voided, uuid)
             VALUES (163000, 'Goal', '2020-11-27 00:00:00', 'FULLY_SPECIFIED', 1, 'en', 0, false,
-                    '163000ENAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+            '163000ENAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
         </sql>
     </changeSet>
 
@@ -1833,13 +1833,13 @@ s
             VALUES (163000, false, 3, 7, 0, 1, '2020-11-27 00:00:00', '163000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
 
             INSERT INTO concept_name (concept_id, name, date_created, concept_name_type, creator, locale,
-                                      locale_preferred, voided, uuid)
+            locale_preferred, voided, uuid)
             VALUES (163000, 'Goal', '2020-11-27 00:00:00', 'FULLY_SPECIFIED', 1, 'en', true, false,
-                    '163000ENAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+            '163000ENAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
             INSERT INTO concept_name (concept_id, name, date_created, concept_name_type, creator, locale,
-                                      locale_preferred, voided, uuid)
+            locale_preferred, voided, uuid)
             VALUES (163000, 'But', '2020-11-27 00:00:00', 'FULLY_SPECIFIED', 1, 'fr', false, false,
-                    '163000FRAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+            '163000FRAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
         </sql>
     </changeSet>
 
@@ -1848,7 +1848,7 @@ s
             UPDATE concept
             SET uuid = CONCAT(concept_id, 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
             WHERE concept_id > 999
-              AND uuid LIKE '%-%-%';
+            AND uuid LIKE '%-%-%';
         </sql>
     </changeSet>
 
@@ -1857,7 +1857,7 @@ s
             UPDATE supply2_product_regime
             SET uuid = CONCAT(concept_id, 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
             WHERE concept_id > 999
-              AND uuid LIKE '%-%-%';
+            AND uuid LIKE '%-%-%';
         </sql>
     </changeSet>
     <!--/CONCEPTS-->
@@ -1911,7 +1911,7 @@ s
                 SELECT COUNT(*)
                 FROM role_role
                 WHERE parent_role = 'AUXILIAIRE'
-                  AND child_role = 'PGP'
+                AND child_role = 'PGP'
             </sqlCheck>
         </preConditions>
         <sql>
@@ -1926,7 +1926,7 @@ s
                 SELECT COUNT(*)
                 FROM role_role
                 WHERE parent_role = 'PGP'
-                  AND child_role = 'PHARMACIEN'
+                AND child_role = 'PHARMACIEN'
             </sqlCheck>
         </preConditions>
         <sql>
@@ -1947,40 +1947,40 @@ s
         </preConditions>
         <sql>
             INSERT INTO encounter_type (name, description, creator, date_created, retired, uuid)
-                VALUE ('DISPENSATION', NULL, 1, '2020-11-10', 0, 'DISPENSATIONEEEEEEEEEEEEEEEEEEEEEEEE');
+            VALUE ('DISPENSATION', NULL, 1, '2020-11-10', 0, 'DISPENSATIONEEEEEEEEEEEEEEEEEEEEEEEE');
         </sql>
     </changeSet>
 
     <changeSet id="supply-dispensation-encounter-transform-mysql" author="BOGUI SERGE" dbms="mysql, mariadb">
         <sql>
             INSERT INTO encounter (encounter_type, patient_id, location_id, encounter_datetime, creator, date_created,
-                                   voided, uuid)
+            voided, uuid)
             SELECT (SELECT encounter_type_id FROM encounter_type WHERE name = 'DISPENSATION') AS encounter_type,
-                   person_id,
-                   location_id,
-                   obs_datetime,
-                   creator,
-                   date_created,
-                   voided,
-                   uuid()                                                                     AS uuid
+            person_id,
+            location_id,
+            obs_datetime,
+            creator,
+            date_created,
+            voided,
+            uuid() AS uuid
             FROM obs
             WHERE concept_id = 165010
-              AND encounter_id IS NULL
-              AND voided = 0;
+            AND encounter_id IS NULL
+            AND voided = 0;
 
             UPDATE
-                obs o LEFT JOIN encounter e
+            obs o LEFT JOIN encounter e
             ON e.encounter_datetime = o.obs_datetime AND patient_id = person_id AND o.date_created = e.date_created
-                SET o.encounter_id = e.encounter_id
+            SET o.encounter_id = e.encounter_id
             WHERE o.concept_id IN (164050, 165033, 165040, 165011, 165010) AND o.encounter_id IS NULL;
 
             INSERT INTO encounter_provider (encounter_id, provider_id, encounter_role_id, creator, date_created, voided,
-                                            uuid)
+            uuid)
             SELECT encounter_id, 1, 1, 1, date_created, voided, uuid() AS uuid
             FROM encounter
             WHERE encounter_type = 19
-              AND encounter_id NOT IN (SELECT encounter_id FROM encounter_provider)
-              AND voided = 0;
+            AND encounter_id NOT IN (SELECT encounter_id FROM encounter_provider)
+            AND voided = 0;
         </sql>
     </changeSet>
 
@@ -2046,15 +2046,15 @@ s
         </preConditions>
         <sql>
             INSERT INTO supply2_product (product_id, conversion_unit, creator, date_created, changed_by, date_changed,
-                                         voided, uuid)
+            voided, uuid)
             SELECT product_id,
-                   conversion_unit,
-                   creator,
-                   date_created,
-                   changed_by,
-                   date_changed,
-                   voided,
-                   uuid
+            conversion_unit,
+            creator,
+            date_created,
+            changed_by,
+            date_changed,
+            voided,
+            uuid
             FROM supply_product;
 
             INSERT INTO supply2_product_name (product_name_id, product_id, product_name_type, name, product_unit, uuid)
@@ -2321,19 +2321,19 @@ s
         <sql>
             INSERT INTO supply2_product_code_regime_members (regime_id, product_code_id)
             SELECT s2pr.product_regime_id,
-                   product_code_id
+            product_code_id
             FROM supply_product sp
-                     INNER JOIN supply_product_regime_members sprm ON sp.product_id = sprm.product_id
-                     INNER JOIN supply_product_regime spr ON sprm.regime_id = spr.product_regime_id
-                     INNER JOIN supply2_product s2p ON s2p.product_id = sp.product_id
-                     INNER JOIN (SELECT product_code_id, product_id
-                                 FROM supply2_product_code
-                                 WHERE program_id =
-                                       (SELECT product_program_id
-                                        FROM supply2_product_program pp
-                                        WHERE name LIKE 'PNLS%IO')) s2pc
-                                ON s2p.product_id = s2pc.product_id
-                     INNER JOIN supply2_product_regime s2pr on spr.concept_id = s2pr.concept_id;
+            INNER JOIN supply_product_regime_members sprm ON sp.product_id = sprm.product_id
+            INNER JOIN supply_product_regime spr ON sprm.regime_id = spr.product_regime_id
+            INNER JOIN supply2_product s2p ON s2p.product_id = sp.product_id
+            INNER JOIN (SELECT product_code_id, product_id
+            FROM supply2_product_code
+            WHERE program_id =
+            (SELECT product_program_id
+            FROM supply2_product_program pp
+            WHERE name LIKE 'PNLS%IO')) s2pc
+            ON s2p.product_id = s2pc.product_id
+            INNER JOIN supply2_product_regime s2pr on spr.concept_id = s2pr.concept_id;
         </sql>
     </changeSet>
 
@@ -2640,7 +2640,7 @@ s
         <sql>
             UPDATE supply2_product_program
             SET name = 'PNLS-ANTIRETROVIRAUX ET IO',
-                uuid = 'PNLSANTIRETROVIRAUXETIOPPPPPPPPPPPPPPP'
+            uuid = 'PNLSANTIRETROVIRAUXETIOPPPPPPPPPPPPPPP'
             WHERE name = 'PNLSARVIO';
         </sql>
     </changeSet>
@@ -2656,7 +2656,7 @@ s
         <sql>
             UPDATE supply2_product_program
             SET name = 'PNLS-CHARGES VIRALES',
-                uuid = 'PNLSCHARGESVIRALESPPPPPPPPPPPPPPPPPPPP'
+            uuid = 'PNLSCHARGESVIRALESPPPPPPPPPPPPPPPPPPPP'
             WHERE name = 'PNLS_CHARGE VIRALE';
         </sql>
     </changeSet>
@@ -2672,7 +2672,7 @@ s
         <sql>
             UPDATE supply2_product_program
             SET name = 'PNLS-PRODUITS DE LABORATOIRE',
-                uuid = 'PNLSPRODUITSDELABORATOIREPPPPPPPPPPPPP'
+            uuid = 'PNLSPRODUITSDELABORATOIREPPPPPPPPPPPPP'
             WHERE name = 'PNLSLAB';
         </sql>
     </changeSet>
@@ -2688,7 +2688,7 @@ s
         <sql>
             UPDATE supply2_product_program
             SET name = 'PNLS-TESTS RAPIDES ET CONSOMMABLES',
-                uuid = 'PNLSTESTSRAPIDESETCONSOMMABLESPPPPPPPP'
+            uuid = 'PNLSTESTSRAPIDESETCONSOMMABLESPPPPPPPP'
             WHERE name = 'PNLSTRC';
         </sql>
     </changeSet>
@@ -2704,10 +2704,10 @@ s
         <sql>
             UPDATE location_attribute
             SET value_reference =
-                    REPLACE(value_reference, 'PNLSARVIO', 'PNLS-ANTIRETROVIRAUX ET IO')
+            REPLACE(value_reference, 'PNLSARVIO', 'PNLS-ANTIRETROVIRAUX ET IO')
             WHERE attribute_type_id = (SELECT location_attribute_type_id
-                                       FROM location_attribute_type
-                                       WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            FROM location_attribute_type
+            WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
 
         </sql>
     </changeSet>
@@ -2723,10 +2723,10 @@ s
         <sql>
             UPDATE location_attribute
             SET value_reference =
-                    REPLACE(value_reference, 'PNLSLAB', 'PNLS-PRODUITS DE LABORATOIRE')
+            REPLACE(value_reference, 'PNLSLAB', 'PNLS-PRODUITS DE LABORATOIRE')
             WHERE attribute_type_id = (SELECT location_attribute_type_id
-                                       FROM location_attribute_type
-                                       WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            FROM location_attribute_type
+            WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
 
         </sql>
     </changeSet>
@@ -2742,10 +2742,10 @@ s
         <sql>
             UPDATE location_attribute
             SET value_reference =
-                    REPLACE(value_reference, 'PNLSTRC', 'PNLS-TESTS RAPIDES ET CONSOMMABLES')
+            REPLACE(value_reference, 'PNLSTRC', 'PNLS-TESTS RAPIDES ET CONSOMMABLES')
             WHERE attribute_type_id = (SELECT location_attribute_type_id
-                                       FROM location_attribute_type
-                                       WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            FROM location_attribute_type
+            WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
 
         </sql>
     </changeSet>
@@ -2761,10 +2761,10 @@ s
         <sql>
             UPDATE location_attribute
             SET value_reference =
-                    REPLACE(value_reference, 'PNLS_CHARGE VIRALE', 'PNLS-CHARGES VIRALES')
+            REPLACE(value_reference, 'PNLS_CHARGE VIRALE', 'PNLS-CHARGES VIRALES')
             WHERE attribute_type_id = (SELECT location_attribute_type_id
-                                       FROM location_attribute_type
-                                       WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
+            FROM location_attribute_type
+            WHERE uuid = 'AVAILPRGRMCCCCCCCCCCCCCCCCCCCCCCCCCC');
 
         </sql>
     </changeSet>
@@ -2924,4 +2924,23 @@ s
     <!--            </sql>-->
     <!--    </changeSet>-->
 
+    <changeSet id="supply2-add-operation-attribute-type-product-list" author="BOGUI SERGE" dbms="mariadb,mysql">
+        <preConditions onFail="MARK_RAN" onError="WARN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM supply2_product_operation_attribute_type
+                WHERE uuid = 'PRODUCTLISTAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+            </sqlCheck>
+        </preConditions>
+        <insert tableName="supply2_product_operation_attribute_type">
+            <column name="product_operation_attribute_type_id">20</column>
+            <column name="name">Liste des produits</column>
+            <column name="description">Liste des produits pour l'opération</column>
+            <column name="format">java.lang.String</column>
+            <column name="sort_weight">1</column>
+            <column name="searchable">1</column>
+            <column name="uuid">PRODUCTLISTAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
+        </insert>
+    </changeSet>
+    
 </databaseChangeLog>
