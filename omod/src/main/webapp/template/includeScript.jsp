@@ -7,7 +7,7 @@
 <%--        file="${pageContext.request.contextPath}/moduleResources/supply/supply/runtime.55c0bd17.js"--%>
 <%--/>--%>
 <%--<openmrs:htmlInclude--%>
-<%--        file="${pageContext.request.contextPath}/moduleResources/supply/assests/index-5bec27c4.js"--%>
+<%--        file="${pageContext.request.contextPath}/moduleResources/supply/assests/index-5dff6b4a.js"--%>
 <%--/>--%>
 
 <script type="module" crossorigin
