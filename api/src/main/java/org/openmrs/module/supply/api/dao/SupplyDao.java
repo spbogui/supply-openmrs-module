@@ -200,13 +200,13 @@ public class SupplyDao {
 	public Obs getPatientLastObs(Person person, Concept concept, Date endDate) {
 		return (Obs) getSession().createCriteria(Obs.class).add(Restrictions.eq("person", person))
 		        .add(Restrictions.eq("concept", concept)).add(Restrictions.eq("location", SupplyUtils.getUserLocation()))
-		        .add(Restrictions.lt("obsDatetime", endDate)).addOrder(Order.desc("obsDatetime")).setMaxResults(1)
-		        .uniqueResult();
+		        .add(Restrictions.eq("voided", false)).add(Restrictions.lt("obsDatetime", endDate))
+		        .addOrder(Order.desc("obsDatetime")).setMaxResults(1).uniqueResult();
 	}
 	
 	public Encounter getPatientLastEncounter(Patient patient, EncounterType encounterType) {
 		return (Encounter) getSession().createCriteria(Encounter.class).add(Restrictions.eq("patient", patient))
-		        .add(Restrictions.eq("encounterType", encounterType))
+		        .add(Restrictions.eq("encounterType", encounterType)).add(Restrictions.eq("voided", false))
 		        .add(Restrictions.eq("location", SupplyUtils.getUserLocation())).addOrder(Order.desc("encounterDatetime"))
 		        .setMaxResults(1).uniqueResult();
 	}
@@ -214,7 +214,7 @@ public class SupplyDao {
 	public Encounter getPatientLastEncounter(Patient patient, EncounterType encounterType, Date endDate) {
 		return (Encounter) getSession().createCriteria(Encounter.class).add(Restrictions.eq("patient", patient))
 		        .add(Restrictions.eq("encounterType", encounterType))
-		        .add(Restrictions.eq("location", SupplyUtils.getUserLocation()))
+		        .add(Restrictions.eq("location", SupplyUtils.getUserLocation())).add(Restrictions.eq("voided", false))
 		        .add(Restrictions.lt("encounterDatetime", endDate)).addOrder(Order.desc("encounterDatetime"))
 		        .setMaxResults(1).uniqueResult();
 	}

@@ -626,6 +626,24 @@ public class ProductOperationDao {
 	}
 	
 	public ProductOperation getLastProductOperation(ProductOperationType operationType, ProductProgram program,
+	        Location location, Boolean validated, Boolean includeVoided, Date startDate, Date endDate) {
+		Criteria criteria = getSession().createCriteria(ProductOperation.class)
+		        .add(Restrictions.eq("operationType", operationType)).add(Restrictions.eq("productProgram", program))
+		        .add(Restrictions.eq("location", location)).add(Restrictions.between("operationDate", startDate, endDate));
+		if (validated) {
+			criteria.add(Restrictions.or(Restrictions.eq("operationStatus", OperationStatus.VALIDATED),
+			    Restrictions.eq("operationStatus", OperationStatus.APPROVED),
+			    Restrictions.eq("operationStatus", OperationStatus.TREATED),
+			    Restrictions.eq("operationStatus", OperationStatus.SUBMITTED)));
+		}
+		if (!includeVoided) {
+			criteria.add(Restrictions.eq("voided", false));
+		}
+		return (ProductOperation) criteria.addOrder(Order.desc("operationDate")).setMaxResults(1).uniqueResult();
+		
+	}
+	
+	public ProductOperation getLastProductOperation(ProductOperationType operationType, ProductProgram program,
 	        String operationNumber, Location location, Boolean validated, Boolean includeVoided) {
 		Criteria criteria = getSession().createCriteria(ProductOperation.class)
 		        .add(Restrictions.eq("operationType", operationType)).add(Restrictions.eq("productProgram", program))
@@ -671,11 +689,11 @@ public class ProductOperationDao {
 		        .add(Restrictions.eq("o.voided", includeVoided))
 		        .add(Restrictions.eq("f.productCode", productCode))
 		        .add(
-		            Restrictions.or(Restrictions.eq("operationStatus", OperationStatus.VALIDATED),
-		                Restrictions.eq("operationStatus", OperationStatus.SUBMITTED),
-		                Restrictions.eq("operationStatus", OperationStatus.TREATED),
-		                Restrictions.eq("operationStatus", OperationStatus.APPROVED)));
-		return (ProductOperation) criteria.addOrder(Order.desc("operationDate")).setMaxResults(1).uniqueResult();
+		            Restrictions.or(Restrictions.eq("o.operationStatus", OperationStatus.VALIDATED),
+		                Restrictions.eq("o.operationStatus", OperationStatus.SUBMITTED),
+		                Restrictions.eq("o.operationStatus", OperationStatus.TREATED),
+		                Restrictions.eq("o.operationStatus", OperationStatus.APPROVED)));
+		return (ProductOperation) criteria.addOrder(Order.desc("o.operationDate")).setMaxResults(1).uniqueResult();
 		
 	}
 	
@@ -684,19 +702,41 @@ public class ProductOperationDao {
 		Criteria criteria = getSession()
 		        .createCriteria(ProductOperation.class, "o")
 		        .createAlias("o.fluxes", "f")
+		        .createAlias("o.otherFluxes", "of")
 		        .add(Restrictions.in("o.operationType", operationTypes))
 		        .add(Restrictions.eq("o.productProgram", program))
 		        .add(Restrictions.eq("o.location", location))
 		        .add(Restrictions.eq("o.voided", includeVoided))
-		        .add(Restrictions.eq("f.productCode", productCode))
+		        .add(
+		            Restrictions.or(Restrictions.eq("f.productCode", productCode),
+		                Restrictions.eq("of.productCode", productCode)))
 		        .add(Restrictions.lt("o.operationDate", limitDate))
 		        .add(
-		            Restrictions.or(Restrictions.eq("operationStatus", OperationStatus.VALIDATED),
-		                Restrictions.eq("operationStatus", OperationStatus.SUBMITTED),
-		                Restrictions.eq("operationStatus", OperationStatus.TREATED),
-		                Restrictions.eq("operationStatus", OperationStatus.APPROVED)));
-		return (ProductOperation) criteria.addOrder(Order.desc("operationDate")).setMaxResults(1).uniqueResult();
-		
+		            Restrictions.or(Restrictions.eq("o.operationStatus", OperationStatus.VALIDATED),
+		                Restrictions.eq("o.operationStatus", OperationStatus.SUBMITTED),
+		                Restrictions.eq("o.operationStatus", OperationStatus.TREATED),
+		                Restrictions.eq("o.operationStatus", OperationStatus.APPROVED)));
+		return (ProductOperation) criteria.addOrder(Order.desc("o.operationDate")).setMaxResults(1).uniqueResult();
+	}
+	
+	public ProductOperation getProductOtherFluxesLastestProductOperation(List<ProductOperationType> operationTypes,
+	        ProductCode productCode, Date limitDate, ProductProgram program, Location location, Boolean includeVoided) {
+		Criteria criteria = getSession()
+		        .createCriteria(ProductOperation.class, "o")
+		        //		        .createAlias("o.fluxes", "f")
+		        .createAlias("o.otherFluxes", "of")
+		        .add(Restrictions.in("o.operationType", operationTypes))
+		        .add(Restrictions.eq("o.productProgram", program))
+		        .add(Restrictions.eq("o.location", location))
+		        .add(Restrictions.eq("o.voided", includeVoided))
+		        .add(Restrictions.eq("of.productCode", productCode))
+		        .add(Restrictions.lt("o.operationDate", limitDate))
+		        .add(
+		            Restrictions.or(Restrictions.eq("o.operationStatus", OperationStatus.VALIDATED),
+		                Restrictions.eq("o.operationStatus", OperationStatus.SUBMITTED),
+		                Restrictions.eq("o.operationStatus", OperationStatus.TREATED),
+		                Restrictions.eq("o.operationStatus", OperationStatus.APPROVED)));
+		return (ProductOperation) criteria.addOrder(Order.desc("o.operationDate")).setMaxResults(1).uniqueResult();
 	}
 	
 	public ProductOperation getLastProductOperation(List<ProductOperationType> operationTypes, ProductCode productCode,
@@ -917,28 +957,39 @@ public class ProductOperationDao {
         }
 
         ProductNotification notification = null;
-
         getSession().saveOrUpdate(operation);
 
         if (operation.getOperationStatus().equals(OperationStatus.NOT_COMPLETED)) {
 
             if (operation.getOperationType().getUuid().equals(OperationConstants.INVENTORY_OPERATION)) {
                 operation.addAllFluxes(createInventoryFluxes(operation));
+//                getSession().saveOrUpdate(operation);
             } else if (operation.getOperationType().getUuid().equals(OperationConstants.RECEPTION_OPERATION)
                     || operation.getOperationType().getUuid().equals(OperationConstants.TRANSFER_IN_OPERATION) ||
                     operation.getOperationType().getUuid().equals(OperationConstants.PRODUCT_RETURN_IN_OPERATION)) {
                 if (operation.getFluxes().isEmpty() && operation.getParentOperation() != null) {
                     operation.addAllFluxes(createFluxesFromOperation(operation, operation.getParentOperation()));
+//                    getSession().saveOrUpdate(operation);
                 }
             } else if (operation.getOperationType().getUuid().equals(OperationConstants.REPORT_OPERATION)) {
                 if (operation.getOtherFluxes().isEmpty()) {
                     operation.addAllOtherFlux(createReportOtherFluxes(operation));
+//                    getSession().saveOrUpdate(operation);
                 }
             } else if (operation.getOperationType().getUuid().equals(OperationConstants.URGENT_REPORT_OPERATION)) {
                 if (operation.getOtherFluxes().isEmpty()) {
-                    operation.addAllOtherFlux(createEmergencyReportOtherFluxes(operation));
+                    if (operation.getParentOperation() != null) {
+                        if (!operation.getParentOperation().getOperationType().getUuid().equals(OperationConstants.REPORT_OPERATION)) {
+                            operation.addAllOtherFlux(createEmergencyReportOtherFluxes(operation));
+                        } else {
+                            operation.addAllOtherFlux(createEmergencyWithoutInventoryReportOtherFluxes(operation));
+                        }
+//                        getSession().saveOrUpdate(operation);
+                    }
+
                 }
             }
+
 
         } else if (operation.getOperationStatus().equals(OperationStatus.VALIDATED) ||
                 operation.getOperationStatus().equals(OperationStatus.TREATED)) {
@@ -1469,6 +1520,16 @@ public class ProductOperationDao {
         return operations;
     }
 	
+	public ProductOperation getLatestBeforeDateByOperationNumber(ProductOperationType operationType, String operationNumber,
+	        Date limitDate, Location location, Boolean validated) {
+		return (ProductOperation) getSession().createCriteria(ProductOperation.class)
+		        .add(Restrictions.eq("operationType", operationType))
+		        .add(Restrictions.eq("operationNumber", operationNumber)).add(Restrictions.lt("operationDate", limitDate))
+		        .add(Restrictions.eq("operationStatus", OperationStatus.VALIDATED)).addOrder(Order.desc("operationDate"))
+		        
+		        .setMaxResults(1).uniqueResult();
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<ProductOperationType> getAllProductOperationType() {
 		return getSession().createCriteria(ProductOperationType.class).list();
@@ -1976,6 +2037,7 @@ public class ProductOperationDao {
                             }
                         }
                     }
+
                     otherFluxes.add(createOtherFlux(
                             lostQuantity,
                             ReportConstants.LOSS_QUANTITY,
@@ -2014,6 +2076,7 @@ public class ProductOperationDao {
 	private List<ProductOperationOtherFlux> createEmergencyReportOtherFluxes(ProductOperation currentReport) {
         List<ProductOperationOtherFlux> otherFluxes = new ArrayList<>();
         ProductOperation inventory = currentReport.getParentOperation();
+
         for (ProductCode productCode : inventory.getProductList()) {
 
             ProductOperation inventoryBefore = getLastProductOperation(Arrays.asList(getProductOperationType(
@@ -2128,6 +2191,82 @@ public class ProductOperationDao {
             }
         }
 
+        return otherFluxes;
+    }
+	
+	private List<ProductOperationOtherFlux> createEmergencyWithoutInventoryReportOtherFluxes(ProductOperation currentReport) {
+        List<ProductOperationOtherFlux> otherFluxes = new ArrayList<>();
+        ProductOperationAttribute attribute = currentReport.getActiveOperationAttributes().stream()
+                .filter(a -> a.getOperationAttributeType().getUuid().equals("PRODUCTLISTAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+                .findFirst().orElse(null);
+
+        if (attribute != null) {
+            String[] productUuidList = attribute.getValue().split(",");
+            for (String productUuid : productUuidList) {
+                ProductCode productCode = (ProductCode) getSession().createCriteria(ProductCode.class).add(Restrictions.eq("uuid", productUuid)).uniqueResult();
+
+                if (productCode != null) {
+                    ProductOperation previousReportWithProduct = getProductOtherFluxesLastestProductOperation(
+                            Arrays.asList(
+                                    getProductOperationType(OperationConstants.REPORT_OPERATION),
+                                    getProductOperationType(OperationConstants.URGENT_REPORT_OPERATION)
+                            ),
+                            productCode,
+                            currentReport.getOperationDate(),
+                            currentReport.getProductProgram(),
+                            currentReport.getLocation(),
+                            false
+                    );
+
+                    System.out.println("------------------------------> report before: " + previousReportWithProduct);
+
+                    if (previousReportWithProduct != null) {
+
+                        otherFluxes.add(createOtherFlux(
+                                getProductOtherFluxQuantity(
+                                        productCode,
+                                        previousReportWithProduct.getOtherFluxes().stream().filter(f -> f.getProductCode().equals(productCode)).collect(Collectors.toList()),
+                                        ReportConstants.DISTRIBUTED_QUANTITY_M1),
+                                ReportConstants.DISTRIBUTED_QUANTITY_M1,
+                                productCode,
+                                currentReport.getLocation())
+                        );
+                        otherFluxes.add(createOtherFlux(
+                                getProductOtherFluxQuantity(
+                                        productCode,
+                                        previousReportWithProduct.getOtherFluxes().stream().filter(f -> f.getProductCode().equals(productCode)).collect(Collectors.toList()),
+                                        ReportConstants.DISTRIBUTED_QUANTITY_M2),
+                                ReportConstants.DISTRIBUTED_QUANTITY_M2,
+                                productCode,
+                                currentReport.getLocation())
+                        );
+                        otherFluxes.add(createOtherFlux(
+                                getProductOtherFluxQuantity(
+                                        productCode,
+                                        previousReportWithProduct.getOtherFluxes().stream().filter(f -> f.getProductCode().equals(productCode)).collect(Collectors.toList()),
+                                        ReportConstants.AVAILABLE_QUANTITY),
+                                ReportConstants.INITIAL_QUANTITY,
+                                productCode,
+                                currentReport.getLocation())
+                        );
+                    } else {
+                        otherFluxes.add(createOtherFlux(0., ReportConstants.INITIAL_QUANTITY, productCode, currentReport.getLocation()));
+                        otherFluxes.add(createOtherFlux(0., ReportConstants.DISTRIBUTED_QUANTITY_M1, productCode, currentReport.getLocation()));
+                        otherFluxes.add(createOtherFlux(0., ReportConstants.DISTRIBUTED_QUANTITY_M2, productCode, currentReport.getLocation()));
+                    }
+
+                    otherFluxes.add(createOtherFlux(0., ReportConstants.AVAILABLE_QUANTITY, productCode, currentReport.getLocation()));
+                    otherFluxes.add(createOtherFlux(0., ReportConstants.DISTRIBUTED_QUANTITY, productCode, currentReport.getLocation()));
+                    otherFluxes.add(createOtherFlux(0., ReportConstants.ADJUSTMENT_QUANTITY, productCode, currentReport.getLocation()));
+                    otherFluxes.add(createOtherFlux(0., ReportConstants.LOSS_QUANTITY, productCode, currentReport.getLocation()));
+                    if (!currentReport.getLocation().getChildLocations().isEmpty()) {
+                        otherFluxes.add(createOtherFlux(0., ReportConstants.SITES_IN_RUPTURE, productCode, currentReport.getLocation()));
+                    }
+                    otherFluxes.add(createOtherFlux(0., ReportConstants.DAYS_OF_RUPTURE, productCode, currentReport.getLocation()));
+
+                }
+            }
+        }
         return otherFluxes;
     }
 	

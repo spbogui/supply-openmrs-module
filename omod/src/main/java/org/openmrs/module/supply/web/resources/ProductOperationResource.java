@@ -591,6 +591,16 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 												throw new RuntimeException(e);
 											}
 										}
+										Date startDate = null;
+										if (StringUtils.isNotBlank(contextStartDate)) {
+											DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+											try {
+												startDate = sourceFormat.parse(contextEndDate);
+											}
+											catch (ParseException e) {
+												throw new RuntimeException(e);
+											}
+										}
 										if (endDate == null) {
 											ProductOperation operation = getService().getLastProductOperation(type,
 											    productProgram, currentLocation, filter.contains("validated"),
@@ -599,11 +609,21 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 												productOperations.add(operation);
 											}
 										} else {
-											ProductOperation operation = getService().getLastProductOperation(type,
-											    productProgram, currentLocation, filter.contains("validated"),
-											    includeVoided != null && includeVoided.equals("true"), endDate);
-											if (operation != null) {
-												productOperations.add(operation);
+											if (startDate == null) {
+												ProductOperation operation = getService().getLastProductOperation(type,
+												    productProgram, currentLocation, filter.contains("validated"),
+												    includeVoided != null && includeVoided.equals("true"), endDate);
+												if (operation != null) {
+													productOperations.add(operation);
+												}
+											} else {
+												ProductOperation operation = getService().getLastProductOperation(type,
+												    productProgram, currentLocation, filter.contains("validated"),
+												    includeVoided != null && includeVoided.equals("true"), startDate,
+												    endDate);
+												if (operation != null) {
+													productOperations.add(operation);
+												}
 											}
 										}
 									} else if (filter.contains("period")) {

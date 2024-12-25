@@ -1524,7 +1524,7 @@ s
     <!--        </sql>-->
     <!--    </changeSet>-->
 
-    <changeSet id="supply-regime-concept-insert" author="BOGUI SERGE" runAlways="true">
+    <changeSet id="supply2-regime-concept-insert" author="BOGUI SERGE" runAlways="true">
         <sql>
             INSERT INTO supply2_product_regime (concept_id, uuid)
             SELECT answer_concept, c.uuid
@@ -1583,7 +1583,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="location_attribute_is_direct_client-mysql-1" author="BOGUI SERGE" dbms="mysql,mariadb">
+    <changeSet id="supply2-location_attribute_is_direct_client-mysql-1" author="BOGUI SERGE" dbms="mysql,mariadb">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(name)
@@ -1624,7 +1624,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply-create-direct-clients-mysql" author="BOGUI SERGE" runAlways="true" dbms="mysql,mariadb">
+    <changeSet id="supply2-create-direct-clients-mysql" author="BOGUI SERGE" runAlways="true" dbms="mysql,mariadb">
         <sql>
             INSERT INTO location_attribute (location_attribute_id, location_id, attribute_type_id, value_reference,
             uuid, creator, date_created, voided)
@@ -1665,7 +1665,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="location_attribute_program_available-mysql" author="BOGUI SERGE" dbms="mysql,mariadb">
+    <changeSet id="supply2-location_attribute_program_available-mysql" author="BOGUI SERGE" dbms="mysql,mariadb">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
@@ -1697,7 +1697,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="location_attribute_level-mysql" author="BOGUI SERGE" dbms="mysql,mariadb">
+    <changeSet id="supply2-location_attribute_level-mysql" author="BOGUI SERGE" dbms="mysql,mariadb">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
@@ -1729,7 +1729,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="location-attribute-npsp-code-mysql" author="BOGUI SERGE" dbms="mysql,mariadb">
+    <changeSet id="supply2-location-attribute-npsp-code-mysql" author="BOGUI SERGE" dbms="mysql,mariadb">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
@@ -1764,7 +1764,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply-provider-attribute-location" author="BOGUI SERGE" dbms="mysql,mariadb">
+    <changeSet id="supply2-provider-attribute-location" author="BOGUI SERGE" dbms="mysql,mariadb">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
@@ -1820,7 +1820,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply-add-goal-mysql" author="BOGUI SERGE" dbms="mariadb, mysql">
+    <changeSet id="supply2-add-goal-mysql" author="BOGUI SERGE" dbms="mariadb, mysql">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(concept_id)
@@ -1843,7 +1843,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply-update-concept-dispensation-uuid" author="BOGUI SERGE" runAlways="true">
+    <changeSet id="supply2-update-concept-dispensation-uuid" author="BOGUI SERGE" runAlways="true">
         <sql>
             UPDATE concept
             SET uuid = CONCAT(concept_id, 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
@@ -1852,7 +1852,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-update-product-regime-uuid" author="BOGUI SERGE" runAlways="true">
+    <changeSet id="supply2-update-product-regime-uuid-1" author="BOGUI SERGE" runAlways="true">
         <sql>
             UPDATE supply2_product_regime
             SET uuid = CONCAT(concept_id, 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
@@ -1937,7 +1937,7 @@ s
 
     <!-- /ROLES-->
 
-    <changeSet id="add-encounter-type-dispensation" author="BOGUI SERGE">
+    <changeSet id="supply2-add-encounter-type-dispensation" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
@@ -1951,7 +1951,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply-dispensation-encounter-transform-mysql" author="BOGUI SERGE" dbms="mysql, mariadb">
+    <changeSet id="supply2-dispensation-encounter-transform-mysql" author="BOGUI SERGE" dbms="mysql, mariadb">
         <sql>
             INSERT INTO encounter (encounter_type, patient_id, location_id, encounter_datetime, creator, date_created,
             voided, uuid)
@@ -2035,7 +2035,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-insert-product-supply-to-supply2" author="BOGUI SERGE">
+    <changeSet id="supply2-insert-product-supply-to-supply2-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <and>
                 <sqlCheck expectedResult="0">SELECT COUNT(*)
@@ -2307,7 +2307,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-insert-product-regime-members-to-product" author="BOGUI SERGE">
+    <changeSet id="supply2-insert-product-regime-members-to-product-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <and>
                 <sqlCheck expectedResult="0">
@@ -2629,7 +2629,7 @@ s
 
     </changeSet>
 
-    <changeSet id="supply2-update-program-PNLSARVIO" author="BOGUI SERGE">
+    <changeSet id="supply2-update-program-PNLSARVIO-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*)
@@ -2645,7 +2645,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-update-program-PNLSCV" author="BOGUI SERGE">
+    <changeSet id="supply2-update-program-PNLSCV-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*)
@@ -2661,7 +2661,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-update-program-PNLSLAB" author="BOGUI SERGE">
+    <changeSet id="supply2-update-program-PNLSLAB-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*)
@@ -2677,7 +2677,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-update-program-PNLSTRC" author="BOGUI SERGE">
+    <changeSet id="supply2-update-program-PNLSTRC-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*)
@@ -2693,7 +2693,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-update-location-program-PNLSARVIO" author="BOGUI SERGE">
+    <changeSet id="supply2-update-location-program-PNLSARVIO-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
@@ -2712,7 +2712,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-update-location-program-PNLSLAB" author="BOGUI SERGE">
+    <changeSet id="supply2-update-location-program-PNLSLAB-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
@@ -2731,7 +2731,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-update-location-program-PNLSTRC" author="BOGUI SERGE">
+    <changeSet id="supply2-update-location-program-PNLSTRC-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
@@ -2750,7 +2750,7 @@ s
         </sql>
     </changeSet>
 
-    <changeSet id="supply2-update-location-program-PNLSCV" author="BOGUI SERGE">
+    <changeSet id="supply2-update-location-program-PNLSCV-1" author="BOGUI SERGE">
         <preConditions onFail="MARK_RAN">
             <not>
                 <sqlCheck expectedResult="0">
@@ -2924,8 +2924,8 @@ s
     <!--            </sql>-->
     <!--    </changeSet>-->
 
-    <changeSet id="supply2-add-operation-attribute-type-product-list" author="BOGUI SERGE" dbms="mariadb,mysql">
-        <preConditions onFail="MARK_RAN" onError="WARN">
+    <changeSet id="supply2-add-operation-attribute-type-product-list-2" author="BOGUI SERGE" dbms="mariadb,mysql">
+        <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*)
                 FROM supply2_product_operation_attribute_type
@@ -2942,5 +2942,5 @@ s
             <column name="uuid">PRODUCTLISTAAAAAAAAAAAAAAAAAAAAAAAAAAA</column>
         </insert>
     </changeSet>
-    
+
 </databaseChangeLog>

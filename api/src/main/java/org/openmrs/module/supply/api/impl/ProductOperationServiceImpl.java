@@ -148,6 +148,12 @@ public class ProductOperationServiceImpl extends BaseOpenmrsService implements P
 	}
 	
 	@Override
+	public ProductOperation getLastProductOperation(ProductOperationType operationType, ProductProgram program,
+	        Location location, Boolean validated, Boolean includeVoided, Date startDate, Date endDate) throws APIException {
+		return dao.getLastProductOperation(operationType, program, location, validated, includeVoided, startDate, endDate);
+	}
+	
+	@Override
 	public List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, Location location,
 	        Boolean includeVoided) {
 		return dao.getAllProductOperation(operationTypes, location, includeVoided);

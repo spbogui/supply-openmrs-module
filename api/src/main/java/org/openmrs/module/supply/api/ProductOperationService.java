@@ -63,6 +63,9 @@ public interface ProductOperationService extends OpenmrsService {
 	ProductOperation getLastProductOperation(ProductOperationType operationType, ProductProgram program,
 	        String operationNumber, Location location, Boolean validated, Boolean includeVoided) throws APIException;
 	
+	ProductOperation getLastProductOperation(ProductOperationType operationType, ProductProgram program, Location location,
+	        Boolean validated, Boolean includeVoided, Date startDate, Date endDate) throws APIException;
+	
 	List<ProductOperation> getAllProductOperation(List<ProductOperationType> operationTypes, Location location,
 	        Boolean includeVoided);
 	
