@@ -101,12 +101,9 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 	@Override
 	public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
-		//        description.addRequiredProperty("name");
-		//		description.addRequiredProperty("product");
-		//        description.addRequiredProperty("productProgram");
 		description.addRequiredProperty("salePrice");
 		description.addRequiredProperty("purchasePrice");
-		description.addRequiredProperty("location");
+		description.addProperty("location");
 		description.addRequiredProperty("active");
 		description.addProperty("uuid");
 		return description;
@@ -120,7 +117,7 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 		.property("salePrice", new DoubleProperty()).property("purchasePrice", new DoubleProperty())
 		        .property("active", new BooleanProperty())
 		        .property("location", new RefProperty("#/definitions/LocationGet")).property("uuid", new StringProperty());
-		model.required("salePrice").required("purchasePrice").required("location");
+		model.required("salePrice").required("purchasePrice");
 		
 		return model;
 	}
@@ -132,6 +129,7 @@ public class ProductPriceResource extends DelegatingSubResource<ProductPrice, Pr
 		description.addProperty("purchasePrice");
 		description.addProperty("location");
 		description.addProperty("active");
+		description.addProperty("uuid");
 		return description;
 	}
 	

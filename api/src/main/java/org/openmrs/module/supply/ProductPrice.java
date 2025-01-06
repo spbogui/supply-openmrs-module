@@ -22,7 +22,7 @@ public class ProductPrice extends BaseOpenmrsData {
 	//	@JoinColumn(name = "product_program_id", nullable = false)
 	//	private ProductProgram program;
 	
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL, optional = false)
 	@JoinColumn(name = "product_code_id", nullable = false)
 	private ProductCode productCode;
 	
@@ -37,7 +37,7 @@ public class ProductPrice extends BaseOpenmrsData {
 	
 	@SuppressWarnings("JpaAttributeTypeInspection")
 	@ManyToOne
-	@JoinColumn(name = "location_id", nullable = false)
+	@JoinColumn(name = "location_id")
 	private Location location;
 	
 	public ProductPrice() {

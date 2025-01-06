@@ -2943,4 +2943,11 @@ s
         </insert>
     </changeSet>
 
+    <changeSet id="supply2-product-price-location-remove-required" author="BOGUI SERGE">
+        <dropNotNullConstraint
+                columnDataType="int"
+                columnName="location_id"
+                tableName="supply2_product_price"/>
+    </changeSet>
+
 </databaseChangeLog>
