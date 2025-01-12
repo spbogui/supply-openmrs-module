@@ -2950,4 +2950,36 @@ s
                 tableName="supply2_product_price"/>
     </changeSet>
 
+    <!--    <changeSet id="supply-remove-supply-product" author="BOGUI SERGE">-->
+    <!--        <preConditions onFail="MARK_RAN">-->
+    <!--            <and>-->
+    <!--                <tableExists tableName="supply_product"/>-->
+    <!--                <tableExists tableName="supply2_product"/>-->
+    <!--            </and>-->
+    <!--        </preConditions>-->
+    <!--        <dropTable tableName="supply_product"/>-->
+    <!--    </changeSet>-->
+
+    <!--
+    supply_product
+supply_product_attribute
+supply_product_attribute_stock
+supply_product_dispensation
+supply_product_name
+supply_product_operation
+supply_product_operation_attribute
+supply_product_operation_attribute_type
+supply_product_operation_flux
+supply_product_operation_flux_attribute
+supply_product_operation_other_flux
+supply_product_operation_type
+supply_product_operation_type_attribute_type
+supply_product_price
+supply_product_program
+supply_product_program_members
+supply_product_regime
+supply_product_regime_members
+supply_product_unit
+    -->
+
 </databaseChangeLog>

@@ -434,305 +434,528 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
 	}
 	
 	@Override
-	protected PageableResult doSearch(RequestContext context) {
-		// String period = context.getParameter("period");
-		String program = context.getParameter("program");
-		String filter = context.getParameter("filter");
-		String operationType = context.getParameter("type");
-		String operationTypes = context.getParameter("types");
-		String locationUuid = context.getParameter("location");
-		String includeVoided = context.getParameter("includeVoided");
-		String validatedOnly = context.getParameter("validatedOnly");
-		String contextStartDate = context.getParameter("startDate");
-		String contextEndDate = context.getParameter("endDate");
-		String contextOperationNumber = context.getParameter("operationNumber");
-		String isForChildLocations = context.getParameter("forChildLocations");
-		String statuses = context.getParameter("statuses");
-		
-		List<ProductOperation> productOperations = new ArrayList<ProductOperation>();
-		
-		Location currentLocation = StringUtils.isNotBlank(locationUuid) ? Context.getLocationService().getLocationByUuid(
-		    locationUuid) : SupplyUtils.getUserLocation();
-		
-		if (StringUtils.isNotBlank(operationTypes) && !StringUtils.isEmpty(operationTypes)) {
-			String[] stringTypes = operationTypes.split(",");
-			List<ProductOperationType> operationTypeList = new ArrayList<ProductOperationType>();
-			
-			for (String uuid : stringTypes) {
-				ProductOperationType type = getService().getProductOperationType(uuid);
-				if (type != null) {
-					operationTypeList.add(type);
-				}
-			}
-			if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
-				ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(program);
-				if (productProgram != null && !operationTypeList.isEmpty()) {
-					ProductOperation operation = getService().getLastProductOperation(operationTypeList, productProgram,
-					    SupplyUtils.getUserLocation(), includeVoided != null && includeVoided.equals("true"));
-					if (operation != null) {
-						productOperations.add(operation);
-					}
-				}
-			} else {
-				if (!operationTypeList.isEmpty()) {
-					if (StringUtils.isNotBlank(filter) && !StringUtils.isEmpty(filter)) {
-						if (filter.contains("allFromLatestInventories")) {
-							List<ProductOperation> inventories = getService().findLatestOperationsByProgram(
-							    getService().getProductOperationType(OperationConstants.INVENTORY_OPERATION),
-							    SupplyUtils.getUserLocation(), new Date());
-							
-							if (inventories != null) {
-								for (ProductOperation operation : inventories) {
-									List<ProductOperation> operations = getService().getAllProductOperation(
-									    operationTypeList, operation.getProductProgram(), operation.getOperationDate(),
-									    new Date(), currentLocation, validatedOnly != null && validatedOnly.equals("true"),
-									    includeVoided != null && includeVoided.equals("true"),
-									    isForChildLocations != null && isForChildLocations.equals("true"));
-									if (operations != null) {
-										productOperations.addAll(operations);
-									}
-								}
-							}
-						}
-					} else {
-						List<ProductOperation> operations = getService().getAllProductOperationByTypes(operationTypeList,
-						    currentLocation, validatedOnly != null && validatedOnly.equals("true"),
-						    includeVoided != null && includeVoided.equals("true"));
-						if (operations != null) {
-							productOperations.addAll(operations);
-						}
-					}
-				}
-			}
-		} else {
-			if (StringUtils.isNotBlank(operationType) && !StringUtils.isEmpty(operationType)) {
-				ProductOperationType type = getService().getProductOperationType(operationType);
-				if (type != null) {
-					if (StringUtils.isNotBlank(filter) && !StringUtils.isEmpty(filter)) {
-						
-						if (filter.contains("latestByProgram")) {
-							List<ProductOperation> operations = getService().findLatestOperationsByProgram(type,
-							    SupplyUtils.getUserLocation(), new Date());
-							if (operations != null) {
-								productOperations.addAll(operations);
-							}
-						} else if (filter.contains("allFromLatestInventories")) {
-							List<ProductOperation> inventories = getService().findLatestOperationsByProgram(
-							    getService().getProductOperationType(OperationConstants.INVENTORY_OPERATION),
-							    SupplyUtils.getUserLocation(), new Date());
-							
-							if (inventories != null) {
-								
-								for (ProductOperation operation : inventories) {
-									List<ProductOperation> operations = getService().getAllProductOperation(type,
-									    operation.getProductProgram(), operation.getOperationDate(), new Date(),
-									    currentLocation, validatedOnly != null && validatedOnly.equals("true"),
-									    includeVoided != null && includeVoided.equals("true"), false);
-									if (operations != null) {
-										productOperations.addAll(operations);
-									}
-								}
-							}
-							
-						} else if (filter.contains("operationNumber")) {
-							String operationNumber = filter.split(":")[1].replaceAll("Ã©", "é").replaceAll("Ã»", "û");
-							Date endDate = null;
-							if (StringUtils.isNotBlank(contextEndDate)) {
-								DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
-								try {
-									endDate = sourceFormat.parse(contextEndDate);
-								}
-								catch (ParseException e) {
-									throw new RuntimeException(e);
-								}
-							}
-							if (filter.contains("last")) {
-								if (endDate == null) {
-									ProductOperation operation = getService().getProductOperationByOperationNumber(type,
-									    operationNumber, currentLocation, filter.contains("validated"));
-									if (operation != null) {
-										productOperations.add(operation);
-									}
-								} else {
-									ProductOperation operation = getService().getProductOperationByOperationNumber(type,
-									    operationNumber, currentLocation, filter.contains("validated"), endDate);
-									if (operation != null) {
-										productOperations.add(operation);
-									}
-								}
-							} else {
-								if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
-									ProductProgram productProgram = Context.getService(ProductService.class)
-									        .getProductProgram(program);
-									if (productProgram != null) {
-										ProductOperation operation = getService().getProductOperationByOperationNumber(type,
-										    productProgram, operationNumber, currentLocation, filter.contains("validated"));
-										if (operation != null) {
-											productOperations.add(operation);
-										}
-									}
-								}
-							}
-						} else {
-							
-							if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
-								ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(
-								    program);
-								if (productProgram != null) {
-									if (filter.contains("last")) {
-										
-										Date endDate = null;
-										if (StringUtils.isNotBlank(contextEndDate)) {
-											DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
-											try {
-												endDate = sourceFormat.parse(contextEndDate);
-											}
-											catch (ParseException e) {
-												throw new RuntimeException(e);
-											}
-										}
-										Date startDate = null;
-										if (StringUtils.isNotBlank(contextStartDate)) {
-											DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
-											try {
-												startDate = sourceFormat.parse(contextEndDate);
-											}
-											catch (ParseException e) {
-												throw new RuntimeException(e);
-											}
-										}
-										if (endDate == null) {
-											ProductOperation operation = getService().getLastProductOperation(type,
-											    productProgram, currentLocation, filter.contains("validated"),
-											    includeVoided != null && includeVoided.equals("true"));
-											if (operation != null) {
-												productOperations.add(operation);
-											}
-										} else {
-											if (startDate == null) {
-												ProductOperation operation = getService().getLastProductOperation(type,
-												    productProgram, currentLocation, filter.contains("validated"),
-												    includeVoided != null && includeVoided.equals("true"), endDate);
-												if (operation != null) {
-													productOperations.add(operation);
-												}
-											} else {
-												ProductOperation operation = getService().getLastProductOperation(type,
-												    productProgram, currentLocation, filter.contains("validated"),
-												    includeVoided != null && includeVoided.equals("true"), startDate,
-												    endDate);
-												if (operation != null) {
-													productOperations.add(operation);
-												}
-											}
-										}
-									} else if (filter.contains("period")) {
-										DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
-										String startDateString = filter.split(",")[0].split(":")[1];
-										String endDateString = filter.split(",")[1].split(":")[1];
-										try {
-											Date startDate = sourceFormat.parse(startDateString);
-											Date endDate = sourceFormat.parse(endDateString);
-											List<ProductOperation> operations = getService().getAllProductOperation(type,
-											    productProgram, startDate, endDate, currentLocation, true,
-											    includeVoided != null && includeVoided.equals("true"));
-											
-											if (operations != null) {
-												productOperations.addAll(operations);
-											}
-										}
-										catch (ParseException e) {
-											throw new RuntimeException(e);
-										}
-									}
-								}
-							}
-						}
-					} else {
-						Date startDate = null;
-						Date endDate = null;
-						if (StringUtils.isNotBlank(contextStartDate)) {
-							DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
-							try {
-								startDate = sourceFormat.parse(contextStartDate);
-								if (StringUtils.isNotBlank(contextEndDate)) {
-									endDate = sourceFormat.parse(contextEndDate);
-								} else {
-									endDate = new Date();
-								}
-							}
-							catch (ParseException e) {
-								throw new RuntimeException(e);
-							}
-						}
-						if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
-							ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(
-							    program);
-							if (productProgram != null) {
-								if (StringUtils.isNotBlank(contextOperationNumber)) {
-									if (startDate != null && endDate != null) {
-										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
-										    contextOperationNumber, startDate, endDate, currentLocation,
-										    validatedOnly != null && validatedOnly.equals("true"),
-										    includeVoided != null && includeVoided.equals("true"),
-										    isForChildLocations != null && isForChildLocations.equals("true")));
-									} else if (startDate != null) {
-										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
-										    contextOperationNumber, startDate, new Date(), currentLocation,
-										    validatedOnly != null && validatedOnly.equals("true"),
-										    includeVoided != null && includeVoided.equals("true"),
-										    isForChildLocations != null && isForChildLocations.equals("true")));
-									} else {
-										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
-										    contextOperationNumber, currentLocation,
-										    validatedOnly != null && validatedOnly.equals("true"),
-										    includeVoided != null && includeVoided.equals("true"),
-										    isForChildLocations != null && isForChildLocations.equals("true")));
-									}
-								} else {
-									if (startDate != null && endDate != null) {
-										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
-										    startDate, endDate, currentLocation,
-										    validatedOnly != null && validatedOnly.equals("true"),
-										    includeVoided != null && includeVoided.equals("true"),
-										    isForChildLocations != null && isForChildLocations.equals("true")));
-									} else if (startDate != null) {
-										productOperations.addAll(getService().getAllProductOperation(type, productProgram,
-										    startDate, new Date(), currentLocation,
-										    validatedOnly != null && validatedOnly.equals("true"),
-										    includeVoided != null && includeVoided.equals("true"),
-										    isForChildLocations != null && isForChildLocations.equals("true")));
-									}
-								}
-							}
-							
-						} else {
-							if (startDate != null) {
-								productOperations.addAll(getService().getAllProductOperation(type, currentLocation,
-								    startDate, endDate, validatedOnly != null && validatedOnly.equals("true"),
-								    includeVoided != null && includeVoided.equals("true")));
-							} else {
-								productOperations.addAll(getService().getAllProductOperation(type, currentLocation, false,
-								    includeVoided != null && includeVoided.equals("true")));
-							}
-						}
-						
-					}
-				}
-			} else {
-				if (StringUtils.isNotBlank(filter) && StringUtils.isNotEmpty(filter)) {
-					if (filter.contains("operationNumber")) {
-						String operationNumber = filter.split(",")[0].split(":")[1];
-						List<ProductOperation> operations = getService().getProductOperationByOperationNumber(
-						    operationNumber, currentLocation, filter.contains("validated"));
-						if (operations != null) {
-							productOperations.addAll(operations);
-						}
-					}
-				}
-			}
-		}
-		
-		return new NeedsPaging<ProductOperation>(productOperations, context);
-	}
+    protected PageableResult doSearch(RequestContext context) {
+        // String period = context.getParameter("period");
+        String program = context.getParameter("program");
+        String filter = context.getParameter("filter");
+        String operationType = context.getParameter("type");
+        String operationTypes = context.getParameter("types");
+        String locationUuid = context.getParameter("location");
+        String includeVoided = context.getParameter("includeVoided");
+        String validatedOnly = context.getParameter("validatedOnly");
+        String contextStartDate = context.getParameter("startDate");
+        String contextEndDate = context.getParameter("endDate");
+        String contextOperationNumber = context.getParameter("operationNumber");
+        String isForChildLocations = context.getParameter("forChildLocations");
+        String statuses = context.getParameter("statuses");
+
+        List<ProductOperation> productOperations = new ArrayList<ProductOperation>();
+
+        Location currentLocation = StringUtils.isNotBlank(locationUuid) ? Context.getLocationService().getLocationByUuid(
+                locationUuid) : SupplyUtils.getUserLocation();
+
+        List<ProductOperationType> productOperationTypes = new ArrayList<>();
+        if (StringUtils.isNotBlank(operationTypes) && !StringUtils.isEmpty(operationTypes)) {
+            for (String uuid : operationTypes.split(",")) {
+                ProductOperationType type = getService().getProductOperationType(uuid);
+                if (type != null) {
+                    productOperationTypes.add(type);
+                }
+            }
+        }
+        ProductOperationType productOperationType = getService().getProductOperationType(operationType);
+
+        Date finalStartDate = null;
+        Date finalEndDate = null;
+
+        DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            if (StringUtils.isNotBlank(contextStartDate) && !StringUtils.isEmpty(contextStartDate)) {
+                finalStartDate = sourceFormat.parse(contextStartDate);
+            }
+            if (StringUtils.isNotBlank(contextEndDate) && !StringUtils.isEmpty(contextEndDate)) {
+                finalEndDate = sourceFormat.parse(contextEndDate);
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        ProductProgram productProgram = null;
+        if (StringUtils.isNotBlank(program) && !StringUtils.isEmpty(program)) {
+            productProgram = Context.getService(ProductService.class)
+                    .getProductProgram(program);
+        }
+
+        if (productOperationType != null) {
+            if (productProgram == null) {
+                if (StringUtils.isNotBlank(filter) && !StringUtils.isEmpty(filter)) {
+                    if (filter.contains("latestByProgram")) {
+                        List<ProductOperation> operations = getService().findLatestOperationsByProgram(productOperationType,
+                                SupplyUtils.getUserLocation(), new Date());
+                        if (operations != null) {
+                            productOperations.addAll(operations);
+                        }
+                    } else if (filter.contains("allFromLatestInventories")) {
+                        List<ProductOperation> inventories = getService().findLatestOperationsByProgram(
+                                getService().getProductOperationType(OperationConstants.INVENTORY_OPERATION),
+                                SupplyUtils.getUserLocation(), new Date());
+                        if (inventories != null) {
+                            for (ProductOperation operation : inventories) {
+                                List<ProductOperation> operations = getService().getAllProductOperation(productOperationType,
+                                        operation.getProductProgram(), operation.getOperationDate(), new Date(),
+                                        currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+                                        includeVoided != null && includeVoided.equals("true"), false);
+                                if (operations != null) {
+                                    productOperations.addAll(operations);
+                                }
+                            }
+                        }
+                    } else if (filter.contains("operationNumber")) {
+                        String operationNumber = filter.split(":")[1].replaceAll("Ã©", "é").replaceAll("Ã»", "û");
+                        if (filter.contains("last")) {
+                            if (finalEndDate == null) {
+                                ProductOperation operation = getService().getProductOperationByOperationNumber(productOperationType,
+                                        operationNumber, currentLocation, filter.contains("validated"));
+                                if (operation != null) {
+                                    productOperations.add(operation);
+                                }
+                            } else {
+                                ProductOperation operation = getService().getProductOperationByOperationNumber(productOperationType,
+                                        operationNumber, currentLocation, filter.contains("validated"), finalEndDate);
+                                if (operation != null) {
+                                    productOperations.add(operation);
+                                }
+                            }
+                        } else {
+
+                        }
+                    }
+                } else {
+                    if (finalStartDate != null && finalEndDate != null) {
+                        productOperations.addAll(getService().getAllProductOperation(productOperationType, currentLocation,
+                                finalStartDate, finalEndDate, validatedOnly != null && validatedOnly.equals("true"),
+                                includeVoided != null && includeVoided.equals("true")));
+                    } else {
+                        productOperations.addAll(getService().getAllProductOperation(productOperationType, currentLocation, false,
+                                includeVoided != null && includeVoided.equals("true")));
+                    }
+                }
+            } else {
+                if (filter.contains("operationNumber")) {
+                    String operationNumber = filter.split(":")[1].replaceAll("Ã©", "é").replaceAll("Ã»", "û");
+                    ProductOperation operation = getService().getProductOperationByOperationNumber(productOperationType,
+                            productProgram, operationNumber, currentLocation, filter.contains("validated"));
+                    if (operation != null) {
+                        productOperations.add(operation);
+                    }
+                } else if (filter.contains("last")) {
+                    if (finalEndDate == null) {
+                        ProductOperation operation = getService().getLastProductOperation(productOperationType,
+                                productProgram, currentLocation, filter.contains("validated"),
+                                includeVoided != null && includeVoided.equals("true"));
+                        if (operation != null) {
+                            productOperations.add(operation);
+                        }
+                    } else {
+                        if (finalStartDate == null) {
+                            ProductOperation operation = getService().getLastProductOperation(productOperationType,
+                                    productProgram, currentLocation, filter.contains("validated"),
+                                    includeVoided != null && includeVoided.equals("true"), finalEndDate);
+                            if (operation != null) {
+                                productOperations.add(operation);
+                            }
+                        } else {
+                            ProductOperation operation = getService().getLastProductOperation(productOperationType,
+                                    productProgram, currentLocation, filter.contains("validated"),
+                                    includeVoided != null && includeVoided.equals("true"), finalStartDate,
+                                    finalEndDate);
+                            if (operation != null) {
+                                productOperations.add(operation);
+                            }
+                        }
+                    }
+                } else if (filter.contains("period")) {
+                    String startDateString = filter.split(",")[0].split(":")[1];
+                    String endDateString = filter.split(",")[1].split(":")[1];
+                    try {
+                        Date startDate = sourceFormat.parse(startDateString);
+                        Date endDate = sourceFormat.parse(endDateString);
+                        List<ProductOperation> operations = getService().getAllProductOperation(productOperationType,
+                                productProgram, startDate, endDate, currentLocation, true,
+                                includeVoided != null && includeVoided.equals("true"));
+
+                        if (operations != null) {
+                            productOperations.addAll(operations);
+                        }
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else if (StringUtils.isBlank(filter)) {
+                    // Blank filter
+                    if (StringUtils.isNotBlank(contextOperationNumber)) {
+                        if (finalStartDate != null && finalEndDate != null) {
+                            productOperations.addAll(getService().getAllProductOperation(productOperationType, productProgram,
+                                    contextOperationNumber, finalStartDate, finalEndDate, currentLocation,
+                                    validatedOnly != null && validatedOnly.equals("true"),
+                                    includeVoided != null && includeVoided.equals("true"),
+                                    isForChildLocations != null && isForChildLocations.equals("true")));
+                        } else if (finalStartDate != null) {
+                            productOperations.addAll(getService().getAllProductOperation(productOperationType, productProgram,
+                                    contextOperationNumber, finalStartDate, new Date(), currentLocation,
+                                    validatedOnly != null && validatedOnly.equals("true"),
+                                    includeVoided != null && includeVoided.equals("true"),
+                                    isForChildLocations != null && isForChildLocations.equals("true")));
+                        } else {
+                            productOperations.addAll(getService().getAllProductOperation(productOperationType, productProgram,
+                                    contextOperationNumber, currentLocation,
+                                    validatedOnly != null && validatedOnly.equals("true"),
+                                    includeVoided != null && includeVoided.equals("true"),
+                                    isForChildLocations != null && isForChildLocations.equals("true")));
+                        }
+                    } else {
+                        if (finalStartDate != null && finalEndDate != null) {
+                            productOperations.addAll(getService().getAllProductOperation(productOperationType, productProgram,
+                                    finalStartDate, finalEndDate, currentLocation,
+                                    validatedOnly != null && validatedOnly.equals("true"),
+                                    includeVoided != null && includeVoided.equals("true"),
+                                    isForChildLocations != null && isForChildLocations.equals("true")));
+                        } else if (finalStartDate != null) {
+                            productOperations.addAll(getService().getAllProductOperation(productOperationType, productProgram,
+                                    finalStartDate, new Date(), currentLocation,
+                                    validatedOnly != null && validatedOnly.equals("true"),
+                                    includeVoided != null && includeVoided.equals("true"),
+                                    isForChildLocations != null && isForChildLocations.equals("true")));
+                        }
+                    }
+                }
+            }
+        } else if (!productOperationTypes.isEmpty()) {
+            if (productProgram != null) {
+                if (finalStartDate != null && finalEndDate != null) {
+                    List<ProductOperation> operations = getService().getAllProductOperation(
+                            productOperationTypes,
+                            finalStartDate,
+                            finalEndDate,
+                            currentLocation,
+                            validatedOnly != null && validatedOnly.equals("true"),
+                            includeVoided != null && includeVoided.equals("true"),
+                            isForChildLocations != null && isForChildLocations.equals("true")
+                    );
+                    if (operations != null) {
+                        productOperations.addAll(operations);
+                    }
+                } else {
+                    ProductOperation operation = getService().getLastProductOperation(productOperationTypes, productProgram,
+                            SupplyUtils.getUserLocation(), includeVoided != null && includeVoided.equals("true"));
+                    if (operation != null) {
+                        productOperations.add(operation);
+                    }
+                }
+            } else {
+                if (StringUtils.isNotBlank(filter) && !StringUtils.isEmpty(filter)) {
+                    if (filter.contains("allFromLatestInventories")) {
+                        List<ProductOperation> inventories = getService().findLatestOperationsByProgram(
+                                getService().getProductOperationType(OperationConstants.INVENTORY_OPERATION),
+                                SupplyUtils.getUserLocation(), new Date());
+
+                        if (inventories != null) {
+                            for (ProductOperation operation : inventories) {
+                                List<ProductOperation> operations = getService().getAllProductOperation(
+                                        productOperationTypes, operation.getProductProgram(), operation.getOperationDate(),
+                                        new Date(), currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+                                        includeVoided != null && includeVoided.equals("true"),
+                                        isForChildLocations != null && isForChildLocations.equals("true"));
+                                if (operations != null) {
+                                    productOperations.addAll(operations);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    List<ProductOperation> operations = getService().getAllProductOperationByTypes(productOperationTypes,
+                            currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+                            includeVoided != null && includeVoided.equals("true"));
+                    if (operations != null) {
+                        productOperations.addAll(operations);
+                    }
+                }
+            }
+        }
+
+//        if (StringUtils.isNotBlank(operationTypes) && !StringUtils.isEmpty(operationTypes)) {
+//            String[] stringTypes = operationTypes.split(",");
+//            List<ProductOperationType> operationTypeList = new ArrayList<ProductOperationType>();
+//
+//            for (String uuid : stringTypes) {
+//                ProductOperationType type = getService().getProductOperationType(uuid);
+//                if (type != null) {
+//                    operationTypeList.add(type);
+//                }
+//            }
+//            if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
+//                ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(program);
+//                if (productProgram != null && !operationTypeList.isEmpty()) {
+//                    ProductOperation operation = getService().getLastProductOperation(operationTypeList, productProgram,
+//                            SupplyUtils.getUserLocation(), includeVoided != null && includeVoided.equals("true"));
+//                    if (operation != null) {
+//                        productOperations.add(operation);
+//                    }
+//                }
+//            } else {
+//                if (!operationTypeList.isEmpty()) {
+//                    if (StringUtils.isNotBlank(filter) && !StringUtils.isEmpty(filter)) {
+//                        if (filter.contains("allFromLatestInventories")) {
+//                            List<ProductOperation> inventories = getService().findLatestOperationsByProgram(
+//                                    getService().getProductOperationType(OperationConstants.INVENTORY_OPERATION),
+//                                    SupplyUtils.getUserLocation(), new Date());
+//
+//                            if (inventories != null) {
+//                                for (ProductOperation operation : inventories) {
+//                                    List<ProductOperation> operations = getService().getAllProductOperation(
+//                                            operationTypeList, operation.getProductProgram(), operation.getOperationDate(),
+//                                            new Date(), currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+//                                            includeVoided != null && includeVoided.equals("true"),
+//                                            isForChildLocations != null && isForChildLocations.equals("true"));
+//                                    if (operations != null) {
+//                                        productOperations.addAll(operations);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    } else {
+//                        List<ProductOperation> operations = getService().getAllProductOperationByTypes(operationTypeList,
+//                                currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+//                                includeVoided != null && includeVoided.equals("true"));
+//                        if (operations != null) {
+//                            productOperations.addAll(operations);
+//                        }
+//                    }
+//                }
+//            }
+//        } else {
+//            if (StringUtils.isNotBlank(operationType) && !StringUtils.isEmpty(operationType)) {
+//                ProductOperationType type = getService().getProductOperationType(operationType);
+//                if (type != null) {
+//                    if (StringUtils.isNotBlank(filter) && !StringUtils.isEmpty(filter)) {
+//
+//                        if (filter.contains("latestByProgram")) {
+//                            List<ProductOperation> operations = getService().findLatestOperationsByProgram(type,
+//                                    SupplyUtils.getUserLocation(), new Date());
+//                            if (operations != null) {
+//                                productOperations.addAll(operations);
+//                            }
+//                        } else if (filter.contains("allFromLatestInventories")) {
+//                            List<ProductOperation> inventories = getService().findLatestOperationsByProgram(
+//                                    getService().getProductOperationType(OperationConstants.INVENTORY_OPERATION),
+//                                    SupplyUtils.getUserLocation(), new Date());
+//
+//                            if (inventories != null) {
+//
+//                                for (ProductOperation operation : inventories) {
+//                                    List<ProductOperation> operations = getService().getAllProductOperation(type,
+//                                            operation.getProductProgram(), operation.getOperationDate(), new Date(),
+//                                            currentLocation, validatedOnly != null && validatedOnly.equals("true"),
+//                                            includeVoided != null && includeVoided.equals("true"), false);
+//                                    if (operations != null) {
+//                                        productOperations.addAll(operations);
+//                                    }
+//                                }
+//                            }
+//
+//                        } else if (filter.contains("operationNumber")) {
+//                            String operationNumber = filter.split(":")[1].replaceAll("Ã©", "é").replaceAll("Ã»", "û");
+//                            Date endDate = null;
+//                            if (StringUtils.isNotBlank(contextEndDate)) {
+//                                DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+//                                try {
+//                                    endDate = sourceFormat.parse(contextEndDate);
+//                                } catch (ParseException e) {
+//                                    throw new RuntimeException(e);
+//                                }
+//                            }
+//                            if (filter.contains("last")) {
+//                                if (endDate == null) {
+//                                    ProductOperation operation = getService().getProductOperationByOperationNumber(type,
+//                                            operationNumber, currentLocation, filter.contains("validated"));
+//                                    if (operation != null) {
+//                                        productOperations.add(operation);
+//                                    }
+//                                } else {
+//                                    ProductOperation operation = getService().getProductOperationByOperationNumber(type,
+//                                            operationNumber, currentLocation, filter.contains("validated"), endDate);
+//                                    if (operation != null) {
+//                                        productOperations.add(operation);
+//                                    }
+//                                }
+//                            } else {
+//                                if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
+//                                    ProductProgram productProgram = Context.getService(ProductService.class)
+//                                            .getProductProgram(program);
+//                                    if (productProgram != null) {
+//                                        ProductOperation operation = getService().getProductOperationByOperationNumber(type,
+//                                                productProgram, operationNumber, currentLocation, filter.contains("validated"));
+//                                        if (operation != null) {
+//                                            productOperations.add(operation);
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        } else {
+//
+//                            if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
+//                                ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(
+//                                        program);
+//                                if (productProgram != null) {
+//                                    if (filter.contains("last")) {
+//
+//                                        Date endDate = null;
+//                                        if (StringUtils.isNotBlank(contextEndDate)) {
+//                                            DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+//                                            try {
+//                                                endDate = sourceFormat.parse(contextEndDate);
+//                                            } catch (ParseException e) {
+//                                                throw new RuntimeException(e);
+//                                            }
+//                                        }
+//                                        Date startDate = null;
+//                                        if (StringUtils.isNotBlank(contextStartDate)) {
+//                                            DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+//                                            try {
+//                                                startDate = sourceFormat.parse(contextEndDate);
+//                                            } catch (ParseException e) {
+//                                                throw new RuntimeException(e);
+//                                            }
+//                                        }
+//                                        if (endDate == null) {
+//                                            ProductOperation operation = getService().getLastProductOperation(type,
+//                                                    productProgram, currentLocation, filter.contains("validated"),
+//                                                    includeVoided != null && includeVoided.equals("true"));
+//                                            if (operation != null) {
+//                                                productOperations.add(operation);
+//                                            }
+//                                        } else {
+//                                            if (startDate == null) {
+//                                                ProductOperation operation = getService().getLastProductOperation(type,
+//                                                        productProgram, currentLocation, filter.contains("validated"),
+//                                                        includeVoided != null && includeVoided.equals("true"), endDate);
+//                                                if (operation != null) {
+//                                                    productOperations.add(operation);
+//                                                }
+//                                            } else {
+//                                                ProductOperation operation = getService().getLastProductOperation(type,
+//                                                        productProgram, currentLocation, filter.contains("validated"),
+//                                                        includeVoided != null && includeVoided.equals("true"), startDate,
+//                                                        endDate);
+//                                                if (operation != null) {
+//                                                    productOperations.add(operation);
+//                                                }
+//                                            }
+//                                        }
+//                                    } else if (filter.contains("period")) {
+// //                                        DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+//                                        String startDateString = filter.split(",")[0].split(":")[1];
+//                                        String endDateString = filter.split(",")[1].split(":")[1];
+//                                        try {
+//                                            Date startDate = sourceFormat.parse(startDateString);
+//                                            Date endDate = sourceFormat.parse(endDateString);
+//                                            List<ProductOperation> operations = getService().getAllProductOperation(type,
+//                                                    productProgram, startDate, endDate, currentLocation, true,
+//                                                    includeVoided != null && includeVoided.equals("true"));
+//
+//                                            if (operations != null) {
+//                                                productOperations.addAll(operations);
+//                                            }
+//                                        } catch (ParseException e) {
+//                                            throw new RuntimeException(e);
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    } else {
+//                        Date startDate = null;
+//                        Date endDate = null;
+//                        if (StringUtils.isNotBlank(contextStartDate)) {
+//                            DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+//                            try {
+//                                startDate = sourceFormat.parse(contextStartDate);
+//                                if (StringUtils.isNotBlank(contextEndDate)) {
+//                                    endDate = sourceFormat.parse(contextEndDate);
+//                                } else {
+//                                    endDate = new Date();
+//                                }
+//                            } catch (ParseException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                        }
+//                        if (StringUtils.isNotBlank(program) && StringUtils.isNotEmpty(program)) {
+//                            ProductProgram productProgram = Context.getService(ProductService.class).getProductProgram(
+//                                    program);
+//                            if (productProgram != null) {
+//                                if (StringUtils.isNotBlank(contextOperationNumber)) {
+//                                    if (startDate != null && endDate != null) {
+//                                        productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+//                                                contextOperationNumber, startDate, endDate, currentLocation,
+//                                                validatedOnly != null && validatedOnly.equals("true"),
+//                                                includeVoided != null && includeVoided.equals("true"),
+//                                                isForChildLocations != null && isForChildLocations.equals("true")));
+//                                    } else if (startDate != null) {
+//                                        productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+//                                                contextOperationNumber, startDate, new Date(), currentLocation,
+//                                                validatedOnly != null && validatedOnly.equals("true"),
+//                                                includeVoided != null && includeVoided.equals("true"),
+//                                                isForChildLocations != null && isForChildLocations.equals("true")));
+//                                    } else {
+//                                        productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+//                                                contextOperationNumber, currentLocation,
+//                                                validatedOnly != null && validatedOnly.equals("true"),
+//                                                includeVoided != null && includeVoided.equals("true"),
+//                                                isForChildLocations != null && isForChildLocations.equals("true")));
+//                                    }
+//                                } else {
+//                                    if (startDate != null && endDate != null) {
+//                                        productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+//                                                startDate, endDate, currentLocation,
+//                                                validatedOnly != null && validatedOnly.equals("true"),
+//                                                includeVoided != null && includeVoided.equals("true"),
+//                                                isForChildLocations != null && isForChildLocations.equals("true")));
+//                                    } else if (startDate != null) {
+//                                        productOperations.addAll(getService().getAllProductOperation(type, productProgram,
+//                                                startDate, new Date(), currentLocation,
+//                                                validatedOnly != null && validatedOnly.equals("true"),
+//                                                includeVoided != null && includeVoided.equals("true"),
+//                                                isForChildLocations != null && isForChildLocations.equals("true")));
+//                                    }
+//                                }
+//                            }
+//
+//                        } else {
+//                            if (startDate != null) {
+//                                productOperations.addAll(getService().getAllProductOperation(type, currentLocation,
+//                                        startDate, endDate, validatedOnly != null && validatedOnly.equals("true"),
+//                                        includeVoided != null && includeVoided.equals("true")));
+//                            } else {
+//                                productOperations.addAll(getService().getAllProductOperation(type, currentLocation, false,
+//                                        includeVoided != null && includeVoided.equals("true")));
+//                            }
+//                        }
+//
+//                    }
+//                }
+//            } else {
+//                if (StringUtils.isNotBlank(filter) && StringUtils.isNotEmpty(filter)) {
+//                    if (filter.contains("operationNumber")) {
+//                        String operationNumber = filter.split(",")[0].split(":")[1];
+//                        List<ProductOperation> operations = getService().getProductOperationByOperationNumber(
+//                                operationNumber, currentLocation, filter.contains("validated"));
+//                        if (operations != null) {
+//                            productOperations.addAll(operations);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+        return new NeedsPaging<ProductOperation>(productOperations, context);
+    }
 }
