@@ -541,56 +541,58 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
                     }
                 }
             } else {
-                if (filter.contains("operationNumber")) {
-                    String operationNumber = filter.split(":")[1].replaceAll("Ã©", "é").replaceAll("Ã»", "û");
-                    ProductOperation operation = getService().getProductOperationByOperationNumber(productOperationType,
-                            productProgram, operationNumber, currentLocation, filter.contains("validated"));
-                    if (operation != null) {
-                        productOperations.add(operation);
-                    }
-                } else if (filter.contains("last")) {
-                    if (finalEndDate == null) {
-                        ProductOperation operation = getService().getLastProductOperation(productOperationType,
-                                productProgram, currentLocation, filter.contains("validated"),
-                                includeVoided != null && includeVoided.equals("true"));
+                if (StringUtils.isNotBlank(filter) && StringUtils.isNotEmpty(filter)) {
+                    if (filter.contains("operationNumber")) {
+                        String operationNumber = filter.split(":")[1].replaceAll("Ã©", "é").replaceAll("Ã»", "û");
+                        ProductOperation operation = getService().getProductOperationByOperationNumber(productOperationType,
+                                productProgram, operationNumber, currentLocation, filter.contains("validated"));
                         if (operation != null) {
                             productOperations.add(operation);
                         }
-                    } else {
-                        if (finalStartDate == null) {
+                    } else if (filter.contains("last")) {
+                        if (finalEndDate == null) {
                             ProductOperation operation = getService().getLastProductOperation(productOperationType,
                                     productProgram, currentLocation, filter.contains("validated"),
-                                    includeVoided != null && includeVoided.equals("true"), finalEndDate);
+                                    includeVoided != null && includeVoided.equals("true"));
                             if (operation != null) {
                                 productOperations.add(operation);
                             }
                         } else {
-                            ProductOperation operation = getService().getLastProductOperation(productOperationType,
-                                    productProgram, currentLocation, filter.contains("validated"),
-                                    includeVoided != null && includeVoided.equals("true"), finalStartDate,
-                                    finalEndDate);
-                            if (operation != null) {
-                                productOperations.add(operation);
+                            if (finalStartDate == null) {
+                                ProductOperation operation = getService().getLastProductOperation(productOperationType,
+                                        productProgram, currentLocation, filter.contains("validated"),
+                                        includeVoided != null && includeVoided.equals("true"), finalEndDate);
+                                if (operation != null) {
+                                    productOperations.add(operation);
+                                }
+                            } else {
+                                ProductOperation operation = getService().getLastProductOperation(productOperationType,
+                                        productProgram, currentLocation, filter.contains("validated"),
+                                        includeVoided != null && includeVoided.equals("true"), finalStartDate,
+                                        finalEndDate);
+                                if (operation != null) {
+                                    productOperations.add(operation);
+                                }
                             }
                         }
-                    }
-                } else if (filter.contains("period")) {
-                    String startDateString = filter.split(",")[0].split(":")[1];
-                    String endDateString = filter.split(",")[1].split(":")[1];
-                    try {
-                        Date startDate = sourceFormat.parse(startDateString);
-                        Date endDate = sourceFormat.parse(endDateString);
-                        List<ProductOperation> operations = getService().getAllProductOperation(productOperationType,
-                                productProgram, startDate, endDate, currentLocation, true,
-                                includeVoided != null && includeVoided.equals("true"));
+                    } else if (filter.contains("period")) {
+                        String startDateString = filter.split(",")[0].split(":")[1];
+                        String endDateString = filter.split(",")[1].split(":")[1];
+                        try {
+                            Date startDate = sourceFormat.parse(startDateString);
+                            Date endDate = sourceFormat.parse(endDateString);
+                            List<ProductOperation> operations = getService().getAllProductOperation(productOperationType,
+                                    productProgram, startDate, endDate, currentLocation, true,
+                                    includeVoided != null && includeVoided.equals("true"));
 
-                        if (operations != null) {
-                            productOperations.addAll(operations);
+                            if (operations != null) {
+                                productOperations.addAll(operations);
+                            }
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
                         }
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
                     }
-                } else if (StringUtils.isBlank(filter)) {
+                } else {
                     // Blank filter
                     if (StringUtils.isNotBlank(contextOperationNumber)) {
                         if (finalStartDate != null && finalEndDate != null) {
@@ -625,6 +627,11 @@ public class ProductOperationResource extends DataDelegatingCrudResource<Product
                                     validatedOnly != null && validatedOnly.equals("true"),
                                     includeVoided != null && includeVoided.equals("true"),
                                     isForChildLocations != null && isForChildLocations.equals("true")));
+                        } else {
+                            productOperations.addAll(getService().getAllProductOperation(productOperationType, productProgram,
+                                    currentLocation,
+                                    validatedOnly != null && validatedOnly.equals("true"),
+                                    includeVoided != null && includeVoided.equals("true")));
                         }
                     }
                 }
